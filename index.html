@@ -435,6 +435,30 @@
     .empty-list { color: var(--muted); text-align: center; padding: 32px 16px; font-size: 14px; }
 
     .hidden-file { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+    .report-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+    .report-cloud {
+      appearance: none; border: 1px solid var(--line); background: #fff; color: var(--blue);
+      border-radius: 8px; width: 40px; height: 40px; min-width: 40px; padding: 0;
+      display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+    .report-cloud svg { width: 20px; height: 20px; fill: currentColor; }
+    .report-cloud:hover, .report-cloud:focus-visible { background: var(--blue-light); outline: none; }
+    .btn-ico { display: inline-flex; align-items: center; gap: 6px; }
+    .btn-ico svg { width: 18px; height: 18px; fill: currentColor; flex-shrink: 0; }
+    .choice-overlay {
+      position: fixed; inset: 0; z-index: 140; background: rgba(16,24,40,.45);
+      display: none; align-items: center; justify-content: center;
+      padding: max(16px, var(--sat)) 16px max(16px, var(--sab));
+    }
+    .choice-overlay.open { display: flex; }
+    .choice-dialog {
+      background: #fff; color: var(--text); border-radius: 12px;
+      padding: 18px 16px 14px; width: min(420px, 100%);
+      box-shadow: 0 16px 40px rgba(0,0,0,.28);
+    }
+    .choice-dialog h3 { margin: 0 0 8px; font-size: 17px; font-weight: 650; }
+    .choice-dialog p { margin: 0 0 16px; font-size: 14px; line-height: 1.45; color: var(--text); }
+    .choice-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
 
     /* Print / PDF – A4 portrait, Watersolution letter layout */
     @page { size: A4 portrait; margin: 0; }
@@ -442,7 +466,7 @@
     @media print {
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
       html, body { background: #fff !important; margin: 0 !important; padding: 0 !important; height: auto !important; }
-      .app-header, .tab-bar, main, .overlay, .drawer, .toast, .lightbox, .hidden-file, .annot-editor { display: none !important; }
+      .app-header, .tab-bar, main, .overlay, .drawer, .toast, .lightbox, .hidden-file, .annot-editor, .choice-overlay { display: none !important; }
       .print-root {
         display: block !important;
         padding: 0;
@@ -763,9 +787,11 @@
     </div>
     <div class="drawer-actions">
       <button class="btn primary" id="btnNew">Neuer Auftrag</button>
+      <button class="btn btn-ico" id="btnOpenAuftrag" title="Auftrag aus Datei öffnen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8l-2-2z"/></svg> Öffnen</button>
       <button class="btn" id="btnExport">JSON exportieren</button>
       <button class="btn" id="btnPrint">Drucken / PDF</button>
     </div>
+    <input class="hidden-file" id="icloudFileInput" type="file" accept=".json,application/json" />
     <div class="report-list" id="reportList"></div>
   </aside>
 
@@ -776,6 +802,13 @@
     <img id="lightboxImg" alt="Foto in Vollbild" />
   </div>
 
+  <div class="choice-overlay" id="choiceOverlay" hidden>
+    <div class="choice-dialog" role="dialog" aria-modal="true" aria-labelledby="choiceTitle">
+      <h3 id="choiceTitle"></h3>
+      <p id="choiceMsg"></p>
+      <div class="choice-actions" id="choiceActions"></div>
+    </div>
+  </div>
   <div class="toast" id="toast" role="status"></div>
   <div class="annot-editor" id="annotEditor" hidden></div>
   <div class="print-root" id="printRoot"></div>
@@ -1032,7 +1065,8 @@
         meta: Object.assign(freshMeta(), a.meta || {}),
         values: Object.assign(freshValues(), a.values || {}),
         mitarbeiter: Object.assign(freshMitarbeiter(), a.mitarbeiter || {}),
-        photos: Array.isArray(a.photos) ? a.photos.map(migratePhoto) : []
+        photos: Array.isArray(a.photos) ? a.photos.map(migratePhoto) : [],
+        photoSortMode: a.photoSortMode === "date" ? "date" : "custom"
       };
       return out;
     }
@@ -1376,7 +1410,9 @@
       camera: '<svg viewBox="0 0 24 24"><path d="M9 3 7.17 5H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.17L15 3H9zm3 15a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-2.5A2.5 2.5 0 1 0 9.5 13 2.5 2.5 0 0 0 12 15.5z"/></svg>',
       chevron: '<svg viewBox="0 0 24 24"><path d="M9.3 6.3 8 7.6 12.4 12 8 16.4l1.3 1.3 5.7-5.7z"/></svg>',
       close: '<svg viewBox="0 0 24 24"><path d="M18.3 5.7 12 12l6.3 6.3-1.4 1.4L10.6 13.4 4.3 19.7 2.9 18.3 9.2 12 2.9 5.7 4.3 4.3l6.3 6.3 6.3-6.3z"/></svg>',
-      printer: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 8h-1V3H6v5H5a3 3 0 0 0-3 3v6h4v4h12v-4h4v-6a3 3 0 0 0-3-3zM8 5h8v3H8V5zm8 14H8v-5h8v5zm4-5h-2v-2H6v2H4v-4a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v4zM7 10.5a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg>'
+      printer: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 8h-1V3H6v5H5a3 3 0 0 0-3 3v6h4v4h12v-4h4v-6a3 3 0 0 0-3-3zM8 5h8v3H8V5zm8 14H8v-5h8v5zm4-5h-2v-2H6v2H4v-4a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v4zM7 10.5a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg>',
+      cloud: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.35 10.04A7.49 7.49 0 0 0 12 4a7.5 7.5 0 0 0-7.35 6.04A5.5 5.5 0 0 0 5.5 21h13a5.5 5.5 0 0 0 .85-10.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>',
+      folder: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8l-2-2z"/></svg>'
     };
 
     function hdrBtn(id, title, icon, extraClass) {
@@ -1400,7 +1436,10 @@
         ? hdrBtn("btnBerichte", "Aufträge", ICO.menu)
         : hdrBtn("btnBack", "Zurück", ICO.back);
       let right = "";
-      if (view === "overview" || view === "bericht" || view === "mitarbeiter") {
+      if (view === "overview") {
+        right = hdrBtn("btnICloudSave", "In iCloud speichern", ICO.cloud)
+          + hdrBtn("btnSave", "Auftrag speichern", ICO.save);
+      } else if (view === "bericht" || view === "mitarbeiter") {
         right = hdrBtn("btnSave", "Auftrag speichern", ICO.save);
       } else if (view === "fotos") {
         right = hdrBtn("btnAddPhoto", "Foto hinzufügen", ICO.plus)
@@ -1417,6 +1456,8 @@
       if (berichte) berichte.addEventListener("click", openDrawer);
       const back = document.getElementById("btnBack");
       if (back) back.addEventListener("click", goBack);
+      const icloud = document.getElementById("btnICloudSave");
+      if (icloud) icloud.addEventListener("click", () => saveAuftragToICloud(current.id));
       const save = document.getElementById("btnSave");
       if (save) save.addEventListener("click", saveToList);
       const add = document.getElementById("btnAddPhoto");
@@ -2206,12 +2247,20 @@
             <strong>${escapeHtml(t.nr)}</strong>
             <span>${escapeHtml(t.kunde)} · ${escapeHtml(t.date)}</span>
           </div>
-          <button class="btn danger" data-del="${r.id}">Löschen</button>
+          <div class="report-actions">
+            <button type="button" class="report-cloud" data-icloud="${r.id}" title="In iCloud speichern" aria-label="In iCloud speichern">${ICO.cloud}</button>
+            <button class="btn danger" data-del="${r.id}">Löschen</button>
+          </div>
         </div>`;
       }).join("");
     }
 
     document.getElementById("reportList").addEventListener("click", (e) => {
+      const icloudBtn = e.target.closest("[data-icloud]");
+      if (icloudBtn) {
+        e.stopPropagation();
+        return saveAuftragToICloud(icloudBtn.getAttribute("data-icloud"));
+      }
       const del = e.target.closest("[data-del]");
       if (del) return deleteAuftrag(del.getAttribute("data-del"), e);
       const item = e.target.closest("[data-open]");
@@ -2246,6 +2295,8 @@
     document.getElementById("btnCloseLightbox").addEventListener("click", (e) => { e.stopPropagation(); closeLightbox(); });
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
+        const choice = document.getElementById("choiceOverlay");
+        if (choice && !choice.hidden) return;
         if (document.getElementById("lightbox").classList.contains("open")) closeLightbox();
         else if (drawer.classList.contains("open")) closeDrawer();
       }
@@ -2285,6 +2336,16 @@
       toast("JSON exportiert");
     }
     document.getElementById("btnExport").addEventListener("click", () => { exportJson(); });
+    document.getElementById("btnOpenAuftrag").addEventListener("click", () => {
+      const inp = document.getElementById("icloudFileInput");
+      inp.value = "";
+      inp.click();
+    });
+    document.getElementById("icloudFileInput").addEventListener("change", (e) => {
+      const file = e.target.files && e.target.files[0];
+      e.target.value = "";
+      if (file) importAuftragFile(file);
+    });
 
     /* ---------- Print / PDF ---------- */
     function printValue(f, values) {
@@ -2617,7 +2678,7 @@
     if ("serviceWorker" in navigator && location.protocol !== "file:") {
       const registerBlobSw = () => {
         const sw = `
-          const CACHE = 'leckortung-v7';
+          const CACHE = 'leckortung-v8';
           self.addEventListener('install', (e) => {
             e.waitUntil(caches.open(CACHE).then((c) => c.add('./')).then(() => self.skipWaiting()));
           });
@@ -3112,6 +3173,287 @@
       if (cmd && e.key.toLowerCase() === "y") { e.preventDefault(); annotRedo(); }
     });
     window.addEventListener("resize", () => { if (annot.open) annotLayout(); });
+
+
+    const ICLOUD_FORMAT = "leckortung";
+    const ICLOUD_FORMAT_VERSION = 1;
+    const STORAGE_ICLOUD_HINT = "leckortung.icloudHint";
+
+    function safeAuftragFilename(a) {
+      const nr = ((a.meta && a.meta.auftragsNr) || "ohne-Nr").trim() || "ohne-Nr";
+      const kunde = ((a.meta && a.meta.kunde) || "ohne-Kunde").trim() || "ohne-Kunde";
+      return ("Auftrag_" + nr + "_" + kunde + ".leckortung.json")
+        .replace(/[^\w.\-ÄÖÜäöüß]+/g, "_")
+        .replace(/_+/g, "_");
+    }
+
+    async function dataUrlToBlob(dataUrl) {
+      const res = await fetch(dataUrl);
+      if (!res.ok) throw new Error("data-url");
+      return res.blob();
+    }
+
+    function canShareFiles(file) {
+      try {
+        return !!(navigator.canShare && file && navigator.canShare({ files: [file] }));
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function showChoiceDialog(title, message, buttons) {
+      return new Promise((resolve) => {
+        const overlay = document.getElementById("choiceOverlay");
+        document.getElementById("choiceTitle").textContent = title;
+        document.getElementById("choiceMsg").innerHTML = message;
+        const actions = document.getElementById("choiceActions");
+        actions.innerHTML = "";
+        const finish = (value) => {
+          overlay.hidden = true;
+          overlay.classList.remove("open");
+          document.removeEventListener("keydown", onKey);
+          resolve(value);
+        };
+        const onKey = (e) => { if (e.key === "Escape") finish("cancel"); };
+        buttons.forEach((b) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "btn" + (b.primary ? " primary" : "") + (b.danger ? " danger" : "");
+          btn.id = b.id || "";
+          btn.textContent = b.label;
+          btn.addEventListener("click", () => finish(b.value));
+          actions.appendChild(btn);
+        });
+        overlay.hidden = false;
+        requestAnimationFrame(() => overlay.classList.add("open"));
+        document.addEventListener("keydown", onKey);
+      });
+    }
+
+    async function maybeShowICloudHint() {
+      try {
+        if (localStorage.getItem(STORAGE_ICLOUD_HINT)) return;
+      } catch (e) {}
+      await showChoiceDialog(
+        "In iCloud speichern",
+        "Im Teilen-Menü „In Dateien sichern“ wählen und den Ordner iCloud Drive › Leckortung auswählen.",
+        [{ label: "Verstanden", value: "ok", primary: true, id: "choiceOk" }]
+      );
+      try { localStorage.setItem(STORAGE_ICLOUD_HINT, "1"); } catch (e) {}
+    }
+
+    async function buildAuftragPackage(auftrag) {
+      const payload = JSON.parse(JSON.stringify(auftrag));
+      payload.photos = [];
+      for (const p of auftrag.photos || []) {
+        const rec = await idbGetPhoto(auftrag.id, p.id);
+        const item = Object.assign({}, migratePhoto(p));
+        delete item.imageData;
+        delete item.originalImageData;
+        delete item.annotatedImageData;
+        if (rec && rec.blob) item.originalImageData = await blobToDataUrl(rec.blob);
+        if (rec && rec.annotatedBlob) item.annotatedImageData = await blobToDataUrl(rec.annotatedBlob);
+        const display = rec ? displayBlob(rec) : null;
+        if (display) {
+          item.imageData = await blobToDataUrl(display);
+          item.mime = rec.mime || "image/jpeg";
+        }
+        payload.photos.push(item);
+      }
+      payload.format = ICLOUD_FORMAT;
+      payload.formatVersion = ICLOUD_FORMAT_VERSION;
+      payload.lastModified = auftrag.updatedAt || nowIso();
+      payload.exportedAt = nowIso();
+      payload.photoSortMode = auftrag.photoSortMode || photoSortMode || "custom";
+      return payload;
+    }
+
+    function downloadBlobFile(file) {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(file);
+      a.download = file.name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    }
+
+    async function shareOrDownloadFile(file) {
+      if (canShareFiles(file)) {
+        await maybeShowICloudHint();
+        try {
+          await navigator.share({ files: [file], title: file.name });
+          toast("Auftrag geteilt");
+          return "share";
+        } catch (err) {
+          if (err && (err.name === "AbortError" || err.name === "NotAllowedError")) return "abort";
+          console.warn("share failed, falling back to download", err);
+        }
+      }
+      downloadBlobFile(file);
+      toast("Datei gespeichert");
+      return "download";
+    }
+
+    async function getAuftragForExport(id) {
+      if (!id || id === current.id) {
+        if (view === "fotodetail") readPhotoDetailIntoModel();
+        persistCurrent();
+        return current;
+      }
+      const found = reports.find((r) => r.id === id);
+      return found || null;
+    }
+
+    async function saveAuftragToICloud(id) {
+      const auftrag = await getAuftragForExport(id);
+      if (!auftrag) {
+        toast("Auftrag nicht gefunden.", true);
+        return;
+      }
+      try {
+        toast("Datei wird erstellt…");
+        const payload = await buildAuftragPackage(auftrag);
+        const json = JSON.stringify(payload);
+        const file = new File([json], safeAuftragFilename(auftrag), { type: "application/json" });
+        await shareOrDownloadFile(file);
+      } catch (err) {
+        console.error(err);
+        toast("Speichern fehlgeschlagen.", true);
+      }
+    }
+
+    function looksLikeAuftrag(obj) {
+      if (!obj || typeof obj !== "object" || Array.isArray(obj)) return false;
+      if (obj.format && obj.format !== ICLOUD_FORMAT) return false;
+      const src = (obj.auftrag && typeof obj.auftrag === "object" && !Array.isArray(obj.auftrag))
+        ? obj.auftrag : obj;
+      return !!(src.id || src.meta || src.values || Array.isArray(src.photos));
+    }
+
+    function unwrapAuftragFile(obj) {
+      const wrapper = obj;
+      const src = (obj.auftrag && typeof obj.auftrag === "object" && !Array.isArray(obj.auftrag))
+        ? obj.auftrag : obj;
+      return {
+        src,
+        lastModified: wrapper.lastModified || src.lastModified || src.updatedAt || "",
+        exportedAt: wrapper.exportedAt || src.exportedAt || "",
+        formatVersion: wrapper.formatVersion || src.formatVersion || 0
+      };
+    }
+
+    function stripPhotoData(p) {
+      const m = migratePhoto(p);
+      return m;
+    }
+
+    async function restorePhotosFromExport(auftragId, photos) {
+      for (const p of photos || []) {
+        if (!p || !p.id) continue;
+        let blob = null;
+        let annotatedBlob = null;
+        if (p.originalImageData) {
+          blob = await dataUrlToBlob(p.originalImageData);
+        } else if (p.imageData) {
+          blob = await dataUrlToBlob(p.imageData);
+        }
+        if (p.annotatedImageData) {
+          annotatedBlob = await dataUrlToBlob(p.annotatedImageData);
+        } else if (p.annotated && p.imageData && p.originalImageData) {
+          annotatedBlob = await dataUrlToBlob(p.imageData);
+        }
+        if (!blob && !annotatedBlob) continue;
+        const patch = { mime: p.mime || "image/jpeg" };
+        if (blob) patch.blob = blob;
+        if (annotatedBlob) patch.annotatedBlob = annotatedBlob;
+        await idbMergePhoto(auftragId, p.id, patch);
+      }
+    }
+
+    function formatStamp(iso) {
+      if (!iso) return "";
+      try {
+        const d = new Date(iso);
+        if (isNaN(d.getTime())) return String(iso);
+        return d.toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" });
+      } catch (e) {
+        return String(iso);
+      }
+    }
+
+
+    async function importAuftragFromObject(obj) {
+      if (!looksLikeAuftrag(obj)) throw new Error("format");
+      const { src, lastModified, exportedAt } = unwrapAuftragFile(obj);
+      const photoRaw = Array.isArray(src.photos) ? src.photos : [];
+      let next = migrateAuftrag(src);
+      const existing = reports.find((r) => r.id === next.id) || (current.id === next.id ? current : null);
+      let mode = "new";
+      if (existing) {
+        const fileTs = lastModified || exportedAt || src.updatedAt || "";
+        const localTs = existing.updatedAt || "";
+        const fileTime = fileTs ? Date.parse(fileTs) : NaN;
+        const localTime = localTs ? Date.parse(localTs) : NaN;
+        const newer = isFinite(fileTime) && isFinite(localTime) && fileTime > localTime + 1000;
+        const older = isFinite(fileTime) && isFinite(localTime) && fileTime + 1000 < localTime;
+        let info = "Ein Auftrag mit derselben ID ist bereits gespeichert.";
+        if (newer) {
+          info += "<br><strong>Die Datei ist neuer</strong> (Datei: "
+            + escapeHtml(formatStamp(fileTs)) + ", gespeichert: "
+            + escapeHtml(formatStamp(localTs)) + ").";
+        } else if (older) {
+          info += "<br>Die gespeicherte Version ist neuer (Datei: "
+            + escapeHtml(formatStamp(fileTs)) + ", gespeichert: "
+            + escapeHtml(formatStamp(localTs)) + ").";
+        } else if (fileTs || localTs) {
+          info += "<br>Stand Datei: " + escapeHtml(formatStamp(fileTs) || "unbekannt")
+            + ", gespeichert: " + escapeHtml(formatStamp(localTs) || "unbekannt") + ".";
+        }
+        const choice = await showChoiceDialog("Auftrag vorhanden", info, [
+          { label: "Überschreiben", value: "overwrite", danger: true, id: "choiceOverwrite" },
+          { label: "Als Kopie", value: "copy", primary: true, id: "choiceCopy" },
+          { label: "Abbrechen", value: "cancel", id: "choiceCancel" }
+        ]);
+        if (choice === "cancel" || choice == null) return;
+        mode = choice;
+        if (mode === "copy") {
+          next.id = uid("r");
+          next.createdAt = nowIso();
+        }
+      }
+      next.photos = photoRaw.map(stripPhotoData);
+      if (mode === "overwrite") {
+        try { await idbDeleteAuftragPhotos(next.id); } catch (e) {}
+      }
+      await restorePhotosFromExport(next.id, photoRaw);
+      const idx = reports.findIndex((r) => r.id === next.id);
+      next.updatedAt = nowIso();
+      if (idx >= 0) reports[idx] = next;
+      else reports.unshift(next);
+      persistList();
+      current = migrateAuftrag(JSON.parse(JSON.stringify(next)));
+      photoSortMode = current.photoSortMode === "date" ? "date" : "custom";
+      persistCurrent();
+      showView("overview");
+      closeDrawer();
+      renderReportList();
+      toast(mode === "copy" ? "Auftrag als Kopie importiert" : (mode === "overwrite" ? "Auftrag überschrieben" : "Auftrag geöffnet"));
+    }
+
+    async function importAuftragFile(file) {
+      if (!file) return;
+      try {
+        const text = await file.text();
+        const obj = JSON.parse(text);
+        await importAuftragFromObject(obj);
+      } catch (err) {
+        console.error(err);
+        if (err && err.message === "format") toast("Die Datei ist kein gültiger Auftrag.", true);
+        else toast("Datei konnte nicht geöffnet werden.", true);
+      }
+    }
+
 
     /* Init */
     ensurePhotoOrder();
