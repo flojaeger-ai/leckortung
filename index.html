@@ -1,0 +1,3123 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#1a5fad" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Leckortung" />
+  <meta name="format-detection" content="telephone=no" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAAA9zQYyAAAFe0lEQVR4nO3czXVbNxCGYVAnu3RgF5IisrMKsEtIKSnBKsDepYgUYnWQtbMxdWj6ksTPDDD45n2Wtg+Fi/tqCJKyTiWAdx+/fF+9Box7fXk+rV7DkgUQcA4rAp/2BYk4t1lxu34RIsYRz7hdHpiQUcMj7CfrByRm1PJoxew7hJAxwmpam0xoYsYoq4aGvisIGR5GpnX3hCZmeBlpqytoYoa33saagyZmzNLTWlPQxIzZWpurDpqYsUpLe1VBEzNWq23wYdDEjChqWjT/6BtY6W7QTGdE86jJm0ETM6K61yZHDkg5DJrpjOhuNfpL0MSMXRy1ypEDUn4KmumM3Vw3y4SGFIKGlLegOW5gV5ftMqEhhaAh5akUjhvY37lhJjSkEDSkEDSknDg/QwkTGlIIGlIIGlIIGlIIGlIIepJvnz+sXkIKBD3BOWai9kfQzoh4LoKejMB9EbSjW/EStR+CdkK0axC0g5qYCd4HQRtrCZWo7RG0oZ5AidoWQUMKQRsZmbRMaTsEbcAiSKK2QdCDLEMk6nEEPcAjQKIeQ9CQQtCdPCcpU7ofQXeYERxR9yHoRjNDI+p2BN1gRWBE3YagK60Mi6jrEXSFCEFFWMMOCPqBSCFFWktUBA0pBH1HxIkYcU2REPQNkcOJvLbVCPrADsHssMYVCPrKTqHstNZZCBpSCPrCjhNvxzV7Iugfdg5j57VbI+iiEYTCNVhIH7RSCErX0it10IoBKF5Ti7RBK9945Wt7JG3Q0JQy6AwTLMM1HkkXdKYbnelaz1IFnfEGZ7vmVEFDX5qgs02qS5muPUXQmW7oLVn2IEXQyEM+6CyTqUaGvZAPGrlIB51hIrVS3xPpoJGPbNDqk2iE8t7IBo2cJINWnkBWVPdIMmjkJRe06uTxoLhXckEjN4KGFIKGFKmgFc+E3tT2TCpogKAhRSZotafOmZT2TiZooBSChhiChhSChhSChhSChhSChhSChpTfVi9gJ3//+98/13/21x+//7liLThG0BWOQr7+O8KOQebI8f7TV5fHvRdzz7+LyGvvVpAJ2kNrpDtHrYKgb+iNk6jXkgpa6alzFrU9kwrayuiUZUqvQ9CQIhe02lOoJ8W9kgt6lNVxgWPHGgQNKZJBKz6VWlPdI8mgkZds0KoTyILy3sgGXYr2jeulvifSQSMf+aBbJ5LVj4FG/HFS9elcSoKgkUuKoDNMpkey7EGKoEtpu6Gjx4Vox40sMZeSKOhSct3Ys2zXnCroUupvcO+UjTSds8VcSsKgS/GLmpjXSxl0KfZRE3MMp3cfv3xfvYiVWn7Z9w6/lyNzzKUQdClF5zfYZ4+5lMRHjksKIShcgwWC/mHnIHZeuzWCvrBjGDuu2RNBX9kpkJ3WOgtBH9ghlB3WuAJB3xA5mMhrW42g74gYTsQ1RULQD0QKKNJaoiLoChFCirCGHfBJYaPZnyoSchsmdKOZgRFzO4LuMCM0Yu7DkWOQ9RGEkMcwoQdZBkjM4wjagEWIxGyDoI2MBEnMdp5eX55PqxehoidMYrbz+vJ8YkIbawmUmO0RtIP3n74+jJWYfRC0o6Noa2JHv7fzM+9H+/r2+QMhOzq/FmRCT0LMcxA0pLwFzdt32NVlu0xoSCFoSPkpaI4d2M11s0xoSPklaKY0dnHU6uGEJmpEd6tRjhyQcjNopjSiutfm3QlN1IjmUZMcOSDlYdBMaURR02LVhCZqrFbbYPWRg6ixSkt7TWdoosZsrc01vygkaszS01rXuxxEDW+9jXW/bUfU8DLSlkmU/AdbWLAYkiYfrDCtMcqqIfMQmdZoYT0MzT/6ZlqjlkcrrvExrXHEc+hNm6bEndusZ+4lxwPizmHF8TPEeZfANUR4/fQ/xxzovi1Y8XYAAAAASUVORK5CYII=" />
+  <link rel="icon" type="image/png" sizes="180x180" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAAA9zQYyAAAFe0lEQVR4nO3czXVbNxCGYVAnu3RgF5IisrMKsEtIKSnBKsDepYgUYnWQtbMxdWj6ksTPDDD45n2Wtg+Fi/tqCJKyTiWAdx+/fF+9Box7fXk+rV7DkgUQcA4rAp/2BYk4t1lxu34RIsYRz7hdHpiQUcMj7CfrByRm1PJoxew7hJAxwmpam0xoYsYoq4aGvisIGR5GpnX3hCZmeBlpqytoYoa33saagyZmzNLTWlPQxIzZWpurDpqYsUpLe1VBEzNWq23wYdDEjChqWjT/6BtY6W7QTGdE86jJm0ETM6K61yZHDkg5DJrpjOhuNfpL0MSMXRy1ypEDUn4KmumM3Vw3y4SGFIKGlLegOW5gV5ftMqEhhaAh5akUjhvY37lhJjSkEDSkEDSknDg/QwkTGlIIGlIIGlIIGlIIGlIIepJvnz+sXkIKBD3BOWai9kfQzoh4LoKejMB9EbSjW/EStR+CdkK0axC0g5qYCd4HQRtrCZWo7RG0oZ5AidoWQUMKQRsZmbRMaTsEbcAiSKK2QdCDLEMk6nEEPcAjQKIeQ9CQQtCdPCcpU7ofQXeYERxR9yHoRjNDI+p2BN1gRWBE3YagK60Mi6jrEXSFCEFFWMMOCPqBSCFFWktUBA0pBH1HxIkYcU2REPQNkcOJvLbVCPrADsHssMYVCPrKTqHstNZZCBpSCPrCjhNvxzV7Iugfdg5j57VbI+iiEYTCNVhIH7RSCErX0it10IoBKF5Ti7RBK9945Wt7JG3Q0JQy6AwTLMM1HkkXdKYbnelaz1IFnfEGZ7vmVEFDX5qgs02qS5muPUXQmW7oLVn2IEXQyEM+6CyTqUaGvZAPGrlIB51hIrVS3xPpoJGPbNDqk2iE8t7IBo2cJINWnkBWVPdIMmjkJRe06uTxoLhXckEjN4KGFIKGFKmgFc+E3tT2TCpogKAhRSZotafOmZT2TiZooBSChhiChhSChhSChhSChhSChhSChpTfVi9gJ3//+98/13/21x+//7liLThG0BWOQr7+O8KOQebI8f7TV5fHvRdzz7+LyGvvVpAJ2kNrpDtHrYKgb+iNk6jXkgpa6alzFrU9kwrayuiUZUqvQ9CQIhe02lOoJ8W9kgt6lNVxgWPHGgQNKZJBKz6VWlPdI8mgkZds0KoTyILy3sgGXYr2jeulvifSQSMf+aBbJ5LVj4FG/HFS9elcSoKgkUuKoDNMpkey7EGKoEtpu6Gjx4Vox40sMZeSKOhSct3Ys2zXnCroUupvcO+UjTSds8VcSsKgS/GLmpjXSxl0KfZRE3MMp3cfv3xfvYiVWn7Z9w6/lyNzzKUQdClF5zfYZ4+5lMRHjksKIShcgwWC/mHnIHZeuzWCvrBjGDuu2RNBX9kpkJ3WOgtBH9ghlB3WuAJB3xA5mMhrW42g74gYTsQ1RULQD0QKKNJaoiLoChFCirCGHfBJYaPZnyoSchsmdKOZgRFzO4LuMCM0Yu7DkWOQ9RGEkMcwoQdZBkjM4wjagEWIxGyDoI2MBEnMdp5eX55PqxehoidMYrbz+vJ8YkIbawmUmO0RtIP3n74+jJWYfRC0o6Noa2JHv7fzM+9H+/r2+QMhOzq/FmRCT0LMcxA0pLwFzdt32NVlu0xoSCFoSPkpaI4d2M11s0xoSPklaKY0dnHU6uGEJmpEd6tRjhyQcjNopjSiutfm3QlN1IjmUZMcOSDlYdBMaURR02LVhCZqrFbbYPWRg6ixSkt7TWdoosZsrc01vygkaszS01rXuxxEDW+9jXW/bUfU8DLSlkmU/AdbWLAYkiYfrDCtMcqqIfMQmdZoYT0MzT/6ZlqjlkcrrvExrXHEc+hNm6bEndusZ+4lxwPizmHF8TPEeZfANUR4/fQ/xxzovi1Y8XYAAAAASUVORK5CYII=" />
+  <title>Leckortung</title>
+  <style>
+    :root {
+      --blue: #1a5fad;
+      --blue-dark: #144a8a;
+      --blue-light: #e8f0fa;
+      --blue-mid: #2b73c9;
+      --bg: #eef1f5;
+      --card: #fff;
+      --line: #d5dbe3;
+      --line-soft: #e6eaef;
+      --text: #1c2430;
+      --muted: #5b6573;
+      --label: #1c2430;
+      --danger: #c0392b;
+      --ok: #1e7a46;
+      --dot-ok: #1f9d55;
+      --dot-missing: #e23c2f;
+      --shadow: 0 1px 3px rgba(16, 32, 56, .08);
+      --header-h: 52px;
+      --tabs-h: 46px;
+      --radius: 8px;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --touch: 48px;
+      --sat: env(safe-area-inset-top, 0px);
+      --sab: env(safe-area-inset-bottom, 0px);
+      --sal: env(safe-area-inset-left, 0px);
+      --sar: env(safe-area-inset-right, 0px);
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0;
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
+      height: 100%;
+      height: 100dvh;
+      font-family: var(--font);
+      color: var(--text);
+      background: var(--bg);
+      -webkit-font-smoothing: antialiased;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+    body {
+      display: flex; flex-direction: column;
+      min-height: 100%;
+      min-height: 100dvh;
+      min-height: -webkit-fill-available;
+    }
+    button, input, textarea, select {
+      font-family: inherit;
+      font-size: 16px;
+      max-width: 100%;
+    }
+    button, a, .tab, .menu-item, .icon-btn, .hdr-btn, .btn {
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: rgba(26,95,173,.18);
+    }
+    img, svg { max-width: 100%; }
+    input[type="date"], input[type="datetime-local"], input[type="time"], input[type="number"] {
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    /* Header */
+    .app-header {
+      position: sticky; top: 0; z-index: 40;
+      height: calc(var(--header-h) + var(--sat));
+      background: linear-gradient(180deg, var(--blue-mid) 0%, var(--blue) 100%);
+      color: #fff;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: var(--sat) max(6px, var(--sar)) 0 max(4px, var(--sal));
+      box-shadow: 0 1px 4px rgba(0,0,0,.18);
+      flex-shrink: 0;
+    }
+    .app-header h1 {
+      position: absolute; left: 50%; transform: translateX(-50%);
+      margin: 0; font-size: 18px; font-weight: 600; letter-spacing: .2px;
+      max-width: calc(100% - 196px);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      pointer-events: none; text-align: center;
+    }
+    .hdr-left, .hdr-right {
+      display: flex; align-items: center; gap: 0; z-index: 1; min-width: 48px;
+    }
+    .hdr-right { margin-left: auto; }
+    .hdr-btn {
+      appearance: none; border: 0; background: transparent; color: #fff;
+      width: 44px; height: 44px; border-radius: 8px; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .hdr-btn:hover, .hdr-btn:focus-visible { background: rgba(255,255,255,.15); outline: none; }
+    .hdr-btn:active { background: rgba(255,255,255,.25); }
+    .hdr-btn svg { width: 22px; height: 22px; fill: currentColor; }
+    .hdr-btn.danger-icon:hover, .hdr-btn.danger-icon:focus-visible { background: rgba(226,60,47,.25); }
+    .save-flash { animation: flashok .7s ease; }
+    @keyframes flashok {
+      0%,100% { background: transparent; }
+      40% { background: rgba(255,255,255,.28); }
+    }
+
+    /* Tabs */
+    .tab-bar {
+      position: sticky; top: calc(var(--header-h) + var(--sat)); z-index: 30;
+      display: flex; gap: 0; background: #fff;
+      border-bottom: 1px solid var(--line);
+      overflow-x: auto; overflow-y: hidden;
+      flex-shrink: 0; height: var(--tabs-h);
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding-left: var(--sal);
+      padding-right: var(--sar);
+    }
+    .tab-bar.is-hidden { display: none; }
+    .tab-bar::-webkit-scrollbar { display: none; }
+    .tab {
+      appearance: none; border: 0; background: transparent;
+      color: var(--muted); font-size: 13.5px; font-weight: 600;
+      padding: 0 18px; height: var(--tabs-h); white-space: nowrap;
+      cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -1px;
+    }
+    .tab:hover { color: var(--blue); background: var(--blue-light); }
+    .tab[aria-selected="true"] {
+      color: var(--blue); border-bottom-color: var(--blue);
+    }
+
+    /* Main */
+    main { flex: 1; overflow: auto; -webkit-overflow-scrolling: touch; padding: 14px max(16px, var(--sar)) calc(80px + var(--sab)) max(16px, var(--sal)); }
+    main.tight { padding: 0 0 calc(40px + var(--sab)); }
+    .panel { display: none; max-width: 1100px; margin: 0 auto; }
+    .panel.active { display: block; }
+    .view { display: none; max-width: 1100px; margin: 0 auto; }
+    .view.active { display: block; }
+
+    /* Form rows */
+    .section { margin: 22px 0 8px; }
+    .section-title {
+      display: flex; align-items: center; gap: 12px;
+      font-size: 12px; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; font-variant: small-caps;
+      color: var(--muted); margin: 0 2px 8px;
+    }
+    .section-title::after {
+      content: ""; flex: 1; height: 1px; background: var(--line);
+    }
+
+    .card {
+      background: var(--card); border: 1px solid var(--line);
+      border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow);
+    }
+    .row {
+      display: grid;
+      grid-template-columns: minmax(200px, 38%) 1fr;
+      align-items: center;
+      min-height: 46px;
+      border-bottom: 1px solid var(--line-soft);
+      padding: 6px 14px;
+      gap: 12px;
+    }
+    .row:last-child { border-bottom: 0; }
+    .row.label-top { align-items: start; padding-top: 10px; padding-bottom: 10px; }
+    .row .lbl {
+      font-weight: 700; font-size: 14px; color: var(--label); line-height: 1.3;
+    }
+    .row input[type="text"],
+    .row input[type="tel"],
+    .row input[type="date"],
+    .row input[type="datetime-local"],
+    .row input[type="number"] {
+      width: 100%; border: 1px solid transparent; background: #f7f9fb;
+      border-radius: 6px; padding: 8px 10px; font-size: 16px; color: var(--text);
+      text-align: right; min-height: 40px;
+    }
+    .row input:focus, .row textarea:focus, .row select:focus {
+      outline: none; border-color: var(--blue); background: #fff;
+      box-shadow: 0 0 0 3px rgba(26,95,173,.15);
+    }
+    .row textarea {
+      width: 100%; border: 1px solid transparent; background: #f7f9fb;
+      border-radius: 6px; padding: 8px 10px; font-size: 16px; color: var(--text);
+      text-align: left; min-height: 88px; resize: vertical; line-height: 1.4;
+    }
+    .row select {
+      width: 100%; border: 1px solid transparent; background-color: #f7f9fb;
+      border-radius: 6px; padding: 8px 28px 8px 10px; font-size: 16px; color: var(--text);
+      text-align: right; min-height: 40px; cursor: pointer;
+      appearance: none; -webkit-appearance: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%235b6573' d='M1 1l5 5 5-5'/></svg>");
+      background-repeat: no-repeat; background-position: right 10px center;
+    }
+    .row input::placeholder, .row textarea::placeholder { color: #9aa3af; }
+    .row input:disabled, .row textarea:disabled, .row select:disabled {
+      color: var(--text); opacity: 1; background: #f0f3f6;
+    }
+
+    .row.check { grid-template-columns: 1fr auto; }
+    .row.check input[type="checkbox"] { margin: 0; }
+    input[type="checkbox"] {
+      appearance: none; width: 24px; height: 24px; border: 2px solid #8b96a5;
+      border-radius: 4px; background: #fff; cursor: pointer; position: relative; flex-shrink: 0;
+    }
+    input[type="checkbox"]:checked {
+      background: var(--blue); border-color: var(--blue);
+    }
+    input[type="checkbox"]:checked::after {
+      content: ""; position: absolute; left: 7px; top: 3px;
+      width: 6px; height: 12px; border: solid #fff; border-width: 0 2.4px 2.4px 0;
+      transform: rotate(45deg);
+    }
+    input[type="checkbox"]:focus-visible { box-shadow: 0 0 0 3px rgba(26,95,173,.25); outline: none; }
+    input[type="checkbox"]:disabled { opacity: .7; cursor: default; }
+
+    .row.pair {
+      grid-template-columns: minmax(160px, 1fr) auto minmax(140px, 1fr) auto;
+      gap: 10px 14px;
+    }
+    .row.pair .lbl { font-weight: 700; }
+    .row.pair.mixed {
+      grid-template-columns: minmax(140px, 32%) 1fr minmax(90px, auto) auto;
+    }
+    .row.pair.mixed input[type="text"],
+    .row.pair.mixed input[type="number"] { text-align: right; }
+    .row.pair .right-lbl { text-align: right; }
+
+    .extend-note {
+      margin: 16px 2px 0; font-size: 12.5px; color: var(--muted); font-style: italic;
+    }
+
+    /* Overview menu */
+    .overview-wrap { padding: 14px max(16px, var(--sar)) calc(80px + var(--sab)) max(16px, var(--sal)); }
+    .menu-list {
+      background: var(--card); border: 1px solid var(--line);
+      border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow);
+      margin-top: 16px;
+    }
+    .menu-item {
+      display: flex; align-items: center; gap: 14px;
+      width: 100%; text-align: left;
+      appearance: none; border: 0; background: #fff; color: var(--text);
+      min-height: 62px; padding: 12px 14px;
+      border-bottom: 1px solid var(--line-soft);
+      cursor: pointer; font-size: 16.5px; font-weight: 600;
+    }
+    .menu-item:last-child { border-bottom: 0; }
+    .menu-item:hover, .menu-item:focus-visible { background: var(--blue-light); outline: none; }
+    .menu-item:active { background: #dce7f5; }
+    .menu-ico {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: var(--blue-light); color: var(--blue);
+      display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .menu-ico svg { width: 22px; height: 22px; fill: currentColor; }
+    .menu-item .menu-label { flex: 1; text-align: left; }
+    .status-dot {
+      width: 14px; height: 14px; min-width: 14px; max-width: 14px;
+      border-radius: 50%; flex-shrink: 0;
+      box-shadow: 0 0 0 3px rgba(0,0,0,.04);
+    }
+    .chevron { flex-shrink: 0; }
+    .status-dot.ok { background: var(--dot-ok); }
+    .status-dot.missing { background: var(--dot-missing); }
+    .chevron { color: #9aa3af; display: inline-flex; }
+    .chevron svg { width: 18px; height: 18px; fill: currentColor; }
+
+    /* Fotos list */
+    .fotos-wrap { padding: 12px max(16px, var(--sar)) calc(80px + var(--sab)) max(16px, var(--sal)); }
+    .fotos-count { color: var(--muted); font-size: 14px; margin: 4px 2px 12px; }
+    .foto-list { display: flex; flex-direction: column; gap: 10px; }
+    .foto-item {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--card); border: 1px solid var(--line);
+      border-radius: var(--radius); padding: 10px 8px 10px 4px;
+      box-shadow: var(--shadow); cursor: pointer; min-height: 76px;
+      user-select: none; -webkit-user-select: none;
+    }
+    .foto-handle {
+      appearance: none; border: 0; background: transparent; color: var(--muted);
+      width: 44px; height: 44px; border-radius: 8px; flex-shrink: 0;
+      display: inline-flex; align-items: center; justify-content: center;
+      cursor: grab; touch-action: none; padding: 0;
+    }
+    .foto-handle:hover, .foto-handle:focus-visible { background: #f4f7fa; color: var(--text); outline: none; }
+    .foto-handle:active, .foto-item.is-dragging .foto-handle { cursor: grabbing; }
+    .foto-handle svg { width: 22px; height: 22px; fill: currentColor; pointer-events: none; }
+    .foto-move { display: flex; flex-direction: column; flex-shrink: 0; gap: 0; }
+    .foto-move .icon-btn { width: 44px; height: 32px; }
+    .foto-move .icon-btn:disabled, .foto-move .icon-btn[aria-disabled="true"] {
+      opacity: .3; pointer-events: none;
+    }
+    .foto-item.is-placeholder {
+      opacity: .4;
+      border-style: dashed;
+    }
+    .foto-ghost {
+      position: fixed; z-index: 90; pointer-events: none;
+      box-shadow: 0 10px 28px rgba(16,32,56,.28);
+      opacity: .96; margin: 0;
+      box-sizing: border-box;
+    }
+    .foto-item:hover, .foto-item:focus-visible { border-color: var(--blue); background: #f7fbff; outline: none; }
+    .foto-item.no-comment { border-color: #f0b4ae; background: #fdf6f5; }
+    .foto-item.no-comment .foto-name { color: var(--danger); }
+    .foto-thumb {
+      width: 72px; height: 72px; border-radius: 6px; object-fit: cover;
+      background: #dfe4ea; flex-shrink: 0;
+    }
+    .foto-meta { flex: 1; min-width: 0; }
+    .foto-name { display: block; font-weight: 650; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .foto-sub { display: block; font-size: 13px; color: var(--muted); margin-top: 2px; }
+    .foto-flag { display: inline-block; font-size: 12px; font-weight: 700; color: var(--danger); margin-top: 3px; }
+    .icon-btn {
+      appearance: none; border: 0; background: transparent; color: var(--muted);
+      width: 44px; height: 44px; border-radius: 8px; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .icon-btn:hover, .icon-btn:focus-visible { background: #f4f7fa; color: var(--danger); outline: none; }
+    .icon-btn svg { width: 20px; height: 20px; fill: currentColor; }
+
+    /* Foto details */
+    .fdetail { padding: 0 0 calc(80px + var(--sab)); max-width: 900px; margin: 0 auto; }
+    .fdetail-img-wrap {
+      background: #111; display: flex; align-items: center; justify-content: center;
+      min-height: 280px; max-height: 52vh; cursor: zoom-in;
+    }
+    .fdetail-img-wrap img {
+      max-width: 100%; max-height: 52vh; object-fit: contain; display: block;
+    }
+    .fdetail-body { padding: 8px 18px 24px; }
+    .fg { margin: 18px 0 6px; }
+    .fg-cap {
+      font-size: 11px; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--muted);
+      padding: 0 0 6px; border-bottom: 1px solid var(--line); margin-bottom: 8px;
+    }
+    .fg .ro { font-size: 16px; padding: 4px 0 2px; }
+    .fg textarea, .fg input[type="text"], .fg input[type="number"] {
+      width: 100%; border: 1px solid transparent; background: #f7f9fb;
+      border-radius: 6px; padding: 10px 10px; font-size: 16px; color: var(--text);
+      min-height: 42px;
+    }
+    .fg textarea { min-height: 110px; resize: vertical; line-height: 1.4; text-align: left; }
+    .fg textarea:focus, .fg input:focus {
+      outline: none; border-color: var(--blue); background: #fff;
+      box-shadow: 0 0 0 3px rgba(26,95,173,.15);
+    }
+    .fg textarea.is-invalid { border-color: var(--danger); background: #fdf6f5; }
+    .fg textarea:disabled, .fg input:disabled { background: #f0f3f6; color: var(--text); opacity: 1; }
+    .fg .hint { font-size: 13px; color: var(--danger); margin: 6px 0 0; display: none; }
+    .fg .hint.show { display: block; }
+    .fg .check-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      min-height: 44px; font-weight: 650; font-size: 15px;
+    }
+
+    /* Lightbox */
+    .lightbox {
+      position: fixed; inset: 0; background: rgba(0,0,0,.92);
+      z-index: 100; display: none; align-items: center; justify-content: center;
+      cursor: zoom-out;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox img { max-width: 100vw; max-height: 100vh; object-fit: contain; }
+    .lightbox .lb-close {
+      position: absolute; top: calc(10px + var(--sat)); right: max(10px, var(--sar)); color: #fff;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed; left: 50%; bottom: calc(22px + var(--sab)); transform: translateX(-50%) translateY(16px);
+      background: #1c2430; color: #fff; padding: 10px 18px; border-radius: 999px;
+      font-size: 14px; opacity: 0; pointer-events: none; transition: .25s ease; z-index: 110;
+      box-shadow: 0 6px 20px rgba(0,0,0,.2); max-width: min(520px, 92vw); text-align: center;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.error { background: #8e1e18; }
+
+    /* Drawer / Aufträge */
+    .overlay {
+      position: fixed; inset: 0; background: rgba(16,24,40,.45);
+      z-index: 50; opacity: 0; pointer-events: none; transition: .2s;
+    }
+    .overlay.open { opacity: 1; pointer-events: auto; }
+    .drawer {
+      position: fixed; top: 0; left: 0; bottom: 0; width: min(420px, 92vw);
+      background: #fff; z-index: 60; transform: translateX(-100%);
+      transition: transform .22s ease; display: flex; flex-direction: column;
+      box-shadow: 6px 0 24px rgba(0,0,0,.18);
+      padding-bottom: var(--sab);
+    }
+    .drawer.open { transform: none; }
+    .drawer-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: calc(14px + var(--sat)) max(14px, var(--sar)) 12px max(14px, var(--sal));
+      border-bottom: 1px solid var(--line);
+      background: var(--blue); color: #fff;
+    }
+    .drawer-head h2 { margin: 0; font-size: 17px; font-weight: 650; }
+    .drawer-actions { display: flex; gap: 8px; padding: 12px 14px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+    .btn {
+      appearance: none; border: 1px solid var(--line); background: #fff; color: var(--text);
+      border-radius: 8px; padding: 10px 12px; font-size: 13.5px; font-weight: 600; cursor: pointer;
+      min-height: 40px;
+    }
+    .btn:hover { background: #f4f7fa; }
+    .btn.primary { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .btn.primary:hover { background: var(--blue-dark); }
+    .btn.danger { color: var(--danger); border-color: #f0c9c5; }
+    .btn.danger:hover { background: #fdf2f1; }
+    .report-list { flex: 1; overflow: auto; padding: 8px; }
+    .report-item {
+      display: flex; gap: 10px; align-items: flex-start;
+      padding: 12px; border: 1px solid var(--line); border-radius: 8px;
+      margin-bottom: 8px; cursor: pointer; background: #fff;
+    }
+    .report-item:hover { border-color: var(--blue); background: var(--blue-light); }
+    .report-item.current { outline: 2px solid var(--blue); }
+    .report-item .meta { flex: 1; min-width: 0; }
+    .report-item .meta strong { display: block; font-size: 15px; margin-bottom: 2px; }
+    .report-item .meta span { font-size: 13px; color: var(--muted); }
+    .empty-list { color: var(--muted); text-align: center; padding: 32px 16px; font-size: 14px; }
+
+    .hidden-file { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+
+    /* Print / PDF – A4 portrait, Watersolution letter layout */
+    @page { size: A4 portrait; margin: 0; }
+    .print-root { display: none; }
+    @media print {
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      html, body { background: #fff !important; margin: 0 !important; padding: 0 !important; height: auto !important; }
+      .app-header, .tab-bar, main, .overlay, .drawer, .toast, .lightbox, .hidden-file, .annot-editor { display: none !important; }
+      .print-root {
+        display: block !important;
+        padding: 0;
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 9.5pt;
+        color: #111;
+        line-height: 1.32;
+        background: #fff;
+      }
+      .pp {
+        width: 210mm;
+        height: 297mm;
+        box-sizing: border-box;
+        padding: 9mm 15mm 26mm 15mm;
+        position: relative;
+        page-break-after: always;
+        break-after: page;
+        overflow: hidden;
+        background: #fff;
+      }
+      .pp:last-child { page-break-after: auto; break-after: auto; }
+      .pp-head { text-align: center; margin: 0 0 5mm; }
+      .ws-logo {
+        display: flex; align-items: center; justify-content: center; gap: 5pt;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+      .ws-water {
+        font-weight: 300; font-size: 20pt; letter-spacing: 0.14em;
+        color: #6eb6e0; line-height: 1;
+      }
+      .ws-drop { width: 15pt; height: 22pt; display: block; flex-shrink: 0; }
+      .ws-solution {
+        font-weight: 700; font-size: 20pt; letter-spacing: 0.04em;
+        color: #0b3d73; line-height: 1; position: relative;
+      }
+      .ws-gmbh {
+        font-weight: 600; font-size: 7pt; letter-spacing: 0.02em;
+        color: #0b3d73; margin-left: 3pt; vertical-align: 8pt;
+      }
+      .pp-foot {
+        position: absolute; left: 15mm; right: 15mm; bottom: 7mm;
+        color: #0b3d73;
+      }
+      .pp-pageno { text-align: right; font-size: 8pt; margin-bottom: 1.6mm; color: #0b3d73; }
+      .pp-cols {
+        display: grid;
+        grid-template-columns: 1.05fr 1.45fr 1fr;
+        gap: 5mm;
+        font-size: 6.4pt;
+        line-height: 1.35;
+        color: #0b3d73;
+      }
+      .sender {
+        font-size: 8pt; text-decoration: underline; margin: 0 0 4mm;
+        color: #111;
+      }
+      .letterhead {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 8mm;
+        margin-bottom: 5mm; align-items: start;
+      }
+      .addr { font-size: 10pt; line-height: 1.4; }
+      .refs { font-size: 8.5pt; line-height: 1.35; }
+      .refs-note { margin-bottom: 2mm; }
+      .refs-nr { font-weight: 700; font-size: 11pt; margin: 0 0 2mm; }
+      .refs-co { margin-top: 2.5mm; font-size: 8pt; line-height: 1.35; }
+      .kv { width: 100%; border-collapse: collapse; margin: 0 0 4mm; font-size: 9.5pt; }
+      .kv th { text-align: left; font-weight: 700; width: 38mm; padding: 0.6mm 3mm 0.6mm 0; vertical-align: top; }
+      .kv td { padding: 0.6mm 0; vertical-align: top; }
+      .doc-title { font-size: 15pt; font-weight: 700; margin: 3mm 0 3.5mm; color: #111; }
+      .inline-row { display: flex; flex-wrap: wrap; gap: 2mm 8mm; margin: 0 0 1.4mm; }
+      .h-u {
+        font-weight: 700; font-size: 11pt; color: #111;
+        border-bottom: 0.8pt solid #111; margin: 3.5mm 0 2mm; padding-bottom: 0.6mm;
+      }
+      .h-sub { font-weight: 700; font-size: 10pt; margin: 2.6mm 0 0.8mm; }
+      .bodytext { white-space: pre-wrap; min-height: 7mm; margin: 0 0 1.2mm; font-size: 9.5pt; }
+      .cb-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.8mm 4mm; margin: 1mm 0 2.5mm; }
+      .cb-grid.two { grid-template-columns: 1fr 1fr; }
+      .cb-item { display: flex; align-items: center; gap: 2mm; font-size: 9pt; break-inside: avoid; }
+      .bx {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 8.5pt; height: 8.5pt; border: 0.7pt solid #111;
+        font-size: 7.5pt; font-weight: 700; line-height: 1;
+        flex-shrink: 0; box-sizing: border-box; background: #fff; color: #111;
+      }
+      .yn { white-space: nowrap; }
+      .yn .bx { margin: 0 1.5pt 0 1pt; vertical-align: -1pt; display: inline-flex; }
+      .line { margin: 0 0 1.3mm; }
+      table.pruef { width: 100%; border-collapse: collapse; margin: 2mm 0 3.5mm; font-size: 8.5pt; }
+      table.pruef th, table.pruef td {
+        border: 0.5pt solid #333; padding: 1mm 1.4mm; text-align: left; vertical-align: middle;
+      }
+      table.pruef th { font-weight: 700; background: #f3f3f3; text-align: center; }
+      table.pruef th.lbl, table.pruef td.lbl { text-align: left; width: auto; }
+      table.pruef td.ctr { text-align: center; width: 16mm; }
+      table.pruef .bx { border-color: #111; }
+      .photo-row {
+        display: grid;
+        grid-template-columns: 1fr 8.2cm;
+        gap: 7mm;
+        align-items: start;
+        min-height: 68mm;
+        margin: 0 0 5mm;
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+      .photo-title { font-weight: 700; font-size: 10.5pt; margin: 0 0 3mm; }
+      .photo-rest { white-space: pre-wrap; font-size: 9.5pt; line-height: 1.4; }
+      .photo-img img { width: 8cm; height: auto; max-height: 68mm; object-fit: contain; display: block; }
+    }
+
+
+    /* Annotation editor */
+    .annot-editor {
+      position: fixed; inset: 0; z-index: 120;
+      display: none; flex-direction: column;
+      background: #1a1f26; color: #fff;
+      padding: var(--sat) var(--sar) var(--sab) var(--sal);
+      overscroll-behavior: none;
+    }
+    .annot-editor.open { display: flex; }
+    .annot-bar {
+      display: flex; align-items: center; gap: 6px;
+      min-height: 52px; padding: 6px 8px; flex-shrink: 0;
+      background: #11161c;
+    }
+    .annot-bar h2 {
+      flex: 1; margin: 0; text-align: center; font-size: 16px; font-weight: 650;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .annot-bar .hdr-btn, .annot-bar .annot-act {
+      color: #fff; min-width: 44px; min-height: 44px;
+    }
+    .annot-act {
+      appearance: none; border: 0; background: transparent; color: #fff;
+      border-radius: 8px; padding: 8px 12px; font-size: 15px; font-weight: 650;
+      cursor: pointer; touch-action: manipulation;
+    }
+    .annot-act:hover, .annot-act:focus-visible { background: rgba(255,255,255,.12); outline: none; }
+    .annot-act.primary { background: var(--blue); }
+    .annot-act:disabled { opacity: .35; pointer-events: none; }
+    .annot-tools {
+      display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+      padding: 6px 8px 8px; background: #151a21; flex-shrink: 0;
+      -webkit-overflow-scrolling: touch;
+    }
+    .annot-tool, .annot-w {
+      appearance: none; border: 1px solid transparent; background: #2a313a; color: #fff;
+      border-radius: 8px; padding: 8px 10px; font-size: 13px; font-weight: 650;
+      min-height: 40px; cursor: pointer; touch-action: manipulation;
+    }
+    .annot-tool.is-on, .annot-w.is-on { background: var(--blue); border-color: #8cb8e8; }
+    .annot-swatch {
+      appearance: none; border: 2px solid transparent; width: 32px; height: 32px;
+      border-radius: 50%; cursor: pointer; padding: 0; flex-shrink: 0;
+    }
+    .annot-swatch.is-on { border-color: #fff; box-shadow: 0 0 0 2px #111; }
+    .annot-swatch.weiß { box-shadow: inset 0 0 0 1px #888; }
+    .annot-swatch.weiß.is-on { box-shadow: inset 0 0 0 1px #888, 0 0 0 2px #111; }
+    .annot-sep { width: 1px; height: 28px; background: #3a414c; margin: 0 4px; }
+    .annot-stage {
+      flex: 1; min-height: 0; position: relative; background: #0b0e12;
+      display: flex; align-items: center; justify-content: center;
+      touch-action: none;
+    }
+    #annotCanvas {
+      display: block; width: 100%; height: 100%;
+      touch-action: none; cursor: crosshair;
+    }
+    .annot-textpop {
+      position: absolute; z-index: 2; background: #fff; color: #111;
+      border-radius: 10px; padding: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.35);
+      display: none; min-width: min(280px, 80vw);
+    }
+    .annot-textpop.open { display: block; }
+    .annot-textpop input {
+      width: 100%; font-size: 16px; padding: 10px; border: 1px solid var(--line);
+      border-radius: 6px; margin-bottom: 8px;
+    }
+    .annot-textpop .row-btns { display: flex; gap: 8px; justify-content: flex-end; }
+    .foto-badge {
+      display: inline-block; font-size: 11px; font-weight: 700; color: var(--blue);
+      background: var(--blue-light); border-radius: 999px; padding: 1px 8px; margin-left: 6px;
+      vertical-align: middle;
+    }
+    .foto-badge svg {
+      width: 11px; height: 11px; fill: currentColor; vertical-align: -1px; margin-right: 3px;
+    }
+    .foto-badge-druck {
+      color: #1a5a3a;
+      background: #e5f4eb;
+    }
+    .btn-restore { margin: 12px 0 0; width: 100%; }
+    @media screen and (max-width: 767.98px) {
+      .annot-tools { overflow-x: visible; flex-wrap: wrap; row-gap: 6px; }
+      .annot-tool, .annot-w, .annot-act { font-size: 12px; padding: 8px 8px; white-space: nowrap; min-height: 40px; }
+    }
+
+    /* Tablet landscape (≥768 already uses the two-column default; widen at 900) */
+    @media screen and (min-width: 768px) and (min-width: 900px) and (orientation: landscape) {
+      .row { grid-template-columns: minmax(260px, 36%) 1fr; padding: 7px 18px; }
+      main { padding: 16px max(28px, var(--sar)) calc(80px + var(--sab)) max(28px, var(--sal)); }
+      main.tight { padding: 0 0 calc(40px + var(--sab)); }
+      .overview-wrap, .fotos-wrap { padding-left: max(28px, var(--sal)); padding-right: max(28px, var(--sar)); }
+      .fdetail-body { padding-left: 28px; padding-right: 28px; }
+    }
+
+    /* Phone / compact: auto-selected below 768px (e.g. iPhone 17 Pro Max 440×956) */
+    @media screen and (max-width: 767.98px) {
+      :root { --header-h: 52px; --tabs-h: 48px; }
+      .app-header h1 {
+        font-size: 16px;
+        max-width: calc(100% - 168px);
+      }
+      .tab {
+        font-size: 14px;
+        padding: 0 14px;
+        min-height: 44px;
+        flex: 0 0 auto;
+      }
+      main {
+        padding: 12px max(12px, var(--sar)) calc(32px + var(--sab)) max(12px, var(--sal));
+      }
+      main.tight { padding: 0 0 calc(24px + var(--sab)); }
+      .overview-wrap, .fotos-wrap {
+        padding-left: max(12px, var(--sal));
+        padding-right: max(12px, var(--sar));
+        padding-bottom: calc(32px + var(--sab));
+      }
+      .section { margin: 16px 0 8px; }
+
+      /* Single column, labels above fields, full-width controls */
+      .row, .row.label-top, .row.check {
+        grid-template-columns: 1fr;
+        justify-items: stretch;
+        align-items: stretch;
+        gap: 6px;
+        padding: 10px 12px;
+        min-height: 44px;
+      }
+      .row.check {
+        grid-template-columns: 1fr auto;
+        align-items: center;
+      }
+      /* Ja/Nein and mixed pairs wrap into stacked label+control rows */
+      .row.pair, .row.pair.mixed {
+        grid-template-columns: 1fr auto;
+        gap: 8px 10px;
+        padding: 10px 12px;
+      }
+      .row.pair .right-lbl,
+      .row.pair.mixed .right-lbl { text-align: left; }
+      .row .lbl { font-size: 14px; }
+      .row input[type="text"],
+      .row input[type="tel"],
+      .row input[type="date"],
+      .row input[type="datetime-local"],
+      .row input[type="number"],
+      .row input[type="time"],
+      .row select {
+        text-align: left;
+        width: 100%;
+        min-height: 44px;
+        font-size: 16px;
+        padding: 10px 12px;
+      }
+      .row textarea {
+        width: 100%;
+        min-height: 96px;
+        font-size: 16px;
+      }
+      input[type="checkbox"] {
+        width: 26px; height: 26px;
+        min-width: 26px;
+      }
+
+      .menu-item { min-height: 56px; padding: 12px; font-size: 16px; gap: 12px; }
+      .drawer { width: 100%; max-width: 100vw; }
+      .drawer-actions { padding-left: max(12px, var(--sal)); padding-right: max(12px, var(--sar)); }
+      .btn { min-height: 44px; font-size: 15px; padding: 10px 14px; }
+      .report-item { align-items: center; }
+      .report-item .btn { flex-shrink: 0; }
+
+      .foto-list { display: flex; flex-direction: column; gap: 10px; }
+      .foto-item { gap: 10px; padding: 10px; min-height: 72px; max-width: 100%; }
+      .foto-thumb { width: 64px; height: 64px; }
+      .foto-name, .foto-sub { overflow-wrap: anywhere; }
+
+      .fdetail-img-wrap { min-height: 180px; max-height: 38vh; }
+      .fdetail-img-wrap img { max-height: 38vh; }
+      .fdetail-body { padding: 8px max(14px, var(--sar)) calc(16px + var(--sab)) max(14px, var(--sal)); }
+      .fg textarea, .fg input[type="text"], .fg input[type="number"] {
+        font-size: 16px;
+        min-height: 44px;
+      }
+      .fg textarea { min-height: 110px; }
+      .fg .check-row { min-height: 44px; }
+
+      .toast { max-width: calc(100vw - 24px - var(--sal) - var(--sar)); }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header" id="appHeader"></header>
+  <nav class="tab-bar is-hidden" id="tabBar" role="tablist" aria-label="Berichtabschnitte"></nav>
+  <main id="main"></main>
+
+  <input class="hidden-file" id="photoInput" type="file" accept="image/*" multiple />
+
+  <div class="overlay" id="overlay" hidden></div>
+  <aside class="drawer" id="drawer" aria-hidden="true" role="dialog" aria-labelledby="drawerTitle">
+    <div class="drawer-head">
+      <h2 id="drawerTitle">Aufträge</h2>
+      <button class="hdr-btn" id="btnCloseDrawer" aria-label="Schließen">
+        <svg viewBox="0 0 24 24"><path d="M18.3 5.7 12 12l6.3 6.3-1.4 1.4L10.6 13.4 4.3 19.7 2.9 18.3 9.2 12 2.9 5.7 4.3 4.3l6.3 6.3 6.3-6.3z"/></svg>
+      </button>
+    </div>
+    <div class="drawer-actions">
+      <button class="btn primary" id="btnNew">Neuer Auftrag</button>
+      <button class="btn" id="btnExport">JSON exportieren</button>
+      <button class="btn" id="btnPrint">Drucken / PDF</button>
+    </div>
+    <div class="report-list" id="reportList"></div>
+  </aside>
+
+  <div class="lightbox" id="lightbox" hidden>
+    <button class="hdr-btn lb-close" id="btnCloseLightbox" aria-label="Schließen">
+      <svg viewBox="0 0 24 24"><path d="M18.3 5.7 12 12l6.3 6.3-1.4 1.4L10.6 13.4 4.3 19.7 2.9 18.3 9.2 12 2.9 5.7 4.3 4.3l6.3 6.3 6.3-6.3z" fill="#fff"/></svg>
+    </button>
+    <img id="lightboxImg" alt="Foto in Vollbild" />
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+  <div class="annot-editor" id="annotEditor" hidden></div>
+  <div class="print-root" id="printRoot"></div>
+
+  <script>
+  (function () {
+    const STORAGE_CURRENT = "leckortung.current";
+    const STORAGE_LIST = "leckortung.reports";
+    const DB_NAME = "leckortung";
+    const DB_STORE = "photos";
+    const DB_VERSION = 1;
+
+    function todayDate() {
+      const d = new Date();
+      const z = (n) => String(n).padStart(2, "0");
+      return d.getFullYear() + "-" + z(d.getMonth() + 1) + "-" + z(d.getDate());
+    }
+    function todayAt(hh, mm) {
+      return todayDate() + "T" + String(hh).padStart(2, "0") + ":" + String(mm).padStart(2, "0");
+    }
+    function uid(prefix) {
+      return (prefix || "r") + "-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8);
+    }
+    function nowIso() { return new Date().toISOString(); }
+    function formatDe(iso) {
+      if (!iso) return "–";
+      const d = new Date(iso);
+      if (isNaN(d)) return iso;
+      return d.toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" });
+    }
+    function formatDateDe(ymd) {
+      if (!ymd) return "–";
+      if (/^\d{4}-\d{2}-\d{2}/.test(ymd)) {
+        const [y, m, d] = ymd.slice(0, 10).split("-");
+        return d + "." + m + "." + y;
+      }
+      const d = new Date(ymd);
+      if (!isNaN(d)) return d.toLocaleDateString("de-DE");
+      return ymd;
+    }
+
+    /* Field definitions – additional fields can be appended to a tab's fields array. */
+    const TABS = [
+      {
+        id: "allgemein",
+        title: "Allgemeine Informationen",
+        fields: [
+          { type: "text", id: "versicherungsNr", label: "Versicherungs-Nr." },
+          { type: "text", id: "schadenNr", label: "Schaden-Nr." },
+          { type: "text", id: "kundenAuftragsnummer", label: "Kunden Auftragsnummer" },
+          { type: "text", id: "versicherungsgesellschaft", label: "Versicherungsgesellschaft" },
+          { type: "date", id: "datum", label: "Datum", default: () => todayDate() },
+          { type: "datetime-local", id: "messterminVon", label: "Messtermin von", default: () => todayAt(8, 0) },
+          { type: "datetime-local", id: "messterminBis", label: "Messtermin bis", default: () => todayAt(11, 0) },
+
+          { type: "section", title: "Anwesende Personen" },
+          { type: "text", id: "messtechniker", label: "Messtechniker", default: "F. Jäger" },
+          { type: "tel", id: "messtechnikerTel", label: "Telefon-Nr." },
+          { type: "checkbox", id: "anwesendVn", label: "Versicherungsnehmer" },
+          { type: "checkbox", id: "anwesendEigentuemer", label: "Eigentümer" },
+          { type: "checkbox", id: "anwesendMieter", label: "Mieter" },
+          { type: "checkbox", id: "anwesendInstallateur", label: "Installateur" },
+          { type: "checkbox", id: "anwesendSonstige", label: "sonstige Person" },
+          { type: "text", id: "personVorOrt", label: "Person vor Ort" },
+          { type: "tel", id: "personVorOrtTel", label: "Telefon-Nr." },
+
+          { type: "textarea", id: "allgemeineInformationen", label: "Allgemeine Informationen" },
+          { type: "textarea", id: "schadensbild", label: "Schadensbild" },
+          { type: "textarea", id: "schadensursache", label: "Schadensursache" },
+          { type: "textarea", id: "durchgefuehrteArbeiten", label: "durchgeführte Arbeiten" },
+          { type: "checkbox", id: "druckpruefungDurchgefuehrt", label: "Druckprüfung durchgeführt" },
+
+          { type: "section", title: "Ursachenermittlung Druck- und Dichtigkeitstest" },
+          { type: "checkbox-pair", left: { id: "kwGeprueft", label: "Kaltwasserleitung geprüft" }, right: { id: "kwDruckverlust", label: "Druckverlust" } },
+          { type: "checkbox-pair", left: { id: "wwGeprueft", label: "Warmwasserleitung geprüft" }, right: { id: "wwDruckverlust", label: "Druckverlust" } },
+          { type: "checkbox-pair", left: { id: "zirkGeprueft", label: "Zirkulationsleitung geprüft" }, right: { id: "zirkDruckverlust", label: "Druckverlust" } },
+          { type: "checkbox-pair", left: { id: "hzGeprueft", label: "Heizungsleitung geprüft" }, right: { id: "hzDruckverlust", label: "Druckverlust" } },
+          { type: "checkbox-pair", left: { id: "fbhGeprueft", label: "Fußbodenheizung geprüft" }, right: { id: "fbhDruckverlust", label: "Druckverlust" } },
+          { type: "checkbox-pair", left: { id: "aussenGeprueft", label: "Außenleitung geprüft" }, right: { id: "aussenDruckverlust", label: "Druckverlust" } },
+          { type: "checkbox-pair", left: { id: "awGeprueft", label: "Abwasserleitung geprüft" }, right: { id: "awUndicht", label: "Undicht" } },
+          { type: "checkbox-pair", left: { id: "grundGeprueft", label: "Grundleitung geprüft" }, right: { id: "grundUndicht", label: "Undicht" } },
+          { type: "checkbox-pair", left: { id: "regenGeprueft", label: "Regenleitung geprüft" }, right: { id: "regenUndicht", label: "Undicht" } },
+          { type: "checkbox-pair", left: { id: "flachdachGeprueft", label: "Flachdach angestaut geprüft" }, right: { id: "flachdachUndicht", label: "Undicht" } },
+          { type: "text-checkbox", text: { id: "sonstigesLeitung", label: "sonstiges" }, check: { id: "sonstigesUndicht", label: "Undicht" } },
+          { type: "text", id: "leitung", label: "Leitung" },
+          { type: "text", id: "ergebnis", label: "Ergebnis" },
+
+          { type: "checkbox", id: "methodeFeuchte", label: "Feuchtigkeitsmessung" },
+          { type: "checkbox", id: "methodeAkustik", label: "Akustik" },
+          { type: "checkbox", id: "methodeLeitungsortung", label: "Leitungsortung" },
+          { type: "decimal", id: "tracerKg", label: "Tracer-/Prüfgas (kg)", default: "0,0" },
+          { type: "checkbox", id: "methodeThermografie", label: "Thermografie" },
+          { type: "checkbox", id: "methodeKanalkamera", label: "Kanalkamera" },
+          { type: "checkbox", id: "methodeVideoendoskopie", label: "Videoendoskopie" },
+          { type: "checkbox", id: "methodeFaerbemittel", label: "Färbemittel" },
+          { type: "text", id: "methodeSonstiges", label: "sonstiges" },
+
+          { type: "checkbox-text", check: { id: "schadensstelleGeoeffnet", label: "Schadensstelle geöffnet" }, text: { id: "geoeffnetDurch", label: "durch", default: "F. Jäger" } },
+          { type: "checkbox-number", check: { id: "fliesenEntnommen", label: "Fliese(n) entnommen" }, number: { id: "fliesenAnzahl", label: "Anzahl", default: 0 } },
+          { type: "checkbox", id: "schadensursacheGefunden", label: "Schadensursache gefunden" },
+          { type: "checkbox", id: "folgeterminNotwendig", label: "Folgetermin notwendig" },
+
+          { type: "textarea", id: "besondereEmpfehlungen", label: "Wichtige Besonderheiten / Empfehlungen", placeholder: "Geben Sie hier Ihren Text ein" },
+          { type: "textarea", id: "hinweispflicht", label: "Hinweispflicht zum Messergebnis", placeholder: "Geben Sie hier Ihren Text ein" },
+          { type: "textarea", id: "messtechnik", label: "Messtechnik", default: "Gann Hydromette UNI 2 mit B50 Elektrode" },
+
+          { type: "section", title: "Schadenregulierer/Sachverständiger Versicherung" },
+          { type: "checkbox", id: "svErforderlich", label: "Halten wir für erforderlich" },
+          { type: "checkbox", id: "svInformiert", label: "Wurde informiert" },
+          { type: "text", id: "svName", label: "Name" },
+          { type: "extend" }
+        ]
+      },
+      {
+        id: "leitungssystem",
+        title: "Leitungssystem",
+        fields: [
+          { type: "section", title: "Leitungssystem - Versorgung" },
+          { type: "checkbox", id: "vsHeizung", label: "Heizung" },
+          { type: "checkbox", id: "vsFbh", label: "Fußbodenheizung" },
+          { type: "checkbox", id: "vsWarmwasser", label: "Warmwasser" },
+          { type: "checkbox", id: "vsKaltwasser", label: "Kaltwasser" },
+          { type: "checkbox", id: "vsRegenwasser", label: "Regenwasser" },
+          { type: "text", id: "vsSonstiges", label: "sonstiges" },
+          { type: "checkbox", id: "vsKupfer", label: "Kupfer" },
+          { type: "checkbox", id: "vsStahl", label: "Stahl" },
+          { type: "checkbox", id: "vsWicu", label: "WICU" },
+          { type: "checkbox", id: "vsMehrverbund", label: "Mehrverbundrohr" },
+          { type: "checkbox", id: "vsKunststoff", label: "Kunststoff" },
+          { type: "text", id: "vsMaterialSonstiges", label: "sonstiges" },
+
+          { type: "section", title: "Leitungssystem - Entsorgung" },
+          { type: "checkbox", id: "enSammelleitung", label: "Abwassersammelleitung" },
+          { type: "checkbox", id: "enStrang", label: "Abwasserstrang" },
+          { type: "checkbox", id: "enGrundleitung", label: "Abwassergrundleitung" },
+          { type: "checkbox", id: "enRegenwasser", label: "Regenwasserleitung" },
+          { type: "text", id: "enSonstiges", label: "sonstiges" },
+          { type: "checkbox", id: "enAbflussKunststoff", label: "Abfluss/Kunststoff" },
+          { type: "checkbox", id: "enAbflussGuss", label: "Abfluss/Guss" },
+          { type: "text", id: "enMaterialSonstiges", label: "sonstiges" },
+
+          { type: "section", title: "Leitungssystem - Allgemein" },
+          { type: "checkbox", id: "alLochfrass", label: "Lochfrasswiederverschluss" },
+          { type: "checkbox", id: "alSchwitzwasser", label: "Schwitzwasser/Kondenswasserbildung" },
+          { type: "checkbox", id: "alArmatur", label: "Armatur defekt/undicht" },
+          { type: "checkbox", id: "alSilikonfugen", label: "Silikonfugen undicht" },
+          { type: "checkbox", id: "alFliesenfugen", label: "Fliesenfugen undicht" },
+          { type: "checkbox", id: "alMuffenversatz", label: "Muffenversatz" },
+          { type: "text", id: "alSonstiges", label: "sonstiges" },
+
+          { type: "section", title: "Weitere Maßnahmen" },
+          { type: "checkbox", id: "maReparaturInstallateur", label: "Reparatur durch Installateur erforderlich" },
+          { type: "checkbox", id: "maSanierung", label: "Sanierung erforderlich" },
+          { type: "select", id: "maSchadensaufnahme", label: "Schadensaufnahme", default: "durchgeführt", options: ["", "durchgeführt", "erforderlich", "nicht erforderlich"] },
+          { type: "select", id: "maTrocknung", label: "Trocknung", default: "nicht erforderlich", options: ["", "durchgeführt", "erforderlich", "nicht erforderlich"] },
+          { type: "select", id: "maSofortmassnahme", label: "Sofortmaßnahme", default: "durchgeführt", options: ["", "durchgeführt", "erforderlich", "nicht erforderlich"] },
+          { type: "checkbox", id: "maDetailsTrocknungsangebot", label: "Details siehe Trocknungsangebot (folgt)" },
+          { type: "textarea", id: "maSonstiges", label: "sonstiges", placeholder: "Geben Sie hier Ihren Text ein" },
+          { type: "extend" }
+        ]
+      },
+      {
+        id: "gewerke",
+        title: "Erforderliche Gewerke / Schadenshöhe",
+        fields: [
+          { type: "section", title: "Erforderliche Gewerke" },
+          { type: "checkbox", id: "gwMaurer", label: "Maurer" },
+          { type: "checkbox", id: "gwFliesenleger", label: "Fliesenleger" },
+          { type: "checkbox", id: "gwDachdecker", label: "Dachdecker" },
+          { type: "checkbox", id: "gwBodenleger", label: "Bodenleger" },
+          { type: "checkbox", id: "gwMalerTrockenbauer", label: "Maler / Trockenbauer" },
+          { type: "checkbox", id: "gwTrocknung", label: "Trocknung" },
+          { type: "text", id: "gwSonstiges", label: "sonstiges" },
+
+          { type: "section", title: "Vermutliche Schadenshöhe (keine Gesamtschadenermittlung)" },
+          { type: "select", id: "shKostenschaetzung", label: "Kostenschätzung", default: "über 2000 euro", options: ["", "über 2000 euro", "unter 2000 euro", "nicht einzuschätzen"] }
+        ]
+      }
+    ];
+
+
+    function defaultValue(field) {
+      if (!field) return "";
+      const d = field.default;
+      if (typeof d === "function") return d();
+      if (d === undefined || d === null) {
+        if (field.type === "checkbox") return false;
+        return "";
+      }
+      return d;
+    }
+
+    function collectFieldMeta(tab) {
+      const list = [];
+      (tab.fields || []).forEach((f) => {
+        if (f.type === "section" || f.type === "extend") return;
+        if (f.type === "checkbox-pair") {
+          list.push({ ...f.left, type: "checkbox" }, { ...f.right, type: "checkbox" });
+        } else if (f.type === "text-checkbox") {
+          list.push({ ...f.text, type: "text" }, { ...f.check, type: "checkbox" });
+        } else if (f.type === "checkbox-text") {
+          list.push({ ...f.check, type: "checkbox" }, { ...f.text, type: "text" });
+        } else if (f.type === "checkbox-number") {
+          list.push({ ...f.check, type: "checkbox" }, { ...f.number, type: "number" });
+        } else {
+          list.push(f);
+        }
+      });
+      return list;
+    }
+
+    function allFieldMeta() {
+      return TABS.flatMap(collectFieldMeta);
+    }
+
+    function freshValues() {
+      const values = {};
+      allFieldMeta().forEach((f) => { values[f.id] = defaultValue(f); });
+      return values;
+    }
+
+    const ANREDE_OPTIONS = ["", "Herrn", "Frau", "Firma", "Familie", "Eheleute", "Herrn und Frau"];
+
+    function freshMeta() {
+      return {
+        auftragsNr: "",
+        anrede: "",
+        kunde: "",
+        plz: "",
+        ort: "",
+        strasse: "",
+        auftragsart: "Leckageortung, (L)",
+        terminVon: "",
+        terminBis: ""
+      };
+    }
+
+    function freshMitarbeiter() {
+      return {
+        startzeit: "",
+        endzeit: "",
+        notiz: "",
+        ausgefArbeiten: "",
+        textFolgeauftrag: ""
+      };
+    }
+
+    function migrateAuftrag(raw) {
+      const a = raw && typeof raw === "object" ? raw : {};
+      const out = {
+        id: a.id || uid("r"),
+        createdAt: a.createdAt || nowIso(),
+        updatedAt: a.updatedAt || a.createdAt || nowIso(),
+        meta: Object.assign(freshMeta(), a.meta || {}),
+        values: Object.assign(freshValues(), a.values || {}),
+        mitarbeiter: Object.assign(freshMitarbeiter(), a.mitarbeiter || {}),
+        photos: Array.isArray(a.photos) ? a.photos.map(migratePhoto) : []
+      };
+      return out;
+    }
+
+    function migratePhoto(p) {
+      p = p || {};
+      return {
+        id: p.id || uid("p"),
+        name: p.name || "Foto",
+        date: (p.date || "").slice(0, 10) || todayDate(),
+        addedAt: p.addedAt || nowIso(),
+        comment: p.comment || "",
+        folgeauftrag: !!p.folgeauftrag,
+        sortiernummer: p.sortiernummer == null || p.sortiernummer === "" ? 0 : Number(p.sortiernummer),
+        druck: p.druck === undefined ? true : !!p.druck,
+        annotations: Array.isArray(p.annotations) ? p.annotations : [],
+        annotated: !!p.annotated
+      };
+    }
+
+    function freshAuftrag() {
+      return migrateAuftrag({
+        id: uid("r"),
+        createdAt: nowIso(),
+        updatedAt: nowIso(),
+        meta: freshMeta(),
+        values: freshValues(),
+        mitarbeiter: freshMitarbeiter(),
+        photos: []
+      });
+    }
+
+    /* ---------- IndexedDB for photo blobs ---------- */
+    let dbPromise = null;
+    function openDb() {
+      if (dbPromise) return dbPromise;
+      dbPromise = new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NAME, DB_VERSION);
+        req.onupgradeneeded = () => {
+          const db = req.result;
+          if (!db.objectStoreNames.contains(DB_STORE)) {
+            const store = db.createObjectStore(DB_STORE, { keyPath: "key" });
+            store.createIndex("auftragId", "auftragId", { unique: false });
+          }
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+      return dbPromise;
+    }
+
+    function photoKey(auftragId, photoId) {
+      return auftragId + "::" + photoId;
+    }
+
+    async function idbPutPhoto(auftragId, photoId, blob, extra) {
+      const db = await openDb();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(DB_STORE, "readwrite");
+        tx.objectStore(DB_STORE).put(Object.assign({
+          key: photoKey(auftragId, photoId),
+          auftragId, photoId, blob
+        }, extra || {}));
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+
+    async function idbGetPhoto(auftragId, photoId) {
+      const db = await openDb();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(DB_STORE, "readonly");
+        const req = tx.objectStore(DB_STORE).get(photoKey(auftragId, photoId));
+        req.onsuccess = () => resolve(req.result || null);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function idbDeletePhoto(auftragId, photoId) {
+      const db = await openDb();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(DB_STORE, "readwrite");
+        tx.objectStore(DB_STORE).delete(photoKey(auftragId, photoId));
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+
+    async function idbDeleteAuftragPhotos(auftragId) {
+      const db = await openDb();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(DB_STORE, "readwrite");
+        const idx = tx.objectStore(DB_STORE).index("auftragId");
+        const req = idx.openCursor(IDBKeyRange.only(auftragId));
+        req.onsuccess = () => {
+          const cursor = req.result;
+          if (cursor) { cursor.delete(); cursor.continue(); }
+        };
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+
+    async function idbMergePhoto(auftragId, photoId, patch) {
+      const rec = (await idbGetPhoto(auftragId, photoId)) || {
+        key: photoKey(auftragId, photoId), auftragId, photoId
+      };
+      Object.assign(rec, patch);
+      const db = await openDb();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(DB_STORE, "readwrite");
+        tx.objectStore(DB_STORE).put(rec);
+        tx.oncomplete = () => resolve(rec);
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+
+    function displayBlob(rec) {
+      return (rec && rec.annotatedBlob) ? rec.annotatedBlob : (rec && rec.blob);
+    }
+
+    const objectUrls = new Set();
+    function blobUrl(blob) {
+      const u = URL.createObjectURL(blob);
+      objectUrls.add(u);
+      return u;
+    }
+    function revokeUrls() {
+      objectUrls.forEach((u) => URL.revokeObjectURL(u));
+      objectUrls.clear();
+    }
+
+    function downscaleFile(file, maxSize, quality) {
+      maxSize = maxSize || 1600;
+      quality = quality || 0.82;
+      return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => {
+          let w = img.naturalWidth, h = img.naturalHeight;
+          if (w > maxSize || h > maxSize) {
+            const scale = maxSize / Math.max(w, h);
+            w = Math.round(w * scale);
+            h = Math.round(h * scale);
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext("2d");
+          ctx.fillStyle = "#fff";
+          ctx.fillRect(0, 0, w, h);
+          ctx.drawImage(img, 0, 0, w, h);
+          URL.revokeObjectURL(url);
+          canvas.toBlob((blob) => {
+            if (!blob) reject(new Error("encode"));
+            else resolve({ blob, width: w, height: h });
+          }, "image/jpeg", quality);
+        };
+        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("load")); };
+        img.src = url;
+      });
+    }
+
+    async function blobToDataUrl(blob) {
+      return new Promise((resolve, reject) => {
+        const r = new FileReader();
+        r.onload = () => resolve(r.result);
+        r.onerror = () => reject(r.error);
+        r.readAsDataURL(blob);
+      });
+    }
+
+    /* ---------- Persistence ---------- */
+    function loadCurrent() {
+      try {
+        const raw = localStorage.getItem(STORAGE_CURRENT);
+        if (raw) return migrateAuftrag(JSON.parse(raw));
+      } catch (e) {}
+      return freshAuftrag();
+    }
+    function loadReports() {
+      try {
+        const list = JSON.parse(localStorage.getItem(STORAGE_LIST) || "[]");
+        return Array.isArray(list) ? list.map(migrateAuftrag) : [];
+      } catch (e) { return []; }
+    }
+    function persistCurrent() {
+      current.updatedAt = nowIso();
+      current.photoSortMode = photoSortMode;
+      try { localStorage.setItem(STORAGE_CURRENT, JSON.stringify(current)); }
+      catch (e) { toast("Speichern nicht möglich (Speicher voll?)", true); }
+    }
+    function persistList() {
+      try { localStorage.setItem(STORAGE_LIST, JSON.stringify(reports)); }
+      catch (e) { toast("Speichern nicht möglich (Speicher voll?)", true); }
+    }
+
+    let current = loadCurrent();
+    let reports = loadReports();
+
+    /* ---------- View state ---------- */
+    let view = "overview"; /* overview | bericht | mitarbeiter | fotos | fotodetail */
+    let activeTab = TABS[0].id;
+    let activePhotoId = null;
+    let photoEditMode = false;
+    let photoSortMode = (current.photoSortMode === "date") ? "date" : "custom";
+
+    const tabBar = document.getElementById("tabBar");
+    const main = document.getElementById("main");
+
+    function escapeHtml(s) {
+      return String(s == null ? "" : s)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+    function attr(s) { return escapeHtml(s); }
+
+    /* ---------- Status ---------- */
+    const BERICHT_TEXT_FIELDS = [
+      "versicherungsNr", "schadenNr", "kundenAuftragsnummer", "versicherungsgesellschaft",
+      "allgemeineInformationen", "schadensbild", "schadensursache", "durchgefuehrteArbeiten",
+      "personVorOrt", "personVorOrtTel", "messtechnikerTel", "leitung", "ergebnis",
+      "methodeSonstiges", "besondereEmpfehlungen", "hinweispflicht", "svName",
+      "sonstigesLeitung", "vsSonstiges", "vsMaterialSonstiges", "enSonstiges",
+      "enMaterialSonstiges", "alSonstiges", "maSonstiges", "gwSonstiges"
+    ];
+
+    function isBerichtFilled(r) {
+      const v = (r || current).values || {};
+      if (BERICHT_TEXT_FIELDS.some((k) => String(v[k] || "").trim())) return true;
+      return allFieldMeta().some((f) => {
+        if (f.type !== "checkbox") return false;
+        const def = defaultValue(f);
+        return !!v[f.id] && !def;
+      });
+    }
+
+    function isMitarbeiterFilled(r) {
+      const m = (r || current).mitarbeiter || {};
+      return !!(m.startzeit && m.endzeit);
+    }
+
+    function photoHasComment(p) {
+      return !!(p && String(p.comment || "").trim());
+    }
+
+    function isFotosFilled(r) {
+      const photos = (r || current).photos || [];
+      return photos.length > 0 && photos.every(photoHasComment);
+    }
+
+    function getPhoto(id) {
+      return (current.photos || []).find((p) => p.id === id) || null;
+    }
+
+    function orderedPhotos() {
+      const list = (current.photos || []).slice();
+      list.sort((a, b) => {
+        const sa = Number(a.sortiernummer) || 0;
+        const sb = Number(b.sortiernummer) || 0;
+        if (sa !== sb) return sa - sb;
+        return String(a.addedAt || "").localeCompare(String(b.addedAt || ""));
+      });
+      return list;
+    }
+
+    function photosByDate() {
+      const list = (current.photos || []).slice();
+      list.sort((a, b) => {
+        const da = a.date || "";
+        const db = b.date || "";
+        if (da !== db) return da.localeCompare(db);
+        return String(a.addedAt || "").localeCompare(String(b.addedAt || ""));
+      });
+      return list;
+    }
+
+    function sortedPhotos() {
+      return photoSortMode === "date" ? photosByDate() : orderedPhotos();
+    }
+
+    function applyPhotoOrder(list, mode) {
+      const ordered = list.slice();
+      ordered.forEach((p, i) => { p.sortiernummer = i + 1; });
+      current.photos = ordered;
+      if (mode) photoSortMode = mode;
+      current.photoSortMode = photoSortMode;
+      persistCurrent();
+    }
+
+    function ensurePhotoOrder() {
+      const list = orderedPhotos();
+      const messy = list.some((p, i) => Number(p.sortiernummer) !== i + 1);
+      if (messy) applyPhotoOrder(list, photoSortMode === "date" ? "date" : "custom");
+    }
+
+    function nextSortNumber() {
+      return (current.photos || []).length + 1;
+    }
+
+    function movePhotoBy(id, delta) {
+      const list = orderedPhotos();
+      const i = list.findIndex((p) => p.id === id);
+      if (i < 0) return;
+      const j = i + delta;
+      if (j < 0 || j >= list.length) return;
+      const tmp = list[i];
+      list[i] = list[j];
+      list[j] = tmp;
+      applyPhotoOrder(list, "custom");
+      renderApp();
+    }
+
+    function movePhotoToPosition(id, pos) {
+      const list = orderedPhotos();
+      const i = list.findIndex((p) => p.id === id);
+      if (i < 0) return;
+      const item = list.splice(i, 1)[0];
+      const n = list.length + 1;
+      let target = parseInt(pos, 10);
+      if (!isFinite(target) || target < 1) target = n;
+      if (target > n) target = n;
+      list.splice(target - 1, 0, item);
+      applyPhotoOrder(list, "custom");
+    }
+
+    /* ---------- Icons ---------- */
+    const ICO = {
+      menu: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v2H4V6zm0 5h16v2H4v-2zm0 5h16v2H4v-2z"/></svg>',
+      handle: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16v2H4V7zm0 4h16v2H4v-2zm0 4h16v2H4v-2z"/></svg>',
+      up: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7 5 15h14z"/></svg>',
+      down: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9h14l-7 8z"/></svg>',
+      back: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.4 4.6 13.99 3.2 5.2 12l8.79 8.8 1.41-1.4L8 12z"/></svg>',
+      save: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7l-4-4zm-5 16a3 3 0 1 1 0-6 3 3 0 0 1 0 6zM15 9H5V5h10v4z"/></svg>',
+      plus: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></svg>',
+      sort: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 7H17V9H11V7ZM7 5H9V19H7V5ZM11 15H21V17H11V15ZM11 11H19V13H11V11Z"/></svg>',
+      pencil: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>',
+      trash: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>',
+      doc: '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm1 7V3.5L19.5 9H15zM8 13h8v2H8v-2zm0 4h8v2H8v-2z"/></svg>',
+      person: '<svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm0 2c-4 0-8 2-8 6v2h16v-2c0-4-4-6-8-6z"/></svg>',
+      camera: '<svg viewBox="0 0 24 24"><path d="M9 3 7.17 5H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.17L15 3H9zm3 15a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-2.5A2.5 2.5 0 1 0 9.5 13 2.5 2.5 0 0 0 12 15.5z"/></svg>',
+      chevron: '<svg viewBox="0 0 24 24"><path d="M9.3 6.3 8 7.6 12.4 12 8 16.4l1.3 1.3 5.7-5.7z"/></svg>',
+      close: '<svg viewBox="0 0 24 24"><path d="M18.3 5.7 12 12l6.3 6.3-1.4 1.4L10.6 13.4 4.3 19.7 2.9 18.3 9.2 12 2.9 5.7 4.3 4.3l6.3 6.3 6.3-6.3z"/></svg>',
+      printer: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 8h-1V3H6v5H5a3 3 0 0 0-3 3v6h4v4h12v-4h4v-6a3 3 0 0 0-3-3zM8 5h8v3H8V5zm8 14H8v-5h8v5zm4-5h-2v-2H6v2H4v-4a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v4zM7 10.5a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg>'
+    };
+
+    function hdrBtn(id, title, icon, extraClass) {
+      return `<button class="hdr-btn${extraClass ? " " + extraClass : ""}" id="${id}" title="${attr(title)}" aria-label="${attr(title)}">${icon}</button>`;
+    }
+
+    function headerTitle() {
+      if (view === "overview") {
+        const nr = (current.meta && current.meta.auftragsNr || "").trim();
+        return nr ? "Auftrag " + nr : "Auftrag";
+      }
+      if (view === "bericht") return "Leckortungsbericht";
+      if (view === "mitarbeiter") return "Mitarbeiter";
+      if (view === "fotos") return "Fotos";
+      if (view === "fotodetail") return "Fotosdetails";
+      return "Auftrag";
+    }
+
+    function renderHeader() {
+      const left = (view === "overview")
+        ? hdrBtn("btnBerichte", "Aufträge", ICO.menu)
+        : hdrBtn("btnBack", "Zurück", ICO.back);
+      let right = "";
+      if (view === "overview" || view === "bericht" || view === "mitarbeiter") {
+        right = hdrBtn("btnSave", "Auftrag speichern", ICO.save);
+      } else if (view === "fotos") {
+        right = hdrBtn("btnAddPhoto", "Foto hinzufügen", ICO.plus)
+          + hdrBtn("btnSortPhotos", photoSortMode === "date" ? "Eigene Reihenfolge anzeigen" : "Nach Datum sortieren", ICO.sort);
+      } else if (view === "fotodetail") {
+        right = hdrBtn("btnEditPhoto", "Bearbeiten", ICO.pencil)
+          + hdrBtn("btnSavePhoto", "Foto speichern", ICO.save)
+          + hdrBtn("btnDeletePhoto", "Foto löschen", ICO.trash, "danger-icon");
+      }
+      document.getElementById("appHeader").innerHTML =
+        `<div class="hdr-left">${left}</div><h1 id="hdrTitle">${escapeHtml(headerTitle())}</h1><div class="hdr-right">${right}</div>`;
+
+      const berichte = document.getElementById("btnBerichte");
+      if (berichte) berichte.addEventListener("click", openDrawer);
+      const back = document.getElementById("btnBack");
+      if (back) back.addEventListener("click", goBack);
+      const save = document.getElementById("btnSave");
+      if (save) save.addEventListener("click", saveToList);
+      const add = document.getElementById("btnAddPhoto");
+      if (add) add.addEventListener("click", () => document.getElementById("photoInput").click());
+      const sort = document.getElementById("btnSortPhotos");
+      if (sort) sort.addEventListener("click", sortPhotosClick);
+      const edit = document.getElementById("btnEditPhoto");
+      if (edit) edit.addEventListener("click", () => openAnnotEditor());
+      const saveP = document.getElementById("btnSavePhoto");
+      if (saveP) saveP.addEventListener("click", savePhotoDetail);
+      const delP = document.getElementById("btnDeletePhoto");
+      if (delP) delP.addEventListener("click", () => deletePhoto(activePhotoId));
+    }
+
+    function goBack() {
+      if (view === "fotodetail") {
+        readPhotoDetailIntoModel();
+        persistCurrent();
+        const p = getPhoto(activePhotoId);
+        if (p && !photoHasComment(p)) {
+          toast("Bitte ergänzen Sie noch einen Kommentar zu diesem Foto.", true);
+        }
+        showView("fotos");
+        return;
+      }
+      showView("overview");
+    }
+
+    function showView(name, opts) {
+      if (view === "fotodetail" && name !== "fotodetail") {
+        readPhotoDetailIntoModel();
+        persistCurrent();
+      }
+      view = name;
+      if (name !== "fotodetail") activePhotoId = null;
+      if (opts && opts.photoId) activePhotoId = opts.photoId;
+      if (opts && opts.editMode != null) photoEditMode = !!opts.editMode;
+      renderApp();
+    }
+
+    /* ---------- Render fields (Bericht) ---------- */
+    function inputHtml(f) {
+      const val = current.values[f.id];
+      const ph = f.placeholder ? ` placeholder="${attr(f.placeholder)}"` : "";
+      if (f.type === "textarea") {
+        return `<textarea id="f-${f.id}" data-id="${f.id}"${ph}>${escapeHtml(val)}</textarea>`;
+      }
+      if (f.type === "checkbox") {
+        return `<input type="checkbox" id="f-${f.id}" data-id="${f.id}" ${val ? "checked" : ""} />`;
+      }
+      if (f.type === "decimal") {
+        return `<input type="text" inputmode="decimal" id="f-${f.id}" data-id="${f.id}" value="${attr(val)}"${ph} />`;
+      }
+      if (f.type === "select") {
+        const opts = (f.options || []).map((o) => {
+          const sel = String(val) === String(o) ? " selected" : "";
+          return `<option value="${attr(o)}"${sel}>${escapeHtml(o)}</option>`;
+        }).join("");
+        return `<select id="f-${f.id}" data-id="${f.id}">${opts}</select>`;
+      }
+      const typ = f.type === "number" ? "number" : f.type;
+      const step = typ === "number" ? ' step="1" min="0"' : "";
+      return `<input type="${typ}" id="f-${f.id}" data-id="${f.id}" value="${attr(val)}"${ph}${step} />`;
+    }
+
+    function renderBerichtPanels(container) {
+      container.innerHTML = TABS.map((t) => {
+        const chunks = [];
+        let open = false;
+        const closeCard = () => { if (open) { chunks.push("</div>"); open = false; } };
+        const openCard = () => { if (!open) { chunks.push('<div class="card">'); open = true; } };
+
+        t.fields.forEach((f) => {
+          if (f.type === "section") {
+            closeCard();
+            chunks.push(`<div class="section"><div class="section-title">${escapeHtml(f.title)}</div></div>`);
+            return;
+          }
+          if (f.type === "extend") {
+            closeCard();
+            chunks.push(`<p class="extend-note">Weitere Felder können hier später ergänzt werden.</p>`);
+            return;
+          }
+          openCard();
+          if (f.type === "textarea") {
+            chunks.push(`<div class="row label-top"><label class="lbl" for="f-${f.id}">${escapeHtml(f.label)}</label>${inputHtml(f)}</div>`);
+          } else if (f.type === "checkbox") {
+            chunks.push(`<div class="row check"><label class="lbl" for="f-${f.id}">${escapeHtml(f.label)}</label>${inputHtml(f)}</div>`);
+          } else if (f.type === "checkbox-pair") {
+            chunks.push(`<div class="row pair">
+              <label class="lbl" for="f-${f.left.id}">${escapeHtml(f.left.label)}</label>
+              ${inputHtml({ ...f.left, type: "checkbox" })}
+              <label class="lbl right-lbl" for="f-${f.right.id}">${escapeHtml(f.right.label)}</label>
+              ${inputHtml({ ...f.right, type: "checkbox" })}
+            </div>`);
+          } else if (f.type === "text-checkbox") {
+            chunks.push(`<div class="row pair mixed">
+              <label class="lbl" for="f-${f.text.id}">${escapeHtml(f.text.label)}</label>
+              ${inputHtml({ ...f.text, type: "text" })}
+              <label class="lbl right-lbl" for="f-${f.check.id}">${escapeHtml(f.check.label)}</label>
+              ${inputHtml({ ...f.check, type: "checkbox" })}
+            </div>`);
+          } else if (f.type === "checkbox-text") {
+            chunks.push(`<div class="row pair mixed">
+              <label class="lbl" for="f-${f.check.id}">${escapeHtml(f.check.label)}</label>
+              ${inputHtml({ ...f.check, type: "checkbox" })}
+              <label class="lbl right-lbl" for="f-${f.text.id}">${escapeHtml(f.text.label)}</label>
+              ${inputHtml({ ...f.text, type: "text" })}
+            </div>`);
+          } else if (f.type === "checkbox-number") {
+            chunks.push(`<div class="row pair mixed">
+              <label class="lbl" for="f-${f.check.id}">${escapeHtml(f.check.label)}</label>
+              ${inputHtml({ ...f.check, type: "checkbox" })}
+              <label class="lbl right-lbl" for="f-${f.number.id}">${escapeHtml(f.number.label)}</label>
+              ${inputHtml({ ...f.number, type: "number" })}
+            </div>`);
+          } else {
+            chunks.push(`<div class="row"><label class="lbl" for="f-${f.id}">${escapeHtml(f.label)}</label>${inputHtml(f)}</div>`);
+          }
+        });
+        closeCard();
+        return `<section class="panel${t.id === activeTab ? " active" : ""}" id="panel-${t.id}" role="tabpanel">${chunks.join("")}</section>`;
+      }).join("");
+      container.querySelectorAll("[data-id]").forEach((el) => {
+        const id = el.getAttribute("data-id");
+        const ev = (el.type === "checkbox" || el.tagName === "SELECT") ? "change" : "input";
+        el.addEventListener(ev, () => {
+          current.values[id] = el.type === "checkbox" ? el.checked : el.value;
+          persistCurrent();
+        });
+      });
+    }
+
+    function renderTabs() {
+      if (view !== "bericht") {
+        tabBar.classList.add("is-hidden");
+        tabBar.innerHTML = "";
+        return;
+      }
+      tabBar.classList.remove("is-hidden");
+      tabBar.innerHTML = TABS.map((t) =>
+        `<button class="tab" role="tab" data-tab="${t.id}" aria-selected="${t.id === activeTab}">${escapeHtml(t.title)}</button>`
+      ).join("");
+    }
+
+    function setTab(id) {
+      activeTab = id;
+      tabBar.querySelectorAll(".tab").forEach((b) => b.setAttribute("aria-selected", b.dataset.tab === id));
+      main.querySelectorAll(".panel").forEach((p) => p.classList.toggle("active", p.id === "panel-" + id));
+    }
+
+    /* ---------- Overview / Mitarbeiter / Fotos ---------- */
+    function metaInput(id, type, placeholder) {
+      const val = current.meta[id] == null ? "" : current.meta[id];
+      const ph = placeholder ? ` placeholder="${attr(placeholder)}"` : "";
+      return `<input type="${type}" id="meta-${id}" data-meta="${id}" value="${attr(val)}"${ph} />`;
+    }
+
+    function renderOverview() {
+      const m = current.meta;
+      const bOk = isBerichtFilled(current);
+      const maOk = isMitarbeiterFilled(current);
+      const fOk = isFotosFilled(current);
+      return `<div class="overview-wrap">
+        <div class="section"><div class="section-title">Details</div></div>
+        <div class="card">
+          <div class="row"><label class="lbl" for="meta-auftragsNr">Auftrags-Nr.</label>${metaInput("auftragsNr", "text", "WA260484-001")}</div>
+          <div class="row"><label class="lbl" for="meta-anrede">Anrede</label>
+            <select id="meta-anrede" data-meta="anrede">${ANREDE_OPTIONS.map((o) => `<option value="${attr(o)}"${m.anrede === o ? " selected" : ""}>${escapeHtml(o)}</option>`).join("")}</select>
+          </div>
+          <div class="row"><label class="lbl" for="meta-kunde">Kunde / Name</label>${metaInput("kunde", "text")}</div>
+          <div class="row"><label class="lbl" for="meta-plz">PLZ</label>${metaInput("plz", "text")}</div>
+          <div class="row"><label class="lbl" for="meta-ort">Ort</label>${metaInput("ort", "text")}</div>
+          <div class="row"><label class="lbl" for="meta-strasse">Straße</label>${metaInput("strasse", "text")}</div>
+          <div class="row"><label class="lbl" for="meta-auftragsart">Auftragsart</label>${metaInput("auftragsart", "text")}</div>
+          <div class="row"><label class="lbl" for="meta-terminVon">Termin von</label>${metaInput("terminVon", "datetime-local")}</div>
+          <div class="row"><label class="lbl" for="meta-terminBis">Termin bis</label>${metaInput("terminBis", "datetime-local")}</div>
+        </div>
+        <div class="menu-list">
+          <button type="button" class="menu-item" data-goto="bericht">
+            <span class="menu-ico">${ICO.doc}</span>
+            <span class="menu-label">Leckortungsbericht</span>
+            <span class="status-dot ${bOk ? "ok" : "missing"}" title="${bOk ? "ausgefüllt" : "unvollständig"}"></span>
+            <span class="chevron">${ICO.chevron}</span>
+          </button>
+          <button type="button" class="menu-item" data-goto="mitarbeiter">
+            <span class="menu-ico">${ICO.person}</span>
+            <span class="menu-label">Mitarbeiter</span>
+            <span class="status-dot ${maOk ? "ok" : "missing"}" title="${maOk ? "ausgefüllt" : "unvollständig"}"></span>
+            <span class="chevron">${ICO.chevron}</span>
+          </button>
+          <button type="button" class="menu-item" data-goto="fotos">
+            <span class="menu-ico">${ICO.camera}</span>
+            <span class="menu-label">Fotos</span>
+            <span class="status-dot ${fOk ? "ok" : "missing"}" title="${fOk ? "ausgefüllt" : "unvollständig"}"></span>
+            <span class="chevron">${ICO.chevron}</span>
+          </button>
+        </div>
+      </div>`;
+    }
+
+    function mitInput(id, type, placeholder, isArea) {
+      const val = current.mitarbeiter[id] == null ? "" : current.mitarbeiter[id];
+      const ph = placeholder ? ` placeholder="${attr(placeholder)}"` : "";
+      if (isArea) return `<textarea id="mit-${id}" data-mit="${id}"${ph}>${escapeHtml(val)}</textarea>`;
+      return `<input type="${type}" id="mit-${id}" data-mit="${id}" value="${attr(val)}"${ph} />`;
+    }
+
+    function renderMitarbeiter() {
+      const ph = "Geben Sie hier Ihren Text ein";
+      return `<div class="section" style="margin-top:8px"><div class="section-title">Zeiten und Notizen</div></div>
+        <div class="card">
+          <div class="row"><label class="lbl" for="mit-startzeit">Startzeit</label>${mitInput("startzeit", "datetime-local")}</div>
+          <div class="row"><label class="lbl" for="mit-endzeit">Endzeit</label>${mitInput("endzeit", "datetime-local")}</div>
+          <div class="row label-top"><label class="lbl" for="mit-notiz">Notiz</label>${mitInput("notiz", "text", ph, true)}</div>
+          <div class="row label-top"><label class="lbl" for="mit-ausgefArbeiten">ausgef. Arbeiten</label>${mitInput("ausgefArbeiten", "text", ph, true)}</div>
+          <div class="row label-top"><label class="lbl" for="mit-textFolgeauftrag">Text Folge-Auftrag</label>${mitInput("textFolgeauftrag", "text", ph, true)}</div>
+        </div>`;
+    }
+
+    function renderFotosListSkeleton() {
+      ensurePhotoOrder();
+      const list = sortedPhotos();
+      const n = list.length;
+      const count = (n === 1 ? "1 Eintrag gefunden" : n + " Einträge gefunden")
+        + " · " + (photoSortMode === "date" ? "nach Datum" : "eigene Reihenfolge");
+      const items = list.map((p, idx) => {
+        const missing = !photoHasComment(p);
+        const first = idx === 0;
+        const last = idx === n - 1;
+        return `<div class="foto-item${missing ? " no-comment" : ""}" data-open-photo="${p.id}" data-index="${idx}" tabindex="0" role="button">
+          <button type="button" class="foto-handle" data-drag-handle title="Verschieben" aria-label="Reihenfolge ändern">${ICO.handle}</button>
+          <img class="foto-thumb" alt="" data-thumb="${p.id}" />
+          <div class="foto-meta">
+            <span class="foto-name">${escapeHtml(p.name)}</span>
+            <span class="foto-sub">Nr. ${p.sortiernummer} · ${escapeHtml(formatDateDe(p.date))}${p.annotated ? ' <span class="foto-badge">Markiert</span>' : ""}${p.druck ? ' <span class="foto-badge foto-badge-druck" title="Wird auf den Leckortungsbericht gedruckt">' + ICO.printer + ' Druck</span>' : ""}</span>
+            ${missing ? '<span class="foto-flag">Kommentar fehlt</span>' : (p.comment ? `<span class="foto-sub">${escapeHtml(String(p.comment).replace(/\n+/g, " "))}</span>` : "")}
+          </div>
+          <div class="foto-move">
+            <button type="button" class="icon-btn" data-move-up="${p.id}" title="Nach oben" aria-label="Nach oben"${first ? " disabled" : ""}>${ICO.up}</button>
+            <button type="button" class="icon-btn" data-move-down="${p.id}" title="Nach unten" aria-label="Nach unten"${last ? " disabled" : ""}>${ICO.down}</button>
+          </div>
+          <button type="button" class="icon-btn" data-del-photo="${p.id}" title="Foto löschen" aria-label="Foto löschen">${ICO.trash}</button>
+        </div>`;
+      }).join("");
+      return `<div class="fotos-wrap">
+        <div class="fotos-count">${escapeHtml(count)}</div>
+        <div class="foto-list" id="fotoList">${items || '<div class="empty-list">Noch keine Fotos. Tippen Sie oben rechts auf +, um Bilder aus der Galerie hinzuzufügen.</div>'}</div>
+      </div>`;
+    }
+
+    function renderFotoDetailSkeleton() {
+      const p = getPhoto(activePhotoId);
+      if (!p) return `<div class="fotos-wrap"><p>Foto nicht gefunden.</p></div>`;
+      const dis = "";
+      const commentInvalid = !photoHasComment(p);
+      return `<div class="fdetail">
+        <div class="fdetail-img-wrap" id="fotoZoom" title="Tippen für Vollbild">
+          <img id="fotoDetailImg" alt="${attr(p.name)}" />
+        </div>
+        <div class="fdetail-body">
+          ${p.annotated ? '<button type="button" class="btn btn-restore" id="btnRestoreOriginal">Original wiederherstellen</button>' : ""}
+          <div class="fg">
+            <div class="fg-cap">Name</div>
+            <div class="ro">${escapeHtml(p.name)}</div>
+          </div>
+          <div class="fg">
+            <div class="fg-cap">Kommentar</div>
+            <textarea id="photoComment" data-phfield="comment" placeholder="Geben Sie hier Ihren Text ein"${dis} class="${commentInvalid && photoEditMode ? "is-invalid" : ""}">${escapeHtml(p.comment)}</textarea>
+            <p class="hint${commentInvalid && photoEditMode ? " show" : ""}" id="commentHint">Ein Kommentar ist erforderlich.</p>
+          </div>
+          <div class="fg">
+            <div class="fg-cap">Datum</div>
+            <div class="ro">${escapeHtml(formatDateDe(p.date))}</div>
+          </div>
+          <div class="fg">
+            <div class="fg-cap">Folgeauftrag</div>
+            <label class="check-row"><span>Anlage Folgeauftrag</span>
+              <input type="checkbox" id="photoFolge" ${p.folgeauftrag ? "checked" : ""}${dis} />
+            </label>
+          </div>
+          <div class="fg">
+            <div class="fg-cap">Sortiernummer</div>
+            <input type="number" id="photoSort" step="1" min="1" value="${attr(p.sortiernummer)}"${dis} />
+          </div>
+          <div class="fg">
+            <div class="fg-cap">Druck</div>
+            <label class="check-row"><span>Druck auf Leckortungsbericht</span>
+              <input type="checkbox" id="photoDruck" ${p.druck ? "checked" : ""}${dis} />
+            </label>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    async function fillPhotoImages() {
+      if (view === "fotos") {
+        const thumbs = main.querySelectorAll("[data-thumb]");
+        for (const img of thumbs) {
+          const rec = await idbGetPhoto(current.id, img.getAttribute("data-thumb"));
+          if (displayBlob(rec)) img.src = blobUrl(displayBlob(rec));
+        }
+      } else if (view === "fotodetail" && activePhotoId) {
+        const img = document.getElementById("fotoDetailImg");
+        if (img) {
+          const rec = await idbGetPhoto(current.id, activePhotoId);
+          if (displayBlob(rec)) img.src = blobUrl(displayBlob(rec));
+        }
+      }
+    }
+
+    function bindMetaAndMit() {
+      main.querySelectorAll("[data-meta]").forEach((el) => {
+        const handler = () => {
+          current.meta[el.getAttribute("data-meta")] = el.value;
+          persistCurrent();
+          const title = document.getElementById("hdrTitle");
+          if (title && view === "overview") title.textContent = headerTitle();
+        };
+        el.addEventListener("input", handler);
+        el.addEventListener("change", handler);
+      });
+      main.querySelectorAll("[data-mit]").forEach((el) => {
+        const ev = el.type === "checkbox" ? "change" : "input";
+        el.addEventListener(ev, () => {
+          current.mitarbeiter[el.getAttribute("data-mit")] = el.type === "checkbox" ? el.checked : el.value;
+          persistCurrent();
+        });
+      });
+      main.querySelectorAll("[data-goto]").forEach((el) => {
+        el.addEventListener("click", () => {
+          const dest = el.getAttribute("data-goto");
+          if (dest === "bericht") { activeTab = TABS[0].id; showView("bericht"); }
+          else showView(dest);
+        });
+      });
+      main.querySelectorAll("[data-open-photo]").forEach((el) => {
+        el.addEventListener("click", (e) => {
+          if (e.target.closest("[data-del-photo], [data-drag-handle], [data-move-up], [data-move-down], .foto-move")) return;
+          if (el.dataset.didDrag === "1") { el.dataset.didDrag = ""; return; }
+          openPhotoDetail(el.getAttribute("data-open-photo"), false);
+        });
+        el.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            openPhotoDetail(el.getAttribute("data-open-photo"), false);
+          }
+        });
+      });
+      main.querySelectorAll("[data-del-photo]").forEach((el) => {
+        el.addEventListener("click", (e) => {
+          e.stopPropagation();
+          deletePhoto(el.getAttribute("data-del-photo"));
+        });
+      });
+      main.querySelectorAll("[data-move-up]").forEach((el) => {
+        el.addEventListener("click", (e) => {
+          e.preventDefault(); e.stopPropagation();
+          movePhotoBy(el.getAttribute("data-move-up"), -1);
+        });
+      });
+      main.querySelectorAll("[data-move-down]").forEach((el) => {
+        el.addEventListener("click", (e) => {
+          e.preventDefault(); e.stopPropagation();
+          movePhotoBy(el.getAttribute("data-move-down"), 1);
+        });
+      });
+      bindFotoDrag();
+      bindPhotoDetailFields();
+    }
+
+    function bindPhotoDetailFields() {
+      const comment = document.getElementById("photoComment");
+      const folge = document.getElementById("photoFolge");
+      const sort = document.getElementById("photoSort");
+      const druck = document.getElementById("photoDruck");
+      const zoom = document.getElementById("fotoZoom");
+      if (comment) {
+        comment.addEventListener("input", () => {
+          readPhotoDetailIntoModel();
+          persistCurrent();
+          const ok = photoHasComment(getPhoto(activePhotoId));
+          comment.classList.toggle("is-invalid", !ok);
+          const hint = document.getElementById("commentHint");
+          if (hint) hint.classList.toggle("show", !ok);
+        });
+      }
+      [folge, druck].forEach((el) => {
+        if (!el) return;
+        el.addEventListener("change", () => {
+          readPhotoDetailIntoModel();
+          persistCurrent();
+        });
+      });
+      if (sort) {
+        sort.addEventListener("change", () => {
+          movePhotoToPosition(activePhotoId, sort.value);
+          const p = getPhoto(activePhotoId);
+          if (p) sort.value = p.sortiernummer;
+          toast("Reihenfolge aktualisiert (Nr. " + (p && p.sortiernummer) + ")");
+        });
+      }
+      if (zoom) zoom.addEventListener("click", openLightbox);
+      const restore = document.getElementById("btnRestoreOriginal");
+      if (restore) restore.addEventListener("click", restoreOriginalPhoto);
+    }
+
+    function readPhotoDetailIntoModel() {
+      if (view !== "fotodetail") return;
+      const p = getPhoto(activePhotoId);
+      if (!p) return;
+      const comment = document.getElementById("photoComment");
+      const folge = document.getElementById("photoFolge");
+      const sort = document.getElementById("photoSort");
+      const druck = document.getElementById("photoDruck");
+      if (comment) p.comment = comment.value;
+      if (folge) p.folgeauftrag = folge.checked;
+      if (druck) p.druck = druck.checked;
+    }
+
+    function openPhotoDetail(id, editMode) {
+      const p = getPhoto(id);
+      if (!p) return;
+      activePhotoId = id;
+      photoEditMode = editMode || !photoHasComment(p);
+      showView("fotodetail", { photoId: id, editMode: photoEditMode });
+      setTimeout(() => {
+        const ta = document.getElementById("photoComment");
+        if (ta && photoEditMode) ta.focus();
+      }, 50);
+    }
+
+    function savePhotoDetail() {
+      readPhotoDetailIntoModel();
+      const sortEl = document.getElementById("photoSort");
+      if (sortEl) movePhotoToPosition(activePhotoId, sortEl.value);
+      const p = getPhoto(activePhotoId);
+      if (!p || !photoHasComment(p)) {
+        const ta = document.getElementById("photoComment");
+        if (ta) {
+          ta.classList.add("is-invalid");
+          ta.focus();
+        }
+        const hint = document.getElementById("commentHint");
+        if (hint) hint.classList.add("show");
+        toast("Bitte geben Sie einen Kommentar zu diesem Foto ein. Ohne Kommentar kann nicht gespeichert werden.", true);
+        return;
+      }
+      persistCurrent();
+      photoEditMode = false;
+      saveToList(true);
+      renderApp();
+      toast("Foto gespeichert");
+    }
+
+    function sortPhotosClick() {
+      if (photoSortMode === "custom") {
+        if (!current.photos || current.photos.length < 2) {
+          photoSortMode = "date";
+          persistCurrent();
+          renderApp();
+          toast("Anzeige: nach Datum");
+          return;
+        }
+        if (!confirm("Nach Datum sortieren? Die bisherige Reihenfolge wird überschrieben, die Sortiernummern werden neu vergeben.")) return;
+        applyPhotoOrder(photosByDate(), "date");
+        renderApp();
+        toast("Sortiert nach Datum");
+      } else {
+        photoSortMode = "custom";
+        persistCurrent();
+        renderApp();
+        toast("Anzeige: eigene Reihenfolge");
+      }
+    }
+
+    /* Pointer-Events drag & drop (mouse + touch), handle only so list scroll stays intact */
+    let fotoDrag = null;
+    let fotoDragScrollRaf = 0;
+
+    function bindFotoDrag() {
+      const list = document.getElementById("fotoList");
+      if (!list) return;
+      list.querySelectorAll("[data-drag-handle]").forEach((handle) => {
+        handle.addEventListener("pointerdown", onFotoPointerDown);
+      });
+    }
+
+    function onFotoPointerDown(e) {
+      if (e.button != null && e.button !== 0) return;
+      const handle = e.currentTarget;
+      const item = handle.closest(".foto-item");
+      const list = document.getElementById("fotoList");
+      if (!item || !list) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const rect = item.getBoundingClientRect();
+      const ghost = item.cloneNode(true);
+      ghost.classList.add("foto-ghost");
+      ghost.removeAttribute("data-open-photo");
+      ghost.style.width = rect.width + "px";
+      ghost.style.left = rect.left + "px";
+      ghost.style.top = rect.top + "px";
+      document.body.appendChild(ghost);
+      item.classList.add("is-placeholder");
+      try { handle.setPointerCapture(e.pointerId); } catch (err) {}
+      fotoDrag = {
+        item: item,
+        list: list,
+        ghost: ghost,
+        pointerId: e.pointerId,
+        offsetY: e.clientY - rect.top,
+        lastY: e.clientY,
+        moved: false,
+        fromIndex: Number(item.getAttribute("data-index")) || 0
+      };
+      stopFotoAutoScroll();
+      document.addEventListener("pointermove", onFotoPointerMove);
+      document.addEventListener("pointerup", onFotoPointerUp);
+      document.addEventListener("pointercancel", onFotoPointerUp);
+    }
+
+    function fotoRowAtPoint(clientY) {
+      const rows = [...document.querySelectorAll("#fotoList > .foto-item")];
+      for (let i = 0; i < rows.length; i++) {
+        const r = rows[i].getBoundingClientRect();
+        const mid = r.top + r.height / 2;
+        if (clientY < mid) return { row: rows[i], index: i, before: true };
+      }
+      if (!rows.length) return null;
+      return { row: rows[rows.length - 1], index: rows.length - 1, before: false };
+    }
+
+    function onFotoPointerMove(e) {
+      if (!fotoDrag) return;
+      if (fotoDrag.pointerId != null && e.pointerId !== fotoDrag.pointerId) return;
+      e.preventDefault();
+      const y = e.clientY;
+      if (Math.abs(y - fotoDrag.lastY) > 2) fotoDrag.moved = true;
+      fotoDrag.lastY = y;
+      const gh = fotoDrag.ghost.getBoundingClientRect().height;
+      let top = y - fotoDrag.offsetY;
+      fotoDrag.ghost.style.top = top + "px";
+      const hit = fotoRowAtPoint(y);
+      if (hit && hit.row !== fotoDrag.item) {
+        if (hit.before) hit.row.parentNode.insertBefore(fotoDrag.item, hit.row);
+        else hit.row.parentNode.appendChild(fotoDrag.item);
+      }
+      maybeFotoAutoScroll(y);
+    }
+
+    function maybeFotoAutoScroll(clientY) {
+      const scroller = document.getElementById("main");
+      if (!scroller) return;
+      const r = scroller.getBoundingClientRect();
+      const edge = 56;
+      let dir = 0;
+      if (clientY < r.top + edge) dir = -1;
+      else if (clientY > r.bottom - edge) dir = 1;
+      fotoDrag.scrollDir = dir;
+      if (dir && !fotoDragScrollRaf) {
+        const step = () => {
+          if (!fotoDrag || !fotoDrag.scrollDir) { fotoDragScrollRaf = 0; return; }
+          scroller.scrollTop += fotoDrag.scrollDir * 14;
+          fotoDragScrollRaf = requestAnimationFrame(step);
+        };
+        fotoDragScrollRaf = requestAnimationFrame(step);
+      }
+      if (!dir) stopFotoAutoScroll();
+    }
+
+    function stopFotoAutoScroll() {
+      if (fotoDragScrollRaf) cancelAnimationFrame(fotoDragScrollRaf);
+      fotoDragScrollRaf = 0;
+      if (fotoDrag) fotoDrag.scrollDir = 0;
+    }
+
+    function onFotoPointerUp(e) {
+      if (!fotoDrag) return;
+      if (e && fotoDrag.pointerId != null && e.pointerId !== fotoDrag.pointerId) return;
+      document.removeEventListener("pointermove", onFotoPointerMove);
+      document.removeEventListener("pointerup", onFotoPointerUp);
+      document.removeEventListener("pointercancel", onFotoPointerUp);
+      stopFotoAutoScroll();
+      const list = fotoDrag.list;
+      const item = fotoDrag.item;
+      const moved = fotoDrag.moved;
+      if (fotoDrag.ghost && fotoDrag.ghost.parentNode) fotoDrag.ghost.parentNode.removeChild(fotoDrag.ghost);
+      item.classList.remove("is-placeholder");
+      if (moved) item.dataset.didDrag = "1";
+      const ids = [...list.querySelectorAll(".foto-item[data-open-photo]")].map((el) => el.getAttribute("data-open-photo"));
+      fotoDrag = null;
+      if (moved && ids.length) {
+        const byId = {};
+        (current.photos || []).forEach((p) => { byId[p.id] = p; });
+        const ordered = ids.map((id) => byId[id]).filter(Boolean);
+        if (ordered.length === (current.photos || []).length) {
+          applyPhotoOrder(ordered, "custom");
+          renderApp();
+          toast("Reihenfolge gespeichert");
+        }
+      }
+    }
+
+    async function addPhotosFromFiles(fileList) {
+      const files = Array.from(fileList || []).filter((f) => f && f.type && f.type.indexOf("image/") === 0 || (f && /\.(jpe?g|png|gif|webp|bmp|heic)$/i.test(f.name || "")));
+      if (!files.length) {
+        toast("Keine Bilder ausgewählt.", true);
+        return;
+      }
+      toast("Fotos werden verarbeitet…");
+      const newIds = [];
+      for (const file of files) {
+        try {
+          const scaled = await downscaleFile(file);
+          const p = migratePhoto({
+            id: uid("p"),
+            name: file.name || "Foto.jpg",
+            date: todayDate(),
+            addedAt: nowIso(),
+            comment: "",
+            folgeauftrag: false,
+            sortiernummer: nextSortNumber(),
+            druck: false
+          });
+          current.photos.push(p);
+          await idbPutPhoto(current.id, p.id, scaled.blob, { width: scaled.width, height: scaled.height, mime: "image/jpeg" });
+          newIds.push(p.id);
+        } catch (err) {
+          toast("Bild konnte nicht geladen werden: " + (file.name || ""), true);
+        }
+      }
+      persistCurrent();
+      document.getElementById("photoInput").value = "";
+      if (newIds.length) {
+        toast(newIds.length === 1 ? "1 Foto hinzugefügt" : newIds.length + " Fotos hinzugefügt");
+        openPhotoDetail(newIds[0], true);
+      }
+    }
+
+    async function deletePhoto(id) {
+      const p = getPhoto(id);
+      if (!p) return;
+      if (!confirm("Dieses Foto wirklich löschen?")) return;
+      current.photos = current.photos.filter((x) => x.id !== id);
+      try { await idbDeletePhoto(current.id, id); } catch (e) {}
+      applyPhotoOrder(orderedPhotos(), photoSortMode === "date" ? "date" : "custom");
+      toast("Foto gelöscht");
+      if (view === "fotodetail") showView("fotos");
+      else renderApp();
+    }
+
+    async function openLightbox() {
+      const img = document.getElementById("lightboxImg");
+      const rec = await idbGetPhoto(current.id, activePhotoId);
+      const b = displayBlob(rec);
+      if (!b) return;
+      img.src = blobUrl(b);
+      const box = document.getElementById("lightbox");
+      box.hidden = false;
+      box.classList.add("open");
+    }
+    function closeLightbox() {
+      const box = document.getElementById("lightbox");
+      box.classList.remove("open");
+      box.hidden = true;
+      document.getElementById("lightboxImg").removeAttribute("src");
+    }
+
+    /* ---------- Main render ---------- */
+    function renderMain() {
+      revokeUrls();
+      main.classList.toggle("tight", view === "fotodetail" || view === "overview" || view === "fotos");
+      if (view === "overview") {
+        main.innerHTML = renderOverview();
+        bindMetaAndMit();
+      } else if (view === "mitarbeiter") {
+        main.innerHTML = renderMitarbeiter();
+        bindMetaAndMit();
+      } else if (view === "fotos") {
+        main.innerHTML = renderFotosListSkeleton();
+        bindMetaAndMit();
+        fillPhotoImages();
+      } else if (view === "fotodetail") {
+        main.innerHTML = renderFotoDetailSkeleton();
+        bindMetaAndMit();
+        fillPhotoImages();
+      } else if (view === "bericht") {
+        renderBerichtPanels(main);
+      }
+    }
+
+    function renderApp() {
+      renderHeader();
+      renderTabs();
+      renderMain();
+    }
+
+    /* ---------- Toast ---------- */
+    let toastTimer;
+    function toast(msg, isError) {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.classList.toggle("error", !!isError);
+      el.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove("show"), isError ? 3200 : 2200);
+    }
+
+    /* ---------- List / save ---------- */
+    function auftragListLabel(r) {
+      const nr = (r.meta && r.meta.auftragsNr || "").trim() || "Ohne Nummer";
+      const kunde = (r.meta && r.meta.kunde || "").trim() || "Ohne Kunde";
+      let date = "";
+      if (r.meta && r.meta.terminVon) date = formatDe(r.meta.terminVon);
+      else if (r.values && r.values.datum) date = formatDateDe(r.values.datum);
+      else date = formatDe(r.updatedAt);
+      return { nr, kunde, date };
+    }
+
+    function saveToList(silent) {
+      const quiet = silent === true;
+      if (view === "fotodetail") readPhotoDetailIntoModel();
+      persistCurrent();
+      const copy = JSON.parse(JSON.stringify(current));
+      copy.updatedAt = nowIso();
+      const idx = reports.findIndex((r) => r.id === copy.id);
+      if (idx >= 0) reports[idx] = copy;
+      else reports.unshift(copy);
+      persistList();
+      const btn = document.getElementById("btnSave") || document.getElementById("btnSavePhoto");
+      if (btn) {
+        btn.classList.remove("save-flash");
+        void btn.offsetWidth;
+        btn.classList.add("save-flash");
+      }
+      if (!quiet) toast("Auftrag gespeichert");
+      renderReportList();
+    }
+
+    function newAuftrag() {
+      persistCurrent();
+      current = freshAuftrag();
+      persistCurrent();
+      showView("overview");
+      toast("Neuer Auftrag angelegt");
+      renderReportList();
+    }
+
+    function openAuftrag(id) {
+      const found = reports.find((r) => r.id === id);
+      if (!found) return;
+      current = migrateAuftrag(JSON.parse(JSON.stringify(found)));
+      photoSortMode = current.photoSortMode === "date" ? "date" : "custom";
+      ensurePhotoOrder();
+      persistCurrent();
+      showView("overview");
+      closeDrawer();
+      toast("Auftrag geöffnet");
+    }
+
+    async function deleteAuftrag(id, ev) {
+      if (ev) ev.stopPropagation();
+      if (!confirm("Diesen Auftrag wirklich löschen?")) return;
+      reports = reports.filter((r) => r.id !== id);
+      persistList();
+      try { await idbDeleteAuftragPhotos(id); } catch (e) {}
+      if (current.id === id) {
+        current = freshAuftrag();
+        persistCurrent();
+        showView("overview");
+      }
+      renderReportList();
+      toast("Auftrag gelöscht");
+    }
+
+    function renderReportList() {
+      const box = document.getElementById("reportList");
+      if (!reports.length) {
+        box.innerHTML = '<div class="empty-list">Noch keine gespeicherten Aufträge. Tippen Sie oben rechts auf das Speichern-Symbol.</div>';
+        return;
+      }
+      box.innerHTML = reports.map((r) => {
+        const t = auftragListLabel(r);
+        return `<div class="report-item${r.id === current.id ? " current" : ""}" data-open="${r.id}">
+          <div class="meta">
+            <strong>${escapeHtml(t.nr)}</strong>
+            <span>${escapeHtml(t.kunde)} · ${escapeHtml(t.date)}</span>
+          </div>
+          <button class="btn danger" data-del="${r.id}">Löschen</button>
+        </div>`;
+      }).join("");
+    }
+
+    document.getElementById("reportList").addEventListener("click", (e) => {
+      const del = e.target.closest("[data-del]");
+      if (del) return deleteAuftrag(del.getAttribute("data-del"), e);
+      const item = e.target.closest("[data-open]");
+      if (item) openAuftrag(item.getAttribute("data-open"));
+    });
+
+    /* Drawer */
+    const drawer = document.getElementById("drawer");
+    const overlay = document.getElementById("overlay");
+    function openDrawer() {
+      renderReportList();
+      overlay.hidden = false;
+      requestAnimationFrame(() => {
+        overlay.classList.add("open");
+        drawer.classList.add("open");
+        drawer.setAttribute("aria-hidden", "false");
+      });
+    }
+    function closeDrawer() {
+      overlay.classList.remove("open");
+      drawer.classList.remove("open");
+      drawer.setAttribute("aria-hidden", "true");
+      setTimeout(() => { overlay.hidden = true; }, 220);
+    }
+    document.getElementById("btnCloseDrawer").addEventListener("click", closeDrawer);
+    overlay.addEventListener("click", closeDrawer);
+    document.getElementById("btnNew").addEventListener("click", () => { newAuftrag(); closeDrawer(); });
+    document.getElementById("photoInput").addEventListener("change", (e) => addPhotosFromFiles(e.target.files));
+    document.getElementById("lightbox").addEventListener("click", (e) => {
+      if (e.target.id === "lightbox" || e.target.id === "lightboxImg" || e.target.closest("#btnCloseLightbox")) closeLightbox();
+    });
+    document.getElementById("btnCloseLightbox").addEventListener("click", (e) => { e.stopPropagation(); closeLightbox(); });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        if (document.getElementById("lightbox").classList.contains("open")) closeLightbox();
+        else if (drawer.classList.contains("open")) closeDrawer();
+      }
+    });
+
+    tabBar.addEventListener("click", (e) => {
+      const btn = e.target.closest(".tab");
+      if (btn) setTab(btn.dataset.tab);
+    });
+
+    /* ---------- Export JSON ---------- */
+    async function exportJson() {
+      if (view === "fotodetail") readPhotoDetailIntoModel();
+      persistCurrent();
+      const payload = JSON.parse(JSON.stringify(current));
+      payload.photos = [];
+      for (const p of current.photos || []) {
+        const rec = await idbGetPhoto(current.id, p.id);
+        const item = Object.assign({}, p);
+        const b = displayBlob(rec);
+        if (b) {
+          item.imageData = await blobToDataUrl(b);
+          item.mime = rec.mime || "image/jpeg";
+        }
+        if (rec && rec.blob && rec.annotatedBlob) {
+          item.originalImageData = await blobToDataUrl(rec.blob);
+        }
+        payload.photos.push(item);
+      }
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      const name = "Auftrag-" + (current.meta.auftragsNr || current.values.schadenNr || current.values.datum || current.id) + ".json";
+      a.href = URL.createObjectURL(blob);
+      a.download = name.replace(/[^\w.\-ÄÖÜäöüß]+/g, "_");
+      a.click();
+      URL.revokeObjectURL(a.href);
+      toast("JSON exportiert");
+    }
+    document.getElementById("btnExport").addEventListener("click", () => { exportJson(); });
+
+    /* ---------- Print / PDF ---------- */
+    function printValue(f, values) {
+      const v = (values || current.values)[f.id];
+      if (f.type === "checkbox") return v ? "Ja" : "Nein";
+      if (v == null || v === "") return "–";
+      if (f.type === "date" && /^\d{4}-\d{2}-\d{2}$/.test(v)) {
+        const [y, mo, d] = v.split("-");
+        return d + "." + mo + "." + y;
+      }
+      if (f.type === "datetime-local" && v) {
+        const d = new Date(v);
+        if (!isNaN(d)) return d.toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" });
+      }
+      return String(v);
+    }
+
+    function printDateTime(v) {
+      if (!v) return "–";
+      const d = new Date(v);
+      if (!isNaN(d)) return d.toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" });
+      return String(v);
+    }
+
+    function printLogo() {
+      return `<div class="ws-logo">
+        <span class="ws-water">WATER</span>
+        <svg class="ws-drop" viewBox="0 0 24 36" aria-hidden="true">
+          <path fill="#1a6fb5" d="M12 1.6C12 1.6 3.2 15.4 3.2 23.2a8.8 8.8 0 0 0 17.6 0C20.8 15.4 12 1.6 12 1.6z"/>
+          <path fill="#8fd0f4" d="M8.6 22.2c.8 3.4 3 5.4 5.6 5.6-3.6 1.6-7.6-.8-8-4.8.4-.8 1.4-1.2 2.4-.8z"/>
+        </svg>
+        <span class="ws-solution">SOLUTION<span class="ws-gmbh">GmbH</span></span>
+      </div>`;
+    }
+
+    function printFooter(pageNo) {
+      return `<footer class="pp-foot">
+        <div class="pp-pageno">Seite: ${pageNo}</div>
+        <div class="pp-cols">
+          <div>Watersolution GmbH<br>Fritz-Karl-Henkel-Straße 14, Halle 32+33<br>67454 Haßloch</div>
+          <div>Handelsregister: HRB 68272<br>Ust-ID: 31/650/40073<br>Geschäftsführer: Marius Böhm, Andreas Koch, André Lehnert</div>
+          <div>VR Bank Südpfalz<br>IBAN: DE07 5486 2500 0005 6550 99</div>
+        </div>
+      </footer>`;
+    }
+
+    function printPage(pageNo, inner) {
+      return `<section class="pp">
+        <header class="pp-head">${printLogo()}</header>
+        <div class="pp-body">${inner}</div>
+        ${printFooter(pageNo)}
+      </section>`;
+    }
+
+    function bx(on) {
+      return `<span class="bx">${on ? "X" : ""}</span>`;
+    }
+    function yn(on) {
+      return `<span class="yn">Ja ${bx(!!on)}&nbsp; Nein ${bx(!on)}</span>`;
+    }
+    function cbItem(on, label) {
+      return `<div class="cb-item">${bx(!!on)}<span>${escapeHtml(label)}</span></div>`;
+    }
+    function dateOnly(v) {
+      if (!v) return "";
+      if (/^\d{4}-\d{2}-\d{2}/.test(String(v))) {
+        const [y, m, d] = String(v).slice(0, 10).split("-");
+        return d + "." + m + "." + y;
+      }
+      const d = new Date(v);
+      if (!isNaN(d)) return d.toLocaleDateString("de-DE");
+      return String(v);
+    }
+    function timeOnly(v) {
+      if (!v) return "";
+      const m = /T(\d{2}):(\d{2})/.exec(String(v));
+      if (m) return m[1] + ":" + m[2] + " Uhr";
+      const d = new Date(v);
+      if (!isNaN(d)) return d.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" }) + " Uhr";
+      return String(v);
+    }
+    function ptxt(s) {
+      return escapeHtml(s == null ? "" : s);
+    }
+    function commentParts(comment) {
+      const t = String(comment || "").replace(/\r\n/g, "\n").replace(/^\n+|\n+$/g, "");
+      const i = t.indexOf("\n");
+      if (i < 0) return { title: t, rest: "" };
+      return { title: t.slice(0, i).trim(), rest: t.slice(i + 1).replace(/^\n/, "") };
+    }
+
+    async function buildPrint() {
+      const meta = current.meta || {};
+      const v = current.values || {};
+      const pages = [];
+
+      const berichtDatum = dateOnly(v.datum) || dateOnly(meta.terminVon) || dateOnly(todayDate());
+      const messDatum = dateOnly(v.messterminVon) || dateOnly(v.datum) || berichtDatum;
+      const messVon = timeOnly(v.messterminVon);
+      const messBis = timeOnly(v.messterminBis);
+      const objekt = [meta.kunde, meta.strasse, [meta.plz, meta.ort].filter(Boolean).join(" ")].filter(Boolean).join(", ");
+      const empf = [meta.anrede, meta.kunde, meta.strasse, [meta.plz, meta.ort].filter(Boolean).join(" ")].filter(Boolean);
+
+      const page1 = `
+        <div class="sender">Watersolution GmbH - Fritz-Karl-Henkel-Straße 14 - 67454 Haßloch</div>
+        <div class="letterhead">
+          <div class="addr">${empf.map(ptxt).join("<br>") || "&nbsp;"}</div>
+          <div class="refs">
+            <div class="refs-note">Bitte bei Rückfragen und Zuschriften stets angeben</div>
+            <div class="refs-nr">${ptxt(meta.auftragsNr)}</div>
+            <div>Datum: ${ptxt(berichtDatum)}</div>
+            <div class="refs-co">Watersolution GmbH, Fritz-Karl-Henkel-Straße 14, 67454 Haßloch, Telefon: 06324 - 980 37 98, info@service-watersolution.de, www.service-watersolution.de</div>
+          </div>
+        </div>
+        <table class="kv">
+          <tr><th>Objekt:</th><td>${ptxt(objekt)}</td></tr>
+          <tr><th>Vers.-Schein-Nr.:</th><td>${ptxt(v.versicherungsNr)}</td></tr>
+          <tr><th>Schaden-Nr.:</th><td>${ptxt(v.schadenNr)}</td></tr>
+        </table>
+        <h1 class="doc-title">Schadensaufnahme</h1>
+        <div class="inline-row">
+          <span>Messtermin am: ${ptxt(messDatum)}</span>
+          <span>Uhrzeit von: ${ptxt(messVon)}</span>
+          <span>bis: ${ptxt(messBis)}</span>
+        </div>
+        <div class="line">Messtechniker: ${ptxt(v.messtechniker)}</div>
+        <div class="line">Mobil-Nr.: ${ptxt(v.messtechnikerTel)}</div>
+        <div class="h-u">Allgemeine Informationen</div>
+        <div class="h-sub">Anwesende Personen</div>
+        <div class="cb-grid">
+          ${cbItem(v.anwesendVn, "Versicherungsnehmer")}
+          ${cbItem(v.anwesendEigentuemer, "Eigentümer")}
+          ${cbItem(v.anwesendMieter, "Mieter")}
+          ${cbItem(v.anwesendInstallateur, "Installateur")}
+          ${cbItem(v.anwesendSonstige, "sonstige Person")}
+        </div>
+        <div class="line">Person vor Ort: ${ptxt(v.personVorOrt)}${v.personVorOrtTel ? " &nbsp; Telefon-Nr.: " + ptxt(v.personVorOrtTel) : ""}</div>
+        <div class="h-sub">Allgemeine Informationen</div>
+        <div class="bodytext">${ptxt(v.allgemeineInformationen)}</div>
+        <div class="h-sub">Aufgabenstellung/vorgefundenes Schadensbild</div>
+        <div class="bodytext">${ptxt(v.schadensbild)}</div>
+        <div class="h-sub">Kurzergebnis zur Schadensursache</div>
+        <div class="bodytext">${ptxt(v.schadensursache)}</div>
+        <div class="h-sub">Kurzbeschreibung der durchgeführten Arbeiten</div>
+        <div class="bodytext">${ptxt(v.durchgefuehrteArbeiten)}</div>
+      `;
+      pages.push(printPage(1, page1));
+
+      const leitungen = [
+        { label: "Kaltwasserleitung", gepr: v.kwGeprueft, flag: v.kwDruckverlust, flagName: "Druckverlust" },
+        { label: "Warmwasserleitung", gepr: v.wwGeprueft, flag: v.wwDruckverlust, flagName: "Druckverlust" },
+        { label: "Zirkulationsleitung", gepr: v.zirkGeprueft, flag: v.zirkDruckverlust, flagName: "Druckverlust" },
+        { label: "Heizungsleitung", gepr: v.hzGeprueft, flag: v.hzDruckverlust, flagName: "Druckverlust" },
+        { label: "Fußbodenheizung", gepr: v.fbhGeprueft, flag: v.fbhDruckverlust, flagName: "Druckverlust" },
+        { label: "Außenleitung", gepr: v.aussenGeprueft, flag: v.aussenDruckverlust, flagName: "Druckverlust" },
+        { label: "Abwasserleitung", gepr: v.awGeprueft, flag: v.awUndicht, flagName: "Undicht" },
+        { label: "Grundleitung", gepr: v.grundGeprueft, flag: v.grundUndicht, flagName: "Undicht" },
+        { label: "Regenleitung", gepr: v.regenGeprueft, flag: v.regenUndicht, flagName: "Undicht" },
+        { label: "Flachdach angestaut", gepr: v.flachdachGeprueft, flag: v.flachdachUndicht, flagName: "Undicht" },
+        { label: "sonstiges" + (v.sonstigesLeitung ? " (" + v.sonstigesLeitung + ")" : ""), gepr: !!String(v.sonstigesLeitung || "").trim(), flag: v.sonstigesUndicht, flagName: "Undicht" }
+      ];
+      const pruefRows = leitungen.map((row) => `<tr>
+        <td class="lbl">${ptxt(row.label)}</td>
+        <td class="ctr">${bx(!!row.gepr)}</td>
+        <td class="ctr">${bx(!row.gepr)}</td>
+        <td class="ctr">${bx(!!row.flag)}</td>
+        <td class="ctr">${bx(!row.flag)}</td>
+      </tr>`).join("");
+
+      const page2 = `
+        <div class="h-u">Prüfungen</div>
+        <div class="line">Druckprüfung durchgeführt: ${yn(v.druckpruefungDurchgefuehrt)}</div>
+        <div class="line">Leitung: ${ptxt(v.leitung)}</div>
+        <div class="line">Ergebnis: ${ptxt(v.ergebnis)}</div>
+        <table class="pruef">
+          <thead>
+            <tr>
+              <th class="lbl" rowspan="2">Leitung</th>
+              <th colspan="2">geprüft</th>
+              <th colspan="2">Druckverlust / Undicht</th>
+            </tr>
+            <tr>
+              <th>Ja</th><th>Nein</th>
+              <th>Ja</th><th>Nein</th>
+            </tr>
+          </thead>
+          <tbody>${pruefRows}</tbody>
+        </table>
+        <div class="h-sub">Methoden</div>
+        <div class="cb-grid">
+          ${cbItem(v.methodeFeuchte, "Feuchtigkeitsmessung")}
+          ${cbItem(v.methodeAkustik, "Akustik")}
+          ${cbItem(v.methodeLeitungsortung, "Leitungsortung")}
+          ${cbItem(String(v.tracerKg || "").trim() && String(v.tracerKg).trim() !== "0,0" && String(v.tracerKg).trim() !== "0", "Trace-/Prüfgas  " + (v.tracerKg || "0,0") + " kg")}
+          ${cbItem(v.methodeThermografie, "Thermografie")}
+          ${cbItem(v.methodeKanalkamera, "Kanalkamera")}
+          ${cbItem(v.methodeVideoendoskopie, "Videoendoskopie")}
+          ${cbItem(v.methodeFaerbemittel, "Färbemittel")}
+          ${cbItem(!!String(v.methodeSonstiges || "").trim(), "sonstige Methode" + (v.methodeSonstiges ? ": " + v.methodeSonstiges : ""))}
+        </div>
+        <div class="line">Schadensstelle geöffnet: ${yn(v.schadensstelleGeoeffnet)} &nbsp; durch: ${ptxt(v.geoeffnetDurch)}</div>
+        <div class="line">Fliese(n) entnommen: ${yn(v.fliesenEntnommen)} &nbsp; Anzahl: ${ptxt(v.fliesenAnzahl == null ? "" : v.fliesenAnzahl)}</div>
+        <div class="line">Schadensursache gefunden: ${yn(v.schadensursacheGefunden)} &nbsp; Folgetermin notwendig: ${yn(v.folgeterminNotwendig)}</div>
+        <div class="h-sub">Wichtige Besonderheiten / Empfehlungen</div>
+        <div class="bodytext">${ptxt(v.besondereEmpfehlungen)}</div>
+        <div class="h-sub">Hinweispflicht zum Messergebnis</div>
+        <div class="bodytext">${ptxt(v.hinweispflicht)}</div>
+        <div class="h-sub">Messtechnik</div>
+        <div class="bodytext">${ptxt(v.messtechnik)}</div>
+      `;
+      pages.push(printPage(2, page2));
+
+      const kosten = String(v.shKostenschaetzung || "");
+      const kUeber = /über\s*2000/i.test(kosten);
+      const kUnter = /unter\s*2000/i.test(kosten);
+      const kNein = /nicht einzuschätzen/i.test(kosten);
+
+      const page3 = `
+        <div class="h-u">Schadenregulierer/Sachverständiger Versicherung</div>
+        <div class="line">Halten wir für erforderlich: ${yn(v.svErforderlich)}</div>
+        <div class="line">Wurde informiert: ${yn(v.svInformiert)}</div>
+        <div class="line">Name: ${ptxt(v.svName)}</div>
+
+        <div class="h-u">Leitungssystem - Versorgung</div>
+        <div class="cb-grid">
+          ${cbItem(v.vsHeizung, "Heizung")}
+          ${cbItem(v.vsFbh, "Fußbodenheizung")}
+          ${cbItem(v.vsWarmwasser, "Warmwasser")}
+          ${cbItem(v.vsKaltwasser, "Kaltwasser")}
+          ${cbItem(v.vsRegenwasser, "Regenwasser")}
+          ${cbItem(!!String(v.vsSonstiges || "").trim(), "sonstiges" + (v.vsSonstiges ? ": " + v.vsSonstiges : ""))}
+        </div>
+        <div class="cb-grid">
+          ${cbItem(v.vsKupfer, "Kupfer")}
+          ${cbItem(v.vsStahl, "Stahl")}
+          ${cbItem(v.vsWicu, "WICU")}
+          ${cbItem(v.vsMehrverbund, "Mehrverbundrohr")}
+          ${cbItem(v.vsKunststoff, "Kunststoff")}
+          ${cbItem(!!String(v.vsMaterialSonstiges || "").trim(), "sonstiges" + (v.vsMaterialSonstiges ? ": " + v.vsMaterialSonstiges : ""))}
+        </div>
+
+        <div class="h-u">Leitungssystem - Entsorgung</div>
+        <div class="cb-grid">
+          ${cbItem(v.enSammelleitung, "Abwassersammelleitung")}
+          ${cbItem(v.enStrang, "Abwasserstrang")}
+          ${cbItem(v.enGrundleitung, "Abwassergrundleitung")}
+          ${cbItem(v.enRegenwasser, "Regenwasserleitung")}
+          ${cbItem(!!String(v.enSonstiges || "").trim(), "sonstiges" + (v.enSonstiges ? ": " + v.enSonstiges : ""))}
+          ${cbItem(v.enAbflussKunststoff, "Abfluss/Kunststoff")}
+          ${cbItem(v.enAbflussGuss, "Abfluss/Guss")}
+          ${cbItem(!!String(v.enMaterialSonstiges || "").trim(), "sonstiges" + (v.enMaterialSonstiges ? ": " + v.enMaterialSonstiges : ""))}
+        </div>
+
+        <div class="h-u">Weitere Empfehlungen / weitere Maßnahmen</div>
+        <div class="cb-grid two">
+          <div class="line">Lochfrasswiederverschluss: ${yn(v.alLochfrass)}</div>
+          <div class="line">Schwitzwasser/Kondenswasserbildung: ${yn(v.alSchwitzwasser)}</div>
+          <div class="line">Armatur defekt/undicht: ${yn(v.alArmatur)}</div>
+          <div class="line">Silikonfugen undicht: ${yn(v.alSilikonfugen)}</div>
+          <div class="line">Fliesenfugen undicht: ${yn(v.alFliesenfugen)}</div>
+          <div class="line">Muffenversatz: ${yn(v.alMuffenversatz)}</div>
+        </div>
+        ${v.alSonstiges ? `<div class="line">sonstiges: ${ptxt(v.alSonstiges)}</div>` : ""}
+        <div style="margin-top:2.5mm">
+          <div class="line">Reparatur durch Installateur erforderlich: ${yn(v.maReparaturInstallateur)}</div>
+          <div class="line">Sanierung erforderlich: ${yn(v.maSanierung)}</div>
+          <div class="line">Schadensaufnahme: ${ptxt(v.maSchadensaufnahme)}</div>
+          <div class="line">Trocknung: ${ptxt(v.maTrocknung)}</div>
+          <div class="line">Sofortmaßnahme: ${ptxt(v.maSofortmassnahme)}</div>
+          <div class="line">Details siehe Trocknungsangebot (folgt): ${yn(v.maDetailsTrocknungsangebot)}</div>
+          <div class="line">sonstiges: ${ptxt(v.maSonstiges)}</div>
+        </div>
+
+        <div class="h-u">Erforderliche Gewerke</div>
+        <div class="cb-grid">
+          ${cbItem(v.gwMaurer, "Maurer")}
+          ${cbItem(v.gwFliesenleger, "Fliesenleger")}
+          ${cbItem(v.gwDachdecker, "Dachdecker")}
+          ${cbItem(v.gwBodenleger, "Bodenleger")}
+          ${cbItem(v.gwMalerTrockenbauer, "Maler / Trockenbauer")}
+          ${cbItem(v.gwTrocknung, "Trocknung")}
+          ${cbItem(!!String(v.gwSonstiges || "").trim(), "sonstiges" + (v.gwSonstiges ? ": " + v.gwSonstiges : ""))}
+        </div>
+
+        <div class="h-u">Eingeschätzte Schadenshöhe</div>
+        <div class="cb-grid">
+          ${cbItem(kUeber, "über 2000,00 €")}
+          ${cbItem(kUnter, "unter 2000,00 €")}
+          ${cbItem(kNein, "nicht einzuschätzen")}
+        </div>
+        <div class="line" style="font-size:8pt;color:#444">(keine Gesamtschadenermittlung)</div>
+      `;
+      pages.push(printPage(3, page3));
+
+      const printable = orderedPhotos().filter((p) => p.druck);
+      const withImg = [];
+      for (const p of printable) {
+        const rec = await idbGetPhoto(current.id, p.id);
+        const b = displayBlob(rec);
+        if (!b) continue;
+        const url = await blobToDataUrl(b);
+        withImg.push({ p, url });
+      }
+      for (let i = 0; i < withImg.length; i += 3) {
+        const chunk = withImg.slice(i, i + 3);
+        const rows = chunk.map(({ p, url }) => {
+          const parts = commentParts(p.comment || p.name);
+          return `<div class="photo-row">
+            <div class="photo-text">
+              <div class="photo-title">${ptxt(parts.title)}</div>
+              <div class="photo-rest">${ptxt(parts.rest)}</div>
+            </div>
+            <div class="photo-img"><img src="${url}" alt="${attr(p.name)}" /></div>
+          </div>`;
+        }).join("");
+        pages.push(printPage(pages.length + 1, rows));
+      }
+
+      document.getElementById("printRoot").innerHTML = pages.join("");
+    }
+
+    document.getElementById("btnPrint").addEventListener("click", async () => {
+      persistCurrent();
+      await buildPrint();
+      closeDrawer();
+      setTimeout(() => window.print(), 80);
+    });
+
+    /* Offline: prefer sw.js on a static HTTPS host, blob fallback otherwise */
+    if ("serviceWorker" in navigator && location.protocol !== "file:") {
+      const registerBlobSw = () => {
+        const sw = `
+          const CACHE = 'leckortung-v7';
+          self.addEventListener('install', (e) => {
+            e.waitUntil(caches.open(CACHE).then((c) => c.add('./')).then(() => self.skipWaiting()));
+          });
+          self.addEventListener('activate', (e) => {
+            e.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim()));
+          });
+          self.addEventListener('fetch', (e) => {
+            e.respondWith(
+              caches.match(e.request).then((r) => r || fetch(e.request).then((res) => {
+                const copy = res.clone();
+                caches.open(CACHE).then((c) => c.put(e.request, copy));
+                return res;
+              }).catch(() => caches.match('./')))
+            );
+          });
+        `;
+        const blob = new Blob([sw], { type: "text/javascript" });
+        return navigator.serviceWorker.register(URL.createObjectURL(blob));
+      };
+      navigator.serviceWorker.register("./sw.js", { scope: "./" }).catch(registerBlobSw);
+    }
+
+
+    /* ---------- Photo annotation editor ---------- */
+    const ANNOT_COLORS = [
+      { id: "rot", hex: "#e23c2f", label: "Rot" },
+      { id: "gelb", hex: "#f0c400", label: "Gelb" },
+      { id: "gruen", hex: "#1f9d55", label: "Grün" },
+      { id: "blau", hex: "#1a5fad", label: "Blau" },
+      { id: "schwarz", hex: "#111111", label: "Schwarz" },
+      { id: "weiß", hex: "#ffffff", label: "Weiß" }
+    ];
+    const ANNOT_WIDTHS = [
+      { id: "thin", label: "dünn" },
+      { id: "mid", label: "mittel" },
+      { id: "thick", label: "dick" }
+    ];
+    const ANNOT_TOOLS = [
+      { id: "freehand", label: "Freihand" },
+      { id: "arrow", label: "Pfeil" },
+      { id: "ellipse", label: "Ellipse" },
+      { id: "rect", label: "Rechteck" },
+      { id: "line", label: "Linie" },
+      { id: "text", label: "Text" }
+    ];
+
+    const annot = {
+      open: false,
+      photoId: null,
+      img: null,
+      shapes: [],
+      history: [],
+      historyIndex: -1,
+      tool: "freehand",
+      color: "rot",
+      width: "mid",
+      draft: null,
+      drawing: false,
+      dirty: false,
+      dpr: 1,
+      scale: 1,
+      ox: 0,
+      oy: 0,
+      cssW: 0,
+      cssH: 0,
+      imgW: 0,
+      imgH: 0,
+      pointerId: null
+    };
+
+    function annotColorHex(id) {
+      const c = ANNOT_COLORS.find((x) => x.id === id);
+      return c ? c.hex : "#e23c2f";
+    }
+
+    function annotStrokePx(widthToken, imgW, imgH) {
+      const w = imgW || annot.imgW || 1600;
+      const h = imgH || annot.imgH || 1200;
+      const base = Math.max(w, h) / 800;
+      const mul = widthToken === "thin" ? 2 : widthToken === "thick" ? 9 : 4.5;
+      return Math.max(1, mul * base);
+    }
+
+    function annotFontPx(widthToken, imgW, imgH) {
+      return annotStrokePx(widthToken, imgW, imgH) * 6.5;
+    }
+
+    function drawAnnotShape(ctx, s, imgW, imgH) {
+      const hex = annotColorHex(s.color);
+      const lw = annotStrokePx(s.width, imgW, imgH);
+      ctx.save();
+      ctx.strokeStyle = hex;
+      ctx.fillStyle = hex;
+      ctx.lineWidth = lw;
+      ctx.lineJoin = "round";
+      ctx.lineCap = "round";
+      if (s.color === "weiß") {
+        ctx.shadowColor = "rgba(0,0,0,0.55)";
+        ctx.shadowBlur = lw * 1.2;
+      }
+      if (s.type === "freehand") {
+        const pts = s.points || [];
+        if (pts.length === 1) {
+          ctx.beginPath();
+          ctx.arc(pts[0].x, pts[0].y, lw / 2, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (pts.length > 1) {
+          ctx.beginPath();
+          ctx.moveTo(pts[0].x, pts[0].y);
+          for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+          ctx.stroke();
+        }
+      } else if (s.type === "line" || s.type === "arrow") {
+        ctx.beginPath();
+        ctx.moveTo(s.x1, s.y1);
+        ctx.lineTo(s.x2, s.y2);
+        ctx.stroke();
+        if (s.type === "arrow") {
+          const ang = Math.atan2(s.y2 - s.y1, s.x2 - s.x1);
+          const head = Math.max(10, lw * 4);
+          ctx.beginPath();
+          ctx.moveTo(s.x2, s.y2);
+          ctx.lineTo(s.x2 - head * Math.cos(ang - 0.4), s.y2 - head * Math.sin(ang - 0.4));
+          ctx.moveTo(s.x2, s.y2);
+          ctx.lineTo(s.x2 - head * Math.cos(ang + 0.4), s.y2 - head * Math.sin(ang + 0.4));
+          ctx.stroke();
+        }
+      } else if (s.type === "rect") {
+        ctx.strokeRect(s.x, s.y, s.w, s.h);
+      } else if (s.type === "ellipse") {
+        const rx = Math.abs(s.w) / 2, ry = Math.abs(s.h) / 2;
+        const cx = s.x + s.w / 2, cy = s.y + s.h / 2;
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, Math.max(rx, 0.5), Math.max(ry, 0.5), 0, 0, Math.PI * 2);
+        ctx.stroke();
+      } else if (s.type === "text" && s.text) {
+        const size = annotFontPx(s.width, imgW, imgH);
+        ctx.font = "bold " + size + "px Arial, sans-serif";
+        ctx.textBaseline = "top";
+        ctx.fillText(s.text, s.x, s.y);
+      }
+      ctx.restore();
+    }
+
+    function annotPtr(e) {
+      const canvas = document.getElementById("annotCanvas");
+      const r = canvas.getBoundingClientRect();
+      return {
+        x: (e.clientX - r.left - annot.ox) / annot.scale,
+        y: (e.clientY - r.top - annot.oy) / annot.scale
+      };
+    }
+
+    function annotRedraw() {
+      const canvas = document.getElementById("annotCanvas");
+      if (!canvas || !annot.img) return;
+      const ctx = canvas.getContext("2d");
+      const dpr = annot.dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const sw = canvas.width / dpr, sh = canvas.height / dpr;
+      ctx.fillStyle = "#0b0e12";
+      ctx.fillRect(0, 0, sw, sh);
+      ctx.drawImage(annot.img, annot.ox, annot.oy, annot.cssW, annot.cssH);
+      ctx.save();
+      ctx.translate(annot.ox, annot.oy);
+      ctx.scale(annot.scale, annot.scale);
+      annot.shapes.forEach((s) => drawAnnotShape(ctx, s, annot.imgW, annot.imgH));
+      if (annot.draft) drawAnnotShape(ctx, annot.draft, annot.imgW, annot.imgH);
+      ctx.restore();
+    }
+
+    function annotLayout() {
+      const stage = document.getElementById("annotStage");
+      const canvas = document.getElementById("annotCanvas");
+      if (!stage || !canvas || !annot.img) return;
+      const availW = Math.max(1, stage.clientWidth);
+      const availH = Math.max(1, stage.clientHeight);
+      const scale = Math.min(availW / annot.imgW, availH / annot.imgH);
+      annot.scale = scale;
+      annot.cssW = annot.imgW * scale;
+      annot.cssH = annot.imgH * scale;
+      annot.ox = (availW - annot.cssW) / 2;
+      annot.oy = (availH - annot.cssH) / 2;
+      annot.dpr = Math.min(window.devicePixelRatio || 1, 3);
+      canvas.style.width = availW + "px";
+      canvas.style.height = availH + "px";
+      canvas.width = Math.round(availW * annot.dpr);
+      canvas.height = Math.round(availH * annot.dpr);
+      annotRedraw();
+    }
+
+    function annotPushHistory() {
+      annot.history = annot.history.slice(0, annot.historyIndex + 1);
+      annot.history.push(JSON.parse(JSON.stringify(annot.shapes)));
+      if (annot.history.length > 60) {
+        annot.history.shift();
+      }
+      annot.historyIndex = annot.history.length - 1;
+      annot.dirty = true;
+      annotUpdateButtons();
+    }
+
+    function annotUndo() {
+      if (annot.historyIndex <= 0) return;
+      annot.historyIndex -= 1;
+      annot.shapes = JSON.parse(JSON.stringify(annot.history[annot.historyIndex]));
+      annot.dirty = true;
+      annotUpdateButtons();
+      annotRedraw();
+    }
+
+    function annotRedo() {
+      if (annot.historyIndex >= annot.history.length - 1) return;
+      annot.historyIndex += 1;
+      annot.shapes = JSON.parse(JSON.stringify(annot.history[annot.historyIndex]));
+      annot.dirty = true;
+      annotUpdateButtons();
+      annotRedraw();
+    }
+
+    function annotClear() {
+      if (!annot.shapes.length) return;
+      if (!confirm("Alle Markierungen auf diesem Bild löschen?")) return;
+      annot.shapes = [];
+      annotPushHistory();
+      annotRedraw();
+    }
+
+    function annotUpdateButtons() {
+      const undo = document.getElementById("annotUndo");
+      const redo = document.getElementById("annotRedo");
+      if (undo) undo.disabled = annot.historyIndex <= 0;
+      if (redo) redo.disabled = annot.historyIndex >= annot.history.length - 1;
+      document.querySelectorAll(".annot-tool").forEach((b) => b.classList.toggle("is-on", b.getAttribute("data-tool") === annot.tool));
+      document.querySelectorAll(".annot-swatch").forEach((b) => b.classList.toggle("is-on", b.getAttribute("data-color") === annot.color));
+      document.querySelectorAll(".annot-w").forEach((b) => b.classList.toggle("is-on", b.getAttribute("data-width") === annot.width));
+    }
+
+    function annotBuildChrome() {
+      const el = document.getElementById("annotEditor");
+      if (!el || el.dataset.ready) return;
+      el.innerHTML = `
+        <div class="annot-bar">
+          <button type="button" class="annot-act" id="annotCancel">Abbrechen</button>
+          <h2>Bild markieren</h2>
+          <button type="button" class="annot-act primary" id="annotSave">Speichern</button>
+        </div>
+        <div class="annot-tools" id="annotTools">
+          ${ANNOT_TOOLS.map((t) => `<button type="button" class="annot-tool" data-tool="${t.id}">${escapeHtml(t.label)}</button>`).join("")}
+          <span class="annot-sep"></span>
+          ${ANNOT_COLORS.map((c) => `<button type="button" class="annot-swatch ${escapeHtml(c.id)}" data-color="${c.id}" title="${escapeHtml(c.label)}" style="background:${c.hex}" aria-label="${escapeHtml(c.label)}"></button>`).join("")}
+          <span class="annot-sep"></span>
+          ${ANNOT_WIDTHS.map((w) => `<button type="button" class="annot-w" data-width="${w.id}">${escapeHtml(w.label)}</button>`).join("")}
+          <span class="annot-sep"></span>
+          <button type="button" class="annot-act" id="annotUndo">Rückgängig</button>
+          <button type="button" class="annot-act" id="annotRedo">Wiederholen</button>
+          <button type="button" class="annot-act" id="annotClear">Alles löschen</button>
+        </div>
+        <div class="annot-stage" id="annotStage">
+          <canvas id="annotCanvas"></canvas>
+          <div class="annot-textpop" id="annotTextPop">
+            <input type="text" id="annotTextInput" placeholder="Text eingeben" maxlength="200" />
+            <div class="row-btns">
+              <button type="button" class="btn" id="annotTextCancel">Abbrechen</button>
+              <button type="button" class="btn primary" id="annotTextOk">OK</button>
+            </div>
+          </div>
+        </div>`;
+      el.dataset.ready = "1";
+      document.getElementById("annotCancel").addEventListener("click", () => annotClose(false));
+      document.getElementById("annotSave").addEventListener("click", () => annotClose(true));
+      document.getElementById("annotUndo").addEventListener("click", annotUndo);
+      document.getElementById("annotRedo").addEventListener("click", annotRedo);
+      document.getElementById("annotClear").addEventListener("click", annotClear);
+      document.getElementById("annotTools").addEventListener("click", (e) => {
+        const tool = e.target.closest("[data-tool]");
+        const col = e.target.closest("[data-color]");
+        const w = e.target.closest("[data-width]");
+        if (tool) { annot.tool = tool.getAttribute("data-tool"); annotUpdateButtons(); }
+        if (col) { annot.color = col.getAttribute("data-color"); annotUpdateButtons(); }
+        if (w) { annot.width = w.getAttribute("data-width"); annotUpdateButtons(); }
+      });
+      const canvas = document.getElementById("annotCanvas");
+      canvas.addEventListener("pointerdown", onAnnotDown);
+      canvas.addEventListener("pointermove", onAnnotMove);
+      canvas.addEventListener("pointerup", onAnnotUp);
+      canvas.addEventListener("pointercancel", onAnnotUp);
+      document.getElementById("annotTextOk").addEventListener("click", annotCommitText);
+      document.getElementById("annotTextCancel").addEventListener("click", annotCancelText);
+      document.getElementById("annotTextInput").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") { e.preventDefault(); annotCommitText(); }
+        if (e.key === "Escape") annotCancelText();
+      });
+    }
+
+    function onAnnotDown(e) {
+      if (!annot.open || e.button) return;
+      e.preventDefault();
+      e.stopPropagation();
+      try { e.currentTarget.setPointerCapture(e.pointerId); } catch (err) {}
+      annot.pointerId = e.pointerId;
+      const p = annotPtr(e);
+      annot.drawing = true;
+      if (annot.tool === "freehand") {
+        annot.draft = { type: "freehand", color: annot.color, width: annot.width, points: [{ x: p.x, y: p.y }] };
+      } else if (annot.tool === "text") {
+        annot.draft = { type: "text", color: annot.color, width: annot.width, x: p.x, y: p.y, text: "" };
+        annot.drawing = false;
+        annotShowTextPop(e.clientX, e.clientY);
+        return;
+      } else {
+        annot.draft = { type: annot.tool, color: annot.color, width: annot.width, x1: p.x, y1: p.y, x2: p.x, y2: p.y, x: p.x, y: p.y, w: 0, h: 0 };
+      }
+      annotRedraw();
+    }
+
+    function onAnnotMove(e) {
+      if (!annot.drawing || !annot.draft) return;
+      if (annot.pointerId != null && e.pointerId !== annot.pointerId) return;
+      e.preventDefault();
+      const p = annotPtr(e);
+      if (annot.draft.type === "freehand") {
+        const last = annot.draft.points[annot.draft.points.length - 1];
+        if (!last || Math.hypot(p.x - last.x, p.y - last.y) > 1.5 / annot.scale) {
+          annot.draft.points.push({ x: p.x, y: p.y });
+        }
+      } else {
+        annot.draft.x2 = p.x;
+        annot.draft.y2 = p.y;
+        annot.draft.w = p.x - annot.draft.x;
+        annot.draft.h = p.y - annot.draft.y;
+      }
+      annotRedraw();
+    }
+
+    function onAnnotUp(e) {
+      if (!annot.drawing && annot.tool !== "text") return;
+      if (annot.pointerId != null && e.pointerId !== annot.pointerId) return;
+      if (annot.draft && annot.draft.type !== "text") {
+        annot.shapes.push(annot.draft);
+        annot.draft = null;
+        annotPushHistory();
+      }
+      annot.drawing = false;
+      annot.pointerId = null;
+      annotRedraw();
+    }
+
+    let annotTextPos = null;
+    function annotShowTextPop(clientX, clientY) {
+      const pop = document.getElementById("annotTextPop");
+      const stage = document.getElementById("annotStage");
+      const sr = stage.getBoundingClientRect();
+      let left = clientX - sr.left + 8;
+      let top = clientY - sr.top + 8;
+      pop.classList.add("open");
+      pop.style.left = "0px";
+      pop.style.top = "0px";
+      const pr = pop.getBoundingClientRect();
+      if (left + pr.width > sr.width - 8) left = Math.max(8, sr.width - pr.width - 8);
+      if (top + pr.height > sr.height - 8) top = Math.max(8, sr.height - pr.height - 8);
+      pop.style.left = left + "px";
+      pop.style.top = top + "px";
+      const input = document.getElementById("annotTextInput");
+      input.value = "";
+      setTimeout(() => input.focus(), 30);
+    }
+    function annotCommitText() {
+      const input = document.getElementById("annotTextInput");
+      const text = (input && input.value || "").trim();
+      document.getElementById("annotTextPop").classList.remove("open");
+      if (text && annot.draft && annot.draft.type === "text") {
+        annot.draft.text = text;
+        annot.shapes.push(annot.draft);
+        annotPushHistory();
+      }
+      annot.draft = null;
+      annotRedraw();
+    }
+    function annotCancelText() {
+      document.getElementById("annotTextPop").classList.remove("open");
+      annot.draft = null;
+      annotRedraw();
+    }
+
+    async function openAnnotEditor() {
+      const p = getPhoto(activePhotoId);
+      if (!p) return;
+      const rec = await idbGetPhoto(current.id, p.id);
+      if (!rec || !rec.blob) {
+        toast("Bild konnte nicht geladen werden.", true);
+        return;
+      }
+      annotBuildChrome();
+      const img = new Image();
+      const url = URL.createObjectURL(rec.blob);
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+        img.src = url;
+      });
+      URL.revokeObjectURL(url);
+      annot.open = true;
+      annot.photoId = p.id;
+      annot.img = img;
+      annot.imgW = img.naturalWidth;
+      annot.imgH = img.naturalHeight;
+      annot.shapes = JSON.parse(JSON.stringify(p.annotations || []));
+      annot.history = [JSON.parse(JSON.stringify(annot.shapes))];
+      annot.historyIndex = 0;
+      annot.draft = null;
+      annot.drawing = false;
+      annot.dirty = false;
+      annot.tool = "freehand";
+      annot.color = "rot";
+      annot.width = "mid";
+      const el = document.getElementById("annotEditor");
+      el.hidden = false;
+      el.classList.add("open");
+      document.body.style.overflow = "hidden";
+      annotUpdateButtons();
+      requestAnimationFrame(() => { annotLayout(); annotLayout(); });
+    }
+
+    async function flattenAnnotatedJpeg(img, shapes) {
+      const c = document.createElement("canvas");
+      c.width = img.naturalWidth;
+      c.height = img.naturalHeight;
+      const ctx = c.getContext("2d");
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0, 0, c.width, c.height);
+      ctx.drawImage(img, 0, 0);
+      shapes.forEach((s) => drawAnnotShape(ctx, s, c.width, c.height));
+      return new Promise((resolve, reject) => {
+        c.toBlob((b) => b ? resolve(b) : reject(new Error("encode")), "image/jpeg", 0.88);
+      });
+    }
+
+    async function annotClose(save) {
+      if (!annot.open) return;
+      if (!save && annot.dirty) {
+        if (!confirm("Markierungen verwerfen und den Editor schließen?")) return;
+      }
+      if (save) {
+        const p = getPhoto(annot.photoId);
+        if (p && annot.img) {
+          p.annotations = JSON.parse(JSON.stringify(annot.shapes));
+          p.annotated = p.annotations.length > 0;
+          persistCurrent();
+          try {
+            let annotatedBlob = null;
+            if (p.annotated) annotatedBlob = await flattenAnnotatedJpeg(annot.img, p.annotations);
+            await idbMergePhoto(current.id, p.id, { annotatedBlob: annotatedBlob });
+          } catch (err) {
+            toast("Markierungen konnten nicht gespeichert werden.", true);
+          }
+          toast(p.annotated ? "Markierungen gespeichert" : "Bild ohne Markierungen gespeichert");
+        }
+      }
+      annot.open = false;
+      annot.img = null;
+      annot.shapes = [];
+      document.getElementById("annotEditor").classList.remove("open");
+      document.getElementById("annotEditor").hidden = true;
+      document.body.style.overflow = "";
+      const pop = document.getElementById("annotTextPop");
+      if (pop) pop.classList.remove("open");
+      if (save) renderApp();
+    }
+
+    async function restoreOriginalPhoto() {
+      const p = getPhoto(activePhotoId);
+      if (!p) return;
+      if (!confirm("Markierungen entfernen und das Originalbild wiederherstellen?")) return;
+      p.annotations = [];
+      p.annotated = false;
+      persistCurrent();
+      try { await idbMergePhoto(current.id, p.id, { annotatedBlob: null }); } catch (e) {}
+      renderApp();
+      toast("Original wiederhergestellt");
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (!annot.open) return;
+      if (e.key === "Escape") {
+        const pop = document.getElementById("annotTextPop");
+        if (pop && pop.classList.contains("open")) { annotCancelText(); return; }
+        annotClose(false);
+      }
+      const cmd = e.metaKey || e.ctrlKey;
+      if (cmd && e.key.toLowerCase() === "z") { e.preventDefault(); if (e.shiftKey) annotRedo(); else annotUndo(); }
+      if (cmd && e.key.toLowerCase() === "y") { e.preventDefault(); annotRedo(); }
+    });
+    window.addEventListener("resize", () => { if (annot.open) annotLayout(); });
+
+    /* Init */
+    ensurePhotoOrder();
+    renderApp();
+    persistCurrent();
+  })();
+  </script>
+</body>
+</html>
