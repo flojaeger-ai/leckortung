@@ -376,11 +376,14 @@
     /* Foto details */
     .fdetail { padding: 0 0 calc(80px + var(--sab)); max-width: 900px; margin: 0 auto; }
     .fdetail-img-wrap {
-      background: #111; display: flex; align-items: center; justify-content: center;
-      min-height: 280px; max-height: 52vh; cursor: zoom-in;
+      background: transparent;
+      display: flex; align-items: center; justify-content: center;
+      width: fit-content; max-width: 100%; margin: 0 auto;
+      max-height: 52vh; cursor: zoom-in;
     }
     .fdetail-img-wrap img {
-      max-width: 100%; max-height: 52vh; object-fit: contain; display: block;
+      max-width: 100%; max-height: 52vh; width: auto; height: auto;
+      object-fit: contain; display: block; background: transparent;
     }
     .fdetail-body { padding: 8px 18px 24px; }
     .fg { margin: 18px 0 6px; }
@@ -686,12 +689,13 @@
     .annot-swatch.weiß.is-on { box-shadow: inset 0 0 0 1px #888, 0 0 0 2px #111; }
     .annot-sep { width: 1px; height: 28px; background: #3a414c; margin: 0 4px; }
     .annot-stage {
-      flex: 1; min-height: 0; position: relative; background: #0b0e12;
+      flex: 1; min-height: 0; position: relative; background: #eef1f5;
       display: flex; align-items: center; justify-content: center;
       touch-action: none;
     }
     #annotCanvas {
-      display: block; width: 100%; height: 100%;
+      display: block; max-width: 100%; max-height: 100%;
+      width: auto; height: auto; background: transparent;
       touch-action: none; cursor: crosshair;
     }
     .annot-textpop {
@@ -863,7 +867,7 @@
       .foto-thumb { width: 64px; height: 64px; }
       .foto-name, .foto-sub { overflow-wrap: anywhere; }
 
-      .fdetail-img-wrap { min-height: 180px; max-height: 38vh; }
+      .fdetail-img-wrap { min-height: 0; max-height: 38vh; }
       .fdetail-img-wrap img { max-height: 38vh; }
       .fdetail-body { padding: 8px max(14px, var(--sar)) calc(16px + var(--sab)) max(14px, var(--sal)); }
       .fg textarea, .fg input[type="text"], .fg input[type="number"] {
@@ -923,7 +927,7 @@
 
   <script>
   (function () {
-    const APP_VERSION = 13; /* Version 13 */
+    const APP_VERSION = 14; /* Version 14 */
     const STORAGE_CURRENT = "leckortung.current";
     const STORAGE_LIST = "leckortung.reports";
     const DB_NAME = "leckortung";
@@ -2430,7 +2434,7 @@
 
     function renderReportList() {
       const box = document.getElementById("reportList");
-      const version = '<div class="app-version">Version 13</div>';
+      const version = '<div class="app-version">Version 14</div>';
       sortReportsNewestFirst();
       if (!reports.length) {
         box.innerHTML = '<div class="empty-list">Noch keine gespeicherten Aufträge. Tippen Sie oben rechts auf das Speichern-Symbol.</div>' + version;
@@ -3060,8 +3064,7 @@
       const dpr = annot.dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       const sw = canvas.width / dpr, sh = canvas.height / dpr;
-      ctx.fillStyle = "#0b0e12";
-      ctx.fillRect(0, 0, sw, sh);
+      ctx.clearRect(0, 0, sw, sh);
       ctx.drawImage(annot.img, annot.ox, annot.oy, annot.cssW, annot.cssH);
       ctx.save();
       ctx.translate(annot.ox, annot.oy);
@@ -3081,13 +3084,13 @@
       annot.scale = scale;
       annot.cssW = annot.imgW * scale;
       annot.cssH = annot.imgH * scale;
-      annot.ox = (availW - annot.cssW) / 2;
-      annot.oy = (availH - annot.cssH) / 2;
+      annot.ox = 0;
+      annot.oy = 0;
       annot.dpr = Math.min(window.devicePixelRatio || 1, 3);
-      canvas.style.width = availW + "px";
-      canvas.style.height = availH + "px";
-      canvas.width = Math.round(availW * annot.dpr);
-      canvas.height = Math.round(availH * annot.dpr);
+      canvas.style.width = Math.max(1, annot.cssW) + "px";
+      canvas.style.height = Math.max(1, annot.cssH) + "px";
+      canvas.width = Math.round(Math.max(1, annot.cssW) * annot.dpr);
+      canvas.height = Math.round(Math.max(1, annot.cssH) * annot.dpr);
       annotRedraw();
     }
 

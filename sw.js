@@ -1,4 +1,4 @@
-const CACHE = 'leckortung-v13';
+const CACHE = 'leckortung-v14';
 const PRECACHE = ['./', './index.html', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (e) => {
