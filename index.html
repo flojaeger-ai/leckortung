@@ -295,6 +295,7 @@
     .chevron { flex-shrink: 0; }
     .status-dot.ok { background: var(--dot-ok); }
     .status-dot.missing { background: var(--dot-missing); }
+    .status-dot.neutral { background: #c5cbd3; }
     .chevron { color: #9aa3af; display: inline-flex; }
     .chevron svg { width: 18px; height: 18px; fill: currentColor; }
 
@@ -845,7 +846,7 @@
 
   <script>
   (function () {
-    const APP_VERSION = 9; /* Version 9 */
+    const APP_VERSION = 10; /* Version 10 */
     const STORAGE_CURRENT = "leckortung.current";
     const STORAGE_LIST = "leckortung.reports";
     const DB_NAME = "leckortung";
@@ -1344,9 +1345,30 @@
       return !!(p && String(p.comment || "").trim());
     }
 
-    function isFotosFilled(r) {
+    function photoNeedsComment(p) {
+      return !!(p && p.druck && !photoHasComment(p));
+    }
+
+    function fotosStatus(r) {
       const photos = (r || current).photos || [];
-      return photos.length > 0 && photos.every(photoHasComment);
+      if (!photos.length) return "neutral";
+      if (photos.some(photoNeedsComment)) return "missing";
+      return "ok";
+    }
+
+    function isFotosFilled(r) {
+      return fotosStatus(r) === "ok";
+    }
+
+    function updateCommentHint(focusIfNeeded) {
+      const p = getPhoto(activePhotoId);
+      const needs = photoNeedsComment(p);
+      const comment = document.getElementById("photoComment");
+      const hint = document.getElementById("commentHint");
+      if (comment) comment.classList.toggle("is-invalid", needs);
+      if (hint) hint.classList.toggle("show", needs);
+      if (needs && focusIfNeeded && comment) comment.focus();
+      return needs;
     }
 
     function getPhoto(id) {
@@ -1508,8 +1530,8 @@
         readPhotoDetailIntoModel();
         persistCurrent();
         const p = getPhoto(activePhotoId);
-        if (p && !photoHasComment(p)) {
-          toast("Bitte ergänzen Sie noch einen Kommentar zu diesem Foto.", true);
+        if (photoNeedsComment(p)) {
+          toast("Bitte ergänzen Sie noch einen Kommentar, weil „Druck auf Leckortungsbericht“ aktiv ist.", true);
         }
         showView("fotos");
         return;
@@ -1651,7 +1673,8 @@
       const m = current.meta;
       const bOk = isBerichtFilled(current);
       const maOk = isMitarbeiterFilled(current);
-      const fOk = isFotosFilled(current);
+      const fStatus = fotosStatus(current);
+      const fTitle = fStatus === "ok" ? "ausgefüllt" : (fStatus === "missing" ? "Kommentar bei Druck-Foto fehlt" : "keine Fotos");
       return `<div class="overview-wrap">
         <div class="section"><div class="section-title">Details</div></div>
         <div class="card">
@@ -1683,7 +1706,7 @@
           <button type="button" class="menu-item" data-goto="fotos">
             <span class="menu-ico">${ICO.camera}</span>
             <span class="menu-label">Fotos</span>
-            <span class="status-dot ${fOk ? "ok" : "missing"}" title="${fOk ? "ausgefüllt" : "unvollständig"}"></span>
+            <span class="status-dot ${fStatus}" title="${fTitle}"></span>
             <span class="chevron">${ICO.chevron}</span>
           </button>
         </div>
@@ -1716,7 +1739,7 @@
       const count = (n === 1 ? "1 Eintrag gefunden" : n + " Einträge gefunden")
         + " · " + (photoSortMode === "date" ? "nach Datum" : "eigene Reihenfolge");
       const items = list.map((p, idx) => {
-        const missing = !photoHasComment(p);
+        const missing = photoNeedsComment(p);
         const first = idx === 0;
         const last = idx === n - 1;
         return `<div class="foto-item${missing ? " no-comment" : ""}" data-open-photo="${p.id}" data-index="${idx}" tabindex="0" role="button">
@@ -1744,7 +1767,7 @@
       const p = getPhoto(activePhotoId);
       if (!p) return `<div class="fotos-wrap"><p>Foto nicht gefunden.</p></div>`;
       const dis = "";
-      const commentInvalid = !photoHasComment(p);
+      const commentInvalid = photoNeedsComment(p);
       return `<div class="fdetail">
         <div class="fdetail-img-wrap" id="fotoZoom" title="Tippen für Vollbild">
           <img id="fotoDetailImg" alt="${attr(p.name)}" />
@@ -1758,7 +1781,7 @@
           <div class="fg">
             <div class="fg-cap">Kommentar</div>
             <textarea id="photoComment" data-phfield="comment" placeholder="Geben Sie hier Ihren Text ein"${dis} class="${commentInvalid && photoEditMode ? "is-invalid" : ""}">${escapeHtml(p.comment)}</textarea>
-            <p class="hint${commentInvalid && photoEditMode ? " show" : ""}" id="commentHint">Ein Kommentar ist erforderlich.</p>
+            <p class="hint${commentInvalid ? " show" : ""}" id="commentHint">Ein Kommentar ist erforderlich, wenn das Foto auf den Leckortungsbericht gedruckt wird.</p>
           </div>
           <div class="fg">
             <div class="fg-cap">Datum</div>
@@ -1766,7 +1789,7 @@
           </div>
           <div class="fg">
             <div class="fg-cap">Folgeauftrag</div>
-            <label class="check-row" for="photoFolge">
+            <label class="check-row">
               <span>Anlage Folgeauftrag</span>
               <input type="checkbox" id="photoFolge" ${p.folgeauftrag ? "checked" : ""} />
             </label>
@@ -1777,7 +1800,7 @@
           </div>
           <div class="fg">
             <div class="fg-cap">Druck</div>
-            <label class="check-row" for="photoDruck">
+            <label class="check-row">
               <span>Druck auf Leckortungsbericht</span>
               <input type="checkbox" id="photoDruck" ${p.druck ? "checked" : ""} />
             </label>
@@ -1866,14 +1889,11 @@
       if (!el) return;
       el.disabled = false;
       el.removeAttribute("disabled");
-      el.removeAttribute("readonly");
       const sync = () => {
         apply(!!el.checked);
         persistCurrent();
       };
       el.addEventListener("change", sync);
-      el.addEventListener("input", sync);
-      el.addEventListener("click", (e) => e.stopPropagation());
     }
 
     function bindPhotoDetailFields() {
@@ -1886,10 +1906,7 @@
         comment.addEventListener("input", () => {
           readPhotoDetailIntoModel();
           persistCurrent();
-          const ok = photoHasComment(getPhoto(activePhotoId));
-          comment.classList.toggle("is-invalid", !ok);
-          const hint = document.getElementById("commentHint");
-          if (hint) hint.classList.toggle("show", !ok);
+          updateCommentHint(false);
         });
       }
       bindPhotoCheckbox(folge, (on) => {
@@ -1899,6 +1916,7 @@
       bindPhotoCheckbox(druck, (on) => {
         const p = getPhoto(activePhotoId);
         if (p) p.druck = on;
+        updateCommentHint(true);
       });
       if (sort) {
         sort.addEventListener("change", () => {
@@ -1930,11 +1948,11 @@
       const p = getPhoto(id);
       if (!p) return;
       activePhotoId = id;
-      photoEditMode = editMode || !photoHasComment(p);
+      photoEditMode = editMode || photoNeedsComment(p);
       showView("fotodetail", { photoId: id, editMode: photoEditMode });
       setTimeout(() => {
         const ta = document.getElementById("photoComment");
-        if (ta && photoEditMode) ta.focus();
+        if (ta && photoNeedsComment(p)) ta.focus();
       }, 50);
     }
 
@@ -1943,15 +1961,9 @@
       const sortEl = document.getElementById("photoSort");
       if (sortEl) movePhotoToPosition(activePhotoId, sortEl.value);
       const p = getPhoto(activePhotoId);
-      if (!p || !photoHasComment(p)) {
-        const ta = document.getElementById("photoComment");
-        if (ta) {
-          ta.classList.add("is-invalid");
-          ta.focus();
-        }
-        const hint = document.getElementById("commentHint");
-        if (hint) hint.classList.add("show");
-        toast("Bitte geben Sie einen Kommentar zu diesem Foto ein. Ohne Kommentar kann nicht gespeichert werden.", true);
+      if (photoNeedsComment(p)) {
+        updateCommentHint(true);
+        toast("Bitte geben Sie einen Kommentar ein, weil „Druck auf Leckortungsbericht“ aktiv ist.", true);
         return;
       }
       persistCurrent();
@@ -2142,7 +2154,7 @@
       document.getElementById("photoInput").value = "";
       if (newIds.length) {
         toast(newIds.length === 1 ? "1 Foto hinzugefügt" : newIds.length + " Fotos hinzugefügt");
-        openPhotoDetail(newIds[0], true);
+        openPhotoDetail(newIds[0], false);
       }
     }
 
@@ -2298,7 +2310,7 @@
 
     function renderReportList() {
       const box = document.getElementById("reportList");
-      const version = '<div class="app-version">Version 9</div>';
+      const version = '<div class="app-version">Version 10</div>';
       if (!reports.length) {
         box.innerHTML = '<div class="empty-list">Noch keine gespeicherten Aufträge. Tippen Sie oben rechts auf das Speichern-Symbol.</div>' + version;
         return;
