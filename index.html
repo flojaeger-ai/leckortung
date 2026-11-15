@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light" />
+  <meta name="supported-color-schemes" content="light" />
   <meta name="theme-color" content="#1a5fad" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -15,6 +17,7 @@
   <title>Leckortung</title>
   <style>
     :root {
+      color-scheme: light;
       --blue: #1a5fad;
       --blue-dark: #144a8a;
       --blue-light: #e8f0fa;
@@ -50,8 +53,9 @@
       height: 100%;
       height: 100dvh;
       font-family: var(--font);
-      color: var(--text);
-      background: var(--bg);
+      color: #1c2430;
+      background: #eef1f5;
+      color-scheme: light;
       -webkit-font-smoothing: antialiased;
       -webkit-text-size-adjust: 100%;
       text-size-adjust: 100%;
@@ -66,6 +70,16 @@
       font-family: inherit;
       font-size: 16px;
       max-width: 100%;
+      min-width: 0;
+      color-scheme: light;
+    }
+    input, textarea, select {
+      background-color: #f7f9fb;
+      color: #1c2430;
+    }
+    .card, .menu-list, .foto-item, .report-item, .choice-dialog {
+      background-color: #fff;
+      color: #1c2430;
     }
     button, a, .tab, .menu-item, .icon-btn, .hdr-btn, .btn {
       touch-action: manipulation;
@@ -152,15 +166,17 @@
       padding: 0 18px; height: var(--tabs-h); white-space: nowrap;
       cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -1px;
     }
+    .tab-short { display: none; }
+    .tab-full { display: inline; }
     .tab:hover { color: var(--blue); background: var(--blue-light); }
     .tab[aria-selected="true"] {
       color: var(--blue); border-bottom-color: var(--blue);
     }
 
     /* Main */
-    main { flex: 1; overflow: auto; -webkit-overflow-scrolling: touch; padding: 14px max(16px, var(--sar)) calc(80px + var(--sab)) max(16px, var(--sal)); }
+    main { flex: 1; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 14px max(16px, var(--sar)) calc(80px + var(--sab)) max(16px, var(--sal)); }
     main.tight { padding: 0 0 calc(40px + var(--sab)); }
-    .panel { display: none; max-width: 1100px; margin: 0 auto; }
+    .panel { display: none; max-width: 1100px; width: 100%; margin: 0 auto; min-width: 0; }
     .panel.active { display: block; }
     .view { display: none; max-width: 1100px; margin: 0 auto; }
     .view.active { display: block; }
@@ -178,8 +194,9 @@
     }
 
     .card {
-      background: var(--card); border: 1px solid var(--line);
+      background: #fff; border: 1px solid var(--line);
       border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow);
+      max-width: 100%; min-width: 0;
     }
     .row {
       display: grid;
@@ -189,6 +206,9 @@
       border-bottom: 1px solid var(--line-soft);
       padding: 6px 14px;
       gap: 12px;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
     }
     .row:last-child { border-bottom: 0; }
     .row.label-top { align-items: start; padding-top: 10px; padding-bottom: 10px; }
@@ -712,16 +732,61 @@
       .report-item { flex-wrap: wrap; }
       .report-actions { width: 100%; justify-content: stretch; margin-top: 4px; }
       .report-actions .btn-icloud { flex: 1; }
-      .tab {
-        font-size: 14px;
-        padding: 0 14px;
+      .tab-bar {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 4px;
+        overflow: hidden;
+        height: auto;
         min-height: 44px;
-        flex: 0 0 auto;
+        padding: 6px max(10px, var(--sar)) 6px max(10px, var(--sal));
+        background: #e8eef6;
       }
+      .tab {
+        display: inline-flex; align-items: center; justify-content: center;
+        font-size: 13px;
+        font-weight: 700;
+        padding: 0 6px;
+        height: 40px;
+        min-height: 40px;
+        min-width: 0;
+        width: auto;
+        flex: none;
+        margin: 0;
+        border-bottom: 0;
+        border-radius: 8px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .tab[aria-selected="true"] {
+        background: var(--blue);
+        color: #fff;
+        border-bottom-color: transparent;
+      }
+      .tab-full { display: none; }
+      .tab-short { display: inline; }
       main {
         padding: 12px max(12px, var(--sar)) calc(32px + var(--sab)) max(12px, var(--sal));
+        overflow-x: hidden;
       }
       main.tight { padding: 0 0 calc(24px + var(--sab)); }
+      .panel, .card, .overview-wrap, .fotos-wrap, .menu-list {
+        max-width: 100%;
+        min-width: 0;
+      }
+      .row, .row.label-top, .row.check, .row.pair, .row.pair.mixed {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+      }
+      input, select, textarea {
+        max-width: 100%;
+        min-width: 0;
+        color-scheme: light;
+        background-color: #f7f9fb;
+        color: #1c2430;
+      }
       .overview-wrap, .fotos-wrap {
         padding-left: max(12px, var(--sal));
         padding-right: max(12px, var(--sar));
@@ -846,7 +911,7 @@
 
   <script>
   (function () {
-    const APP_VERSION = 10; /* Version 10 */
+    const APP_VERSION = 11; /* Version 11 */
     const STORAGE_CURRENT = "leckortung.current";
     const STORAGE_LIST = "leckortung.reports";
     const DB_NAME = "leckortung";
@@ -1651,8 +1716,9 @@
         return;
       }
       tabBar.classList.remove("is-hidden");
+      const TAB_SHORT = { allgemein: "Allgemein", leitungssystem: "Leitungen", gewerke: "Gewerke" };
       tabBar.innerHTML = TABS.map((t) =>
-        `<button class="tab" role="tab" data-tab="${t.id}" aria-selected="${t.id === activeTab}">${escapeHtml(t.title)}</button>`
+        `<button class="tab" role="tab" data-tab="${t.id}" aria-selected="${t.id === activeTab}" title="${attr(t.title)}"><span class="tab-full">${escapeHtml(t.title)}</span><span class="tab-short">${escapeHtml(TAB_SHORT[t.id] || t.title)}</span></button>`
       ).join("");
     }
 
@@ -2310,7 +2376,7 @@
 
     function renderReportList() {
       const box = document.getElementById("reportList");
-      const version = '<div class="app-version">Version 10</div>';
+      const version = '<div class="app-version">Version 11</div>';
       if (!reports.length) {
         box.innerHTML = '<div class="empty-list">Noch keine gespeicherten Aufträge. Tippen Sie oben rechts auf das Speichern-Symbol.</div>' + version;
         return;
