@@ -442,12 +442,20 @@
     .overlay.open { opacity: 1; pointer-events: auto; }
     .drawer {
       position: fixed; top: 0; left: 0; bottom: 0; width: min(420px, 92vw);
-      background: #fff; z-index: 60; transform: translateX(-100%);
-      transition: transform .22s ease; display: flex; flex-direction: column;
-      box-shadow: 6px 0 24px rgba(0,0,0,.18);
+      background: #fff; z-index: 60;
+      transform: translateX(calc(-100% - 40px));
+      transition: transform .22s ease, box-shadow .22s ease, visibility 0s linear .22s;
+      display: flex; flex-direction: column;
+      box-shadow: none;
+      visibility: hidden;
       padding-bottom: var(--sab);
     }
-    .drawer.open { transform: none; }
+    .drawer.open {
+      transform: none;
+      box-shadow: 6px 0 24px rgba(0,0,0,.18);
+      visibility: visible;
+      transition: transform .22s ease, box-shadow .22s ease, visibility 0s;
+    }
     .drawer-head {
       display: flex; align-items: center; justify-content: space-between;
       padding: calc(14px + var(--sat)) max(14px, var(--sar)) 12px max(14px, var(--sal));
@@ -911,7 +919,7 @@
 
   <script>
   (function () {
-    const APP_VERSION = 11; /* Version 11 */
+    const APP_VERSION = 12; /* Version 12 */
     const STORAGE_CURRENT = "leckortung.current";
     const STORAGE_LIST = "leckortung.reports";
     const DB_NAME = "leckortung";
@@ -2376,7 +2384,7 @@
 
     function renderReportList() {
       const box = document.getElementById("reportList");
-      const version = '<div class="app-version">Version 11</div>';
+      const version = '<div class="app-version">Version 12</div>';
       if (!reports.length) {
         box.innerHTML = '<div class="empty-list">Noch keine gespeicherten Aufträge. Tippen Sie oben rechts auf das Speichern-Symbol.</div>' + version;
         return;
