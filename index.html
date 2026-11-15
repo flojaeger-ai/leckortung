@@ -104,6 +104,24 @@
       width: 44px; height: 44px; border-radius: 8px; cursor: pointer;
       display: inline-flex; align-items: center; justify-content: center;
     }
+    .hdr-btn-label {
+      width: auto; min-width: 44px; height: 36px; padding: 0 10px; gap: 6px;
+      font-size: 13px; font-weight: 700; white-space: nowrap;
+      background: rgba(255,255,255,.16);
+    }
+    .hdr-btn-label:hover, .hdr-btn-label:focus-visible { background: rgba(255,255,255,.26); }
+    .app-toolbar {
+      display: none; flex-shrink: 0; gap: 8px; align-items: center;
+      padding: 8px max(12px, var(--sar)) 8px max(12px, var(--sal));
+      background: #fff; border-bottom: 1px solid var(--line);
+      position: sticky; top: calc(var(--header-h) + var(--sat)); z-index: 35;
+    }
+    .app-toolbar .btn { flex: 1; min-height: 44px; font-weight: 700; }
+    .btn-icloud { white-space: nowrap; font-weight: 700; }
+    .app-version {
+      text-align: center; color: var(--muted); font-size: 12px;
+      padding: 16px 8px 20px; user-select: text;
+    }
     .hdr-btn:hover, .hdr-btn:focus-visible { background: rgba(255,255,255,.15); outline: none; }
     .hdr-btn:active { background: rgba(255,255,255,.25); }
     .hdr-btn svg { width: 22px; height: 22px; fill: currentColor; }
@@ -211,15 +229,18 @@
     .row.check { grid-template-columns: 1fr auto; }
     .row.check input[type="checkbox"] { margin: 0; }
     input[type="checkbox"] {
-      appearance: none; width: 24px; height: 24px; border: 2px solid #8b96a5;
-      border-radius: 4px; background: #fff; cursor: pointer; position: relative; flex-shrink: 0;
+      appearance: none; -webkit-appearance: none;
+      width: 28px; height: 28px; min-width: 28px; min-height: 28px;
+      border: 2px solid #8b96a5;
+      border-radius: 6px; background: #fff; cursor: pointer; position: relative;
+      flex-shrink: 0; margin: 0; pointer-events: auto; z-index: 1;
     }
     input[type="checkbox"]:checked {
       background: var(--blue); border-color: var(--blue);
     }
     input[type="checkbox"]:checked::after {
-      content: ""; position: absolute; left: 7px; top: 3px;
-      width: 6px; height: 12px; border: solid #fff; border-width: 0 2.4px 2.4px 0;
+      content: ""; position: absolute; left: 8px; top: 3px;
+      width: 7px; height: 14px; border: solid #fff; border-width: 0 2.6px 2.6px 0;
       transform: rotate(45deg);
     }
     input[type="checkbox"]:focus-visible { box-shadow: 0 0 0 3px rgba(26,95,173,.25); outline: none; }
@@ -364,8 +385,11 @@
     .fg .hint.show { display: block; }
     .fg .check-row {
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
-      min-height: 44px; font-weight: 650; font-size: 15px;
+      min-height: 48px; padding: 8px 6px; margin: 0 -6px; border-radius: 8px;
+      font-weight: 650; font-size: 15px; cursor: pointer;
+      position: relative; z-index: 2; pointer-events: auto;
     }
+    .fg .check-row:hover, .fg .check-row:active { background: #f4f7fa; }
 
     /* Lightbox */
     .lightbox {
@@ -466,7 +490,7 @@
     @media print {
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
       html, body { background: #fff !important; margin: 0 !important; padding: 0 !important; height: auto !important; }
-      .app-header, .tab-bar, main, .overlay, .drawer, .toast, .lightbox, .hidden-file, .annot-editor, .choice-overlay { display: none !important; }
+      .app-header, .app-toolbar, .tab-bar, main, .overlay, .drawer, .toast, .lightbox, .hidden-file, .annot-editor, .choice-overlay { display: none !important; }
       .print-root {
         display: block !important;
         padding: 0;
@@ -680,8 +704,13 @@
       :root { --header-h: 52px; --tabs-h: 48px; }
       .app-header h1 {
         font-size: 16px;
-        max-width: calc(100% - 168px);
+        max-width: calc(100% - 120px);
       }
+      .hdr-icloud { display: none !important; }
+      .app-toolbar.is-visible { display: flex; }
+      .report-item { flex-wrap: wrap; }
+      .report-actions { width: 100%; justify-content: stretch; margin-top: 4px; }
+      .report-actions .btn-icloud { flex: 1; }
       .tab {
         font-size: 14px;
         padding: 0 14px;
@@ -772,6 +801,7 @@
 </head>
 <body>
   <header class="app-header" id="appHeader"></header>
+  <div class="app-toolbar" id="appToolbar"></div>
   <nav class="tab-bar is-hidden" id="tabBar" role="tablist" aria-label="Berichtabschnitte"></nav>
   <main id="main"></main>
 
@@ -787,7 +817,7 @@
     </div>
     <div class="drawer-actions">
       <button class="btn primary" id="btnNew">Neuer Auftrag</button>
-      <button class="btn btn-ico" id="btnOpenAuftrag" title="Auftrag aus Datei öffnen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8l-2-2z"/></svg> Öffnen</button>
+      <button class="btn btn-ico" id="btnOpenAuftrag" title="Auftrag aus Datei öffnen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8l-2-2z"/></svg> 📂 Öffnen</button>
       <button class="btn" id="btnExport">JSON exportieren</button>
       <button class="btn" id="btnPrint">Drucken / PDF</button>
     </div>
@@ -815,6 +845,7 @@
 
   <script>
   (function () {
+    const APP_VERSION = 9; /* Version 9 */
     const STORAGE_CURRENT = "leckortung.current";
     const STORAGE_LIST = "leckortung.reports";
     const DB_NAME = "leckortung";
@@ -1437,7 +1468,7 @@
         : hdrBtn("btnBack", "Zurück", ICO.back);
       let right = "";
       if (view === "overview") {
-        right = hdrBtn("btnICloudSave", "In iCloud speichern", ICO.cloud)
+        right = `<button class="hdr-btn hdr-btn-label hdr-icloud" id="btnICloudSave" title="In iCloud speichern" aria-label="In iCloud speichern">☁ iCloud speichern</button>`
           + hdrBtn("btnSave", "Auftrag speichern", ICO.save);
       } else if (view === "bericht" || view === "mitarbeiter") {
         right = hdrBtn("btnSave", "Auftrag speichern", ICO.save);
@@ -1735,18 +1766,20 @@
           </div>
           <div class="fg">
             <div class="fg-cap">Folgeauftrag</div>
-            <label class="check-row"><span>Anlage Folgeauftrag</span>
-              <input type="checkbox" id="photoFolge" ${p.folgeauftrag ? "checked" : ""}${dis} />
+            <label class="check-row" for="photoFolge">
+              <span>Anlage Folgeauftrag</span>
+              <input type="checkbox" id="photoFolge" ${p.folgeauftrag ? "checked" : ""} />
             </label>
           </div>
           <div class="fg">
             <div class="fg-cap">Sortiernummer</div>
-            <input type="number" id="photoSort" step="1" min="1" value="${attr(p.sortiernummer)}"${dis} />
+            <input type="number" id="photoSort" step="1" min="1" value="${attr(p.sortiernummer)}" />
           </div>
           <div class="fg">
             <div class="fg-cap">Druck</div>
-            <label class="check-row"><span>Druck auf Leckortungsbericht</span>
-              <input type="checkbox" id="photoDruck" ${p.druck ? "checked" : ""}${dis} />
+            <label class="check-row" for="photoDruck">
+              <span>Druck auf Leckortungsbericht</span>
+              <input type="checkbox" id="photoDruck" ${p.druck ? "checked" : ""} />
             </label>
           </div>
         </div>
@@ -1829,6 +1862,20 @@
       bindPhotoDetailFields();
     }
 
+    function bindPhotoCheckbox(el, apply) {
+      if (!el) return;
+      el.disabled = false;
+      el.removeAttribute("disabled");
+      el.removeAttribute("readonly");
+      const sync = () => {
+        apply(!!el.checked);
+        persistCurrent();
+      };
+      el.addEventListener("change", sync);
+      el.addEventListener("input", sync);
+      el.addEventListener("click", (e) => e.stopPropagation());
+    }
+
     function bindPhotoDetailFields() {
       const comment = document.getElementById("photoComment");
       const folge = document.getElementById("photoFolge");
@@ -1845,12 +1892,13 @@
           if (hint) hint.classList.toggle("show", !ok);
         });
       }
-      [folge, druck].forEach((el) => {
-        if (!el) return;
-        el.addEventListener("change", () => {
-          readPhotoDetailIntoModel();
-          persistCurrent();
-        });
+      bindPhotoCheckbox(folge, (on) => {
+        const p = getPhoto(activePhotoId);
+        if (p) p.folgeauftrag = on;
+      });
+      bindPhotoCheckbox(druck, (on) => {
+        const p = getPhoto(activePhotoId);
+        if (p) p.druck = on;
       });
       if (sort) {
         sort.addEventListener("change", () => {
@@ -2150,8 +2198,22 @@
       }
     }
 
+    function renderToolbar() {
+      const bar = document.getElementById("appToolbar");
+      if (!bar) return;
+      if (view === "overview") {
+        bar.classList.add("is-visible");
+        bar.innerHTML = `<button type="button" class="btn primary btn-icloud" id="btnICloudSaveBar">☁ iCloud speichern</button>`;
+        document.getElementById("btnICloudSaveBar").addEventListener("click", () => saveAuftragToICloud(current.id));
+      } else {
+        bar.classList.remove("is-visible");
+        bar.innerHTML = "";
+      }
+    }
+
     function renderApp() {
       renderHeader();
+      renderToolbar();
       renderTabs();
       renderMain();
     }
@@ -2236,8 +2298,9 @@
 
     function renderReportList() {
       const box = document.getElementById("reportList");
+      const version = '<div class="app-version">Version 9</div>';
       if (!reports.length) {
-        box.innerHTML = '<div class="empty-list">Noch keine gespeicherten Aufträge. Tippen Sie oben rechts auf das Speichern-Symbol.</div>';
+        box.innerHTML = '<div class="empty-list">Noch keine gespeicherten Aufträge. Tippen Sie oben rechts auf das Speichern-Symbol.</div>' + version;
         return;
       }
       box.innerHTML = reports.map((r) => {
@@ -2248,11 +2311,11 @@
             <span>${escapeHtml(t.kunde)} · ${escapeHtml(t.date)}</span>
           </div>
           <div class="report-actions">
-            <button type="button" class="report-cloud" data-icloud="${r.id}" title="In iCloud speichern" aria-label="In iCloud speichern">${ICO.cloud}</button>
+            <button type="button" class="btn btn-icloud" data-icloud="${r.id}" title="In iCloud speichern">☁ iCloud speichern</button>
             <button class="btn danger" data-del="${r.id}">Löschen</button>
           </div>
         </div>`;
-      }).join("");
+      }).join("") + version;
     }
 
     document.getElementById("reportList").addEventListener("click", (e) => {
@@ -2674,32 +2737,56 @@
       setTimeout(() => window.print(), 80);
     });
 
-    /* Offline: prefer sw.js on a static HTTPS host, blob fallback otherwise */
-    if ("serviceWorker" in navigator && location.protocol !== "file:") {
-      const registerBlobSw = () => {
-        const sw = `
-          const CACHE = 'leckortung-v8';
-          self.addEventListener('install', (e) => {
-            e.waitUntil(caches.open(CACHE).then((c) => c.add('./')).then(() => self.skipWaiting()));
-          });
-          self.addEventListener('activate', (e) => {
-            e.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim()));
-          });
-          self.addEventListener('fetch', (e) => {
-            e.respondWith(
-              caches.match(e.request).then((r) => r || fetch(e.request).then((res) => {
-                const copy = res.clone();
-                caches.open(CACHE).then((c) => c.put(e.request, copy));
-                return res;
-              }).catch(() => caches.match('./')))
-            );
-          });
-        `;
-        const blob = new Blob([sw], { type: "text/javascript" });
-        return navigator.serviceWorker.register(URL.createObjectURL(blob));
+    /* Offline: register ./sw.js only (no blob fallback — it can pin stale versions) */
+    function setupServiceWorker() {
+      if (!("serviceWorker" in navigator) || location.protocol === "file:") return;
+      try {
+        if (sessionStorage.getItem("leckortung.updated") === "1") {
+          sessionStorage.removeItem("leckortung.updated");
+          setTimeout(() => toast("Neue Version geladen"), 300);
+        }
+      } catch (e) {}
+      const refreshOnce = () => {
+        try {
+          if (sessionStorage.getItem("leckortung.swReloading") === "1") return;
+          sessionStorage.setItem("leckortung.swReloading", "1");
+          sessionStorage.setItem("leckortung.updated", "1");
+        } catch (e) {}
+        location.reload();
       };
-      navigator.serviceWorker.register("./sw.js", { scope: "./" }).catch(registerBlobSw);
+      navigator.serviceWorker.addEventListener("controllerchange", () => {
+        try {
+          if (sessionStorage.getItem("leckortung.swReloading") === "1") {
+            sessionStorage.removeItem("leckortung.swReloading");
+            return;
+          }
+        } catch (e) {}
+        refreshOnce();
+      });
+      const checkUpdate = (reg) => {
+        if (reg && reg.update) reg.update().catch(() => {});
+      };
+      navigator.serviceWorker.register("./sw.js", { scope: "./" }).then((reg) => {
+        checkUpdate(reg);
+        document.addEventListener("visibilitychange", () => {
+          if (document.visibilityState === "visible") checkUpdate(reg);
+        });
+        window.addEventListener("focus", () => checkUpdate(reg));
+        if (reg.waiting) {
+          try { reg.waiting.postMessage({ type: "SKIP_WAITING" }); } catch (e) {}
+        }
+        reg.addEventListener("updatefound", () => {
+          const nw = reg.installing;
+          if (!nw) return;
+          nw.addEventListener("statechange", () => {
+            if (nw.state === "installed" && navigator.serviceWorker.controller) {
+              try { nw.postMessage({ type: "SKIP_WAITING" }); } catch (e) {}
+            }
+          });
+        });
+      }).catch((err) => console.warn("Service Worker nicht registriert", err));
     }
+    setupServiceWorker();
 
 
     /* ---------- Photo annotation editor ---------- */
