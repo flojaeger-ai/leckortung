@@ -927,7 +927,7 @@
 
   <script>
   (function () {
-    const APP_VERSION = 14; /* Version 14 */
+    const APP_VERSION = 15; /* Version 15 */
     const STORAGE_CURRENT = "leckortung.current";
     const STORAGE_LIST = "leckortung.reports";
     const DB_NAME = "leckortung";
@@ -2434,7 +2434,7 @@
 
     function renderReportList() {
       const box = document.getElementById("reportList");
-      const version = '<div class="app-version">Version 14</div>';
+      const version = '<div class="app-version">Version 15</div>';
       sortReportsNewestFirst();
       if (!reports.length) {
         box.innerHTML = '<div class="empty-list">Noch keine gespeicherten Aufträge. Tippen Sie oben rechts auf das Speichern-Symbol.</div>' + version;
@@ -3506,7 +3506,7 @@
       if (canShareFiles(file)) {
         await maybeShowICloudHint();
         try {
-          await navigator.share({ files: [file], title: file.name });
+          await navigator.share({ files: [file] });
           toast("Auftrag geteilt");
           return "share";
         } catch (err) {
