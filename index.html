@@ -415,6 +415,43 @@
     }
     .fg .check-row:hover, .fg .check-row:active { background: #f4f7fa; }
 
+    /* Druck: großer Schalter (Fotodetails) und Ein-Tipp-Schalter (Fotoliste) */
+    .druck-switch {
+      appearance: none; display: flex; align-items: center; justify-content: space-between; gap: 14px;
+      width: 100%; min-height: 64px; padding: 10px 14px; margin: 0;
+      border: 2px solid var(--line); border-radius: 12px; background: #fff;
+      font: inherit; font-weight: 650; font-size: 16px; color: var(--text); text-align: left;
+      cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+      user-select: none; -webkit-user-select: none;
+    }
+    .druck-switch .ds-text { flex: 1; min-width: 0; }
+    .druck-switch .ds-state { display: block; font-size: 13px; font-weight: 600; color: var(--muted); margin-top: 2px; }
+    .druck-switch .ds-track {
+      position: relative; flex-shrink: 0; width: 64px; height: 36px; border-radius: 999px;
+      background: #c9d1da; transition: background .15s ease;
+    }
+    .druck-switch .ds-knob {
+      position: absolute; top: 3px; left: 3px; width: 30px; height: 30px; border-radius: 50%;
+      background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.3); transition: left .15s ease;
+    }
+    .druck-switch[aria-checked="true"] { border-color: #2e8b57; background: #eef8f2; }
+    .druck-switch[aria-checked="true"] .ds-track { background: #2e8b57; }
+    .druck-switch[aria-checked="true"] .ds-knob { left: 31px; }
+    .druck-switch[aria-checked="true"] .ds-state { color: #1a5a3a; }
+    .druck-switch:focus-visible { outline: 3px solid rgba(26,95,173,.35); outline-offset: 2px; }
+    .fg-druck { margin-top: 12px; }
+    .foto-druck-btn {
+      appearance: none; flex-shrink: 0; display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+      min-width: 76px; min-height: 52px; padding: 4px 8px; border-radius: 10px;
+      border: 2px solid #c9d1da; background: #fff; color: var(--muted);
+      font: inherit; font-size: 13px; font-weight: 700; line-height: 1.15; cursor: pointer;
+      touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+    }
+    .foto-druck-btn svg { width: 18px; height: 18px; fill: currentColor; margin-bottom: 2px; }
+    .foto-druck-btn .fd-state { font-size: 11px; font-weight: 600; }
+    .foto-druck-btn[aria-checked="true"] { border-color: #2e8b57; background: #e5f4eb; color: #1a5a3a; }
+    .foto-druck-btn:focus-visible { outline: 3px solid rgba(26,95,173,.35); outline-offset: 2px; }
+
     /* Lightbox */
     .lightbox {
       position: fixed; inset: 0; background: rgba(0,0,0,.92);
@@ -866,6 +903,7 @@
       .foto-item { gap: 10px; padding: 10px; min-height: 72px; max-width: 100%; }
       .foto-thumb { width: 64px; height: 64px; }
       .foto-name, .foto-sub { overflow-wrap: anywhere; }
+      .foto-druck-btn { min-width: 62px; padding: 4px 6px; }
 
       .fdetail-img-wrap { min-height: 0; max-height: 38vh; }
       .fdetail-img-wrap img { max-height: 38vh; }
@@ -927,7 +965,7 @@
 
   <script>
   (function () {
-    const APP_VERSION = 15; /* Version 15 */
+    const APP_VERSION = 16; /* Version 16 */
     const STORAGE_CURRENT = "leckortung.current";
     const STORAGE_LIST = "leckortung.reports";
     const DB_NAME = "leckortung";
@@ -1814,13 +1852,7 @@
         </div>`;
     }
 
-    function renderFotosListSkeleton() {
-      ensurePhotoOrder();
-      const list = sortedPhotos();
-      const n = list.length;
-      const count = (n === 1 ? "1 Eintrag gefunden" : n + " Einträge gefunden")
-        + " · " + (photoSortMode === "date" ? "nach Datum" : "eigene Reihenfolge");
-      const items = list.map((p, idx) => {
+    function fotoItemHtml(p, idx, n) {
         const missing = photoNeedsComment(p);
         const first = idx === 0;
         const last = idx === n - 1;
@@ -1832,13 +1864,22 @@
             <span class="foto-sub">Nr. ${p.sortiernummer} · ${escapeHtml(formatDateDe(p.date))}${p.annotated ? ' <span class="foto-badge">Markiert</span>' : ""}${p.druck ? ' <span class="foto-badge foto-badge-druck" title="Wird auf den Leckortungsbericht gedruckt">' + ICO.printer + ' Druck</span>' : ""}</span>
             ${missing ? '<span class="foto-flag">Kommentar fehlt</span>' : (p.comment ? `<span class="foto-sub">${escapeHtml(String(p.comment).replace(/\n+/g, " "))}</span>` : "")}
           </div>
+          ${fotoDruckBtnHtml(p)}
           <div class="foto-move">
             <button type="button" class="icon-btn" data-move-up="${p.id}" title="Nach oben" aria-label="Nach oben"${first ? " disabled" : ""}>${ICO.up}</button>
             <button type="button" class="icon-btn" data-move-down="${p.id}" title="Nach unten" aria-label="Nach unten"${last ? " disabled" : ""}>${ICO.down}</button>
           </div>
           <button type="button" class="icon-btn" data-del-photo="${p.id}" title="Foto löschen" aria-label="Foto löschen">${ICO.trash}</button>
         </div>`;
-      }).join("");
+    }
+
+    function renderFotosListSkeleton() {
+      ensurePhotoOrder();
+      const list = sortedPhotos();
+      const n = list.length;
+      const count = (n === 1 ? "1 Eintrag gefunden" : n + " Einträge gefunden")
+        + " · " + (photoSortMode === "date" ? "nach Datum" : "eigene Reihenfolge");
+      const items = list.map((p, idx) => fotoItemHtml(p, idx, n)).join("");
       return `<div class="fotos-wrap">
         <div class="fotos-count">${escapeHtml(count)}</div>
         <div class="foto-list" id="fotoList">${items || '<div class="empty-list">Noch keine Fotos. Tippen Sie oben rechts auf +, um Bilder aus der Galerie hinzuzufügen.</div>'}</div>
@@ -1855,6 +1896,10 @@
           <img id="fotoDetailImg" alt="${attr(p.name)}" />
         </div>
         <div class="fdetail-body">
+          <div class="fg fg-druck">
+            <div class="fg-cap">Druck</div>
+            ${druckSwitchHtml(p)}
+          </div>
           ${p.annotated ? '<button type="button" class="btn btn-restore" id="btnRestoreOriginal">Original wiederherstellen</button>' : ""}
           <div class="fg">
             <div class="fg-cap">Name</div>
@@ -1880,15 +1925,62 @@
             <div class="fg-cap">Sortiernummer</div>
             <input type="number" id="photoSort" step="1" min="1" value="${attr(p.sortiernummer)}" />
           </div>
-          <div class="fg">
-            <div class="fg-cap">Druck</div>
-            <label class="check-row">
-              <span>Druck auf Leckortungsbericht</span>
-              <input type="checkbox" id="photoDruck" ${p.druck ? "checked" : ""} />
-            </label>
-          </div>
         </div>
       </div>`;
+    }
+
+    function druckSwitchHtml(p) {
+      const on = !!(p && p.druck);
+      return `<button type="button" class="druck-switch" id="photoDruck" role="switch" aria-checked="${on ? "true" : "false"}">
+              <span class="ds-text">Druck auf Leckortungsbericht<span class="ds-state">${on ? "An – wird gedruckt" : "Aus – wird nicht gedruckt"}</span></span>
+              <span class="ds-track" aria-hidden="true"><span class="ds-knob"></span></span>
+            </button>`;
+    }
+
+    function setDruckSwitchState(el, on) {
+      if (!el) return;
+      el.setAttribute("aria-checked", on ? "true" : "false");
+      const st = el.querySelector(".ds-state");
+      if (st) st.textContent = on ? "An – wird gedruckt" : "Aus – wird nicht gedruckt";
+    }
+
+    /* Schutz gegen Doppel-Tipp (z. B. Fernzugriff/Zoom-Geste): ein zweiter Klick
+       innerhalb kurzer Zeit würde den Schalter sofort wieder zurücksetzen. */
+    function druckTapAccepted(el, e) {
+      if (e && e.detail > 1) return false;
+      const now = Date.now();
+      const last = Number(el.dataset.lastToggle || 0);
+      if (now - last < 450) return false;
+      el.dataset.lastToggle = String(now);
+      return true;
+    }
+
+    function fotoDruckBtnHtml(p) {
+      const on = !!p.druck;
+      return `<button type="button" class="foto-druck-btn" data-druck-toggle="${p.id}" role="switch" aria-checked="${on ? "true" : "false"}" title="Druck auf Leckortungsbericht" aria-label="Druck auf Leckortungsbericht">${ICO.printer}<span>Druck</span><span class="fd-state">${on ? "an" : "aus"}</span></button>`;
+    }
+
+    function toggleDruckInList(btn) {
+      const id = btn.getAttribute("data-druck-toggle");
+      const p = getPhoto(id);
+      if (!p) return;
+      p.druck = !p.druck;
+      persistCurrent();
+      const item = btn.closest(".foto-item");
+      if (item) {
+        const tmp = document.createElement("div");
+        tmp.innerHTML = fotoItemHtml(p, Number(item.getAttribute("data-index")) || 0, (current.photos || []).length);
+        const fresh = tmp.firstElementChild;
+        const thumb = item.querySelector("[data-thumb]");
+        const freshThumb = fresh.querySelector("[data-thumb]");
+        if (thumb && freshThumb) freshThumb.replaceWith(thumb);
+        item.replaceWith(fresh);
+        bindFotoItem(fresh);
+        const nb = fresh.querySelector("[data-druck-toggle]");
+        if (nb) { nb.dataset.lastToggle = btn.dataset.lastToggle || ""; nb.focus({ preventScroll: true }); }
+      }
+      renderTabs();
+      if (photoNeedsComment(p)) toast("Druck an – bitte noch einen Kommentar ergänzen.", true);
     }
 
     async function fillPhotoImages() {
@@ -1932,39 +2024,52 @@
           else showView(dest);
         });
       });
-      main.querySelectorAll("[data-open-photo]").forEach((el) => {
-        el.addEventListener("click", (e) => {
-          if (e.target.closest("[data-del-photo], [data-drag-handle], [data-move-up], [data-move-down], .foto-move")) return;
-          if (el.dataset.didDrag === "1") { el.dataset.didDrag = ""; return; }
-          openPhotoDetail(el.getAttribute("data-open-photo"), false);
-        });
-        el.addEventListener("keydown", (e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            openPhotoDetail(el.getAttribute("data-open-photo"), false);
-          }
-        });
-      });
-      main.querySelectorAll("[data-del-photo]").forEach((el) => {
-        el.addEventListener("click", (e) => {
-          e.stopPropagation();
-          deletePhoto(el.getAttribute("data-del-photo"));
-        });
-      });
-      main.querySelectorAll("[data-move-up]").forEach((el) => {
-        el.addEventListener("click", (e) => {
-          e.preventDefault(); e.stopPropagation();
-          movePhotoBy(el.getAttribute("data-move-up"), -1);
-        });
-      });
-      main.querySelectorAll("[data-move-down]").forEach((el) => {
-        el.addEventListener("click", (e) => {
-          e.preventDefault(); e.stopPropagation();
-          movePhotoBy(el.getAttribute("data-move-down"), 1);
-        });
-      });
+      main.querySelectorAll("[data-open-photo]").forEach((el) => bindFotoItem(el, true));
       bindFotoDrag();
       bindPhotoDetailFields();
+    }
+
+    function bindFotoItem(el, skipDrag) {
+      el.addEventListener("click", (e) => {
+        if (e.target.closest("[data-del-photo], [data-drag-handle], [data-move-up], [data-move-down], .foto-move, [data-druck-toggle]")) return;
+        if (el.dataset.didDrag === "1") { el.dataset.didDrag = ""; return; }
+        openPhotoDetail(el.getAttribute("data-open-photo"), false);
+      });
+      el.addEventListener("keydown", (e) => {
+        if (e.target !== el) return;
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openPhotoDetail(el.getAttribute("data-open-photo"), false);
+        }
+      });
+      el.querySelectorAll("[data-del-photo]").forEach((b) => {
+        b.addEventListener("click", (e) => {
+          e.stopPropagation();
+          deletePhoto(b.getAttribute("data-del-photo"));
+        });
+      });
+      el.querySelectorAll("[data-move-up]").forEach((b) => {
+        b.addEventListener("click", (e) => {
+          e.preventDefault(); e.stopPropagation();
+          movePhotoBy(b.getAttribute("data-move-up"), -1);
+        });
+      });
+      el.querySelectorAll("[data-move-down]").forEach((b) => {
+        b.addEventListener("click", (e) => {
+          e.preventDefault(); e.stopPropagation();
+          movePhotoBy(b.getAttribute("data-move-down"), 1);
+        });
+      });
+      el.querySelectorAll("[data-druck-toggle]").forEach((b) => {
+        b.addEventListener("pointerdown", (e) => e.stopPropagation());
+        b.addEventListener("dblclick", (e) => { e.preventDefault(); e.stopPropagation(); });
+        b.addEventListener("click", (e) => {
+          e.preventDefault(); e.stopPropagation();
+          if (!druckTapAccepted(b, e)) return;
+          toggleDruckInList(b);
+        });
+      });
+      if (!skipDrag) el.querySelectorAll("[data-drag-handle]").forEach((h) => h.addEventListener("pointerdown", onFotoPointerDown));
     }
 
     function bindPhotoCheckbox(el, apply) {
@@ -1995,11 +2100,19 @@
         const p = getPhoto(activePhotoId);
         if (p) p.folgeauftrag = on;
       });
-      bindPhotoCheckbox(druck, (on) => {
-        const p = getPhoto(activePhotoId);
-        if (p) p.druck = on;
-        updateCommentHint(true);
-      });
+      if (druck) {
+        druck.addEventListener("dblclick", (e) => { e.preventDefault(); e.stopPropagation(); });
+        druck.addEventListener("click", (e) => {
+          e.preventDefault();
+          if (!druckTapAccepted(druck, e)) return;
+          const p = getPhoto(activePhotoId);
+          if (!p) return;
+          p.druck = !p.druck;
+          setDruckSwitchState(druck, p.druck);
+          persistCurrent();
+          updateCommentHint(false);
+        });
+      }
       if (sort) {
         sort.addEventListener("change", () => {
           movePhotoToPosition(activePhotoId, sort.value);
@@ -2023,7 +2136,7 @@
       const druck = document.getElementById("photoDruck");
       if (comment) p.comment = comment.value;
       if (folge) p.folgeauftrag = folge.checked;
-      if (druck) p.druck = druck.checked;
+      if (druck) p.druck = druck.getAttribute("aria-checked") === "true";
     }
 
     function openPhotoDetail(id, editMode) {
@@ -2434,7 +2547,7 @@
 
     function renderReportList() {
       const box = document.getElementById("reportList");
-      const version = '<div class="app-version">Version 15</div>';
+      const version = '<div class="app-version">Version 16</div>';
       sortReportsNewestFirst();
       if (!reports.length) {
         box.innerHTML = '<div class="empty-list">Noch keine gespeicherten Aufträge. Tippen Sie oben rechts auf das Speichern-Symbol.</div>' + version;
