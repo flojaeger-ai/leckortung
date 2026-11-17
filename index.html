@@ -136,6 +136,18 @@
       text-align: center; color: var(--muted); font-size: 12px;
       padding: 16px 8px 20px; user-select: text;
     }
+    .btn-quiet {
+      font-weight: 600; color: var(--muted); background: #f7f8fa;
+    }
+    .btn-quiet:hover, .btn-quiet:focus-visible { color: var(--text); background: #eef1f5; }
+    .field-with-count { min-width: 0; width: 100%; }
+    .char-count {
+      display: block; margin: 6px 0 0; font-size: 12px; font-weight: 600;
+      color: var(--muted); text-align: right;
+    }
+    .char-count.warn { color: #c47b00; }
+    .char-count.over { color: var(--danger); }
+    .char-count .char-hint { display: block; font-weight: 700; margin-top: 2px; }
     .hdr-btn:hover, .hdr-btn:focus-visible { background: rgba(255,255,255,.15); outline: none; }
     .hdr-btn:active { background: rgba(255,255,255,.25); }
     .hdr-btn svg { width: 22px; height: 22px; fill: currentColor; }
@@ -939,6 +951,7 @@
       <button class="btn primary" id="btnNew">Neuer Auftrag</button>
       <button class="btn btn-ico" id="btnOpenAuftrag" title="Auftrag aus Datei öffnen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8l-2-2z"/></svg> 📂 Öffnen</button>
       <button class="btn" id="btnExport">JSON exportieren</button>
+      <button class="btn btn-quiet" id="btnExportEasyTec" title="Fotoreihenfolge, Kommentare, Druck und Markierungen als JSON (ohne Bilder) für die Übergabe an EasyTec">Export für EasyTec</button>
       <button class="btn" id="btnPrint">Drucken / PDF</button>
     </div>
     <input class="hidden-file" id="icloudFileInput" type="file" accept=".json,application/json" />
@@ -965,7 +978,7 @@
 
   <script>
   (function () {
-    const APP_VERSION = 16; /* Version 16 */
+    const APP_VERSION = 17; /* Version 17 */
     const STORAGE_CURRENT = "leckortung.current";
     const STORAGE_LIST = "leckortung.reports";
     const DB_NAME = "leckortung";
@@ -1846,7 +1859,7 @@
         <div class="card">
           <div class="row"><label class="lbl" for="mit-startzeit">Startzeit</label>${mitInput("startzeit", "datetime-local")}</div>
           <div class="row"><label class="lbl" for="mit-endzeit">Endzeit</label>${mitInput("endzeit", "datetime-local")}</div>
-          <div class="row label-top"><label class="lbl" for="mit-notiz">Notiz</label>${mitInput("notiz", "text", ph, true)}</div>
+          <div class="row label-top"><label class="lbl" for="mit-notiz">Notiz</label><div class="field-with-count">${mitInput("notiz", "text", ph, true)}<span class="char-count" id="notizCount" aria-live="polite"></span></div></div>
           <div class="row label-top"><label class="lbl" for="mit-ausgefArbeiten">ausgef. Arbeiten</label>${mitInput("ausgefArbeiten", "text", ph, true)}</div>
           <div class="row label-top"><label class="lbl" for="mit-textFolgeauftrag">Text Folge-Auftrag</label>${mitInput("textFolgeauftrag", "text", ph, true)}</div>
         </div>`;
@@ -2027,6 +2040,28 @@
       main.querySelectorAll("[data-open-photo]").forEach((el) => bindFotoItem(el, true));
       bindFotoDrag();
       bindPhotoDetailFields();
+      const notiz = document.getElementById("mit-notiz");
+      if (notiz) {
+        updateNotizCount();
+        notiz.addEventListener("input", updateNotizCount);
+      }
+    }
+
+    const NOTIZ_LIMIT = 2048;
+    const NOTIZ_WARN = 1900;
+    function updateNotizCount() {
+      const ta = document.getElementById("mit-notiz");
+      const el = document.getElementById("notizCount");
+      if (!ta || !el) return;
+      const n = (ta.value || "").length;
+      const over = n > NOTIZ_LIMIT;
+      const atLimit = n >= NOTIZ_LIMIT;
+      el.className = "char-count" + (atLimit ? " over" : (n >= NOTIZ_WARN ? " warn" : ""));
+      if (over) {
+        el.innerHTML = n + " / " + NOTIZ_LIMIT + '<span class="char-hint">EasyTec-Limit überschritten</span>';
+      } else {
+        el.textContent = n + " / " + NOTIZ_LIMIT;
+      }
     }
 
     function bindFotoItem(el, skipDrag) {
@@ -2547,7 +2582,7 @@
 
     function renderReportList() {
       const box = document.getElementById("reportList");
-      const version = '<div class="app-version">Version 16</div>';
+      const version = '<div class="app-version">Version ' + APP_VERSION + '</div>';
       sortReportsNewestFirst();
       if (!reports.length) {
         box.innerHTML = '<div class="empty-list">Noch keine gespeicherten Aufträge. Tippen Sie oben rechts auf das Speichern-Symbol.</div>' + version;
@@ -2650,6 +2685,96 @@
       toast("JSON exportiert");
     }
     document.getElementById("btnExport").addEventListener("click", () => { exportJson(); });
+
+    function annotToRelative(s, w, h) {
+      if (!s || !w || !h) return s ? JSON.parse(JSON.stringify(s)) : s;
+      const nx = (v) => (typeof v === "number" ? v / w : v);
+      const ny = (v) => (typeof v === "number" ? v / h : v);
+      const out = Object.assign({}, s);
+      if ("x" in out) out.x = nx(out.x);
+      if ("y" in out) out.y = ny(out.y);
+      if ("w" in out) out.w = nx(out.w);
+      if ("h" in out) out.h = ny(out.h);
+      if ("x1" in out) out.x1 = nx(out.x1);
+      if ("y1" in out) out.y1 = ny(out.y1);
+      if ("x2" in out) out.x2 = nx(out.x2);
+      if ("y2" in out) out.y2 = ny(out.y2);
+      if (Array.isArray(out.points)) {
+        out.points = out.points.map((pt) => ({ x: nx(pt.x), y: ny(pt.y) }));
+      }
+      return out;
+    }
+
+    async function photoDimensions(p) {
+      const rec = await idbGetPhoto(current.id, p.id);
+      if (rec && rec.width && rec.height) {
+        return { width: rec.width, height: rec.height, mime: rec.mime || "" };
+      }
+      const blob = rec && rec.blob;
+      if (!blob) return { width: 0, height: 0, mime: "" };
+      try {
+        const url = URL.createObjectURL(blob);
+        const dims = await new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => resolve({ width: img.naturalWidth, height: img.naturalHeight });
+          img.onerror = reject;
+          img.src = url;
+        });
+        URL.revokeObjectURL(url);
+        return { width: dims.width, height: dims.height, mime: rec.mime || blob.type || "" };
+      } catch (e) {
+        return { width: 0, height: 0, mime: "" };
+      }
+    }
+
+    async function exportEasyTecJson() {
+      if (view === "fotodetail") readPhotoDetailIntoModel();
+      persistCurrent();
+      const list = orderedPhotos();
+      const photos = [];
+      for (let i = 0; i < list.length; i++) {
+        const p = list[i];
+        const dims = await photoDimensions(p);
+        const anns = Array.isArray(p.annotations) ? p.annotations : [];
+        photos.push({
+          order: i + 1,
+          sortiernummer: Number(p.sortiernummer) || (i + 1),
+          id: p.id,
+          name: p.name || "",
+          comment: p.comment || "",
+          druck: !!p.druck,
+          annotated: !!p.annotated,
+          storedWidth: dims.width || null,
+          storedHeight: dims.height || null,
+          annotations: JSON.parse(JSON.stringify(anns)),
+          annotationsRelative: (dims.width && dims.height)
+            ? anns.map((s) => annotToRelative(s, dims.width, dims.height))
+            : []
+        });
+      }
+      const payload = {
+        format: "leckortung-easytec-export",
+        formatVersion: 1,
+        appVersion: APP_VERSION,
+        exportedAt: nowIso(),
+        auftrag: {
+          id: current.id,
+          auftragsNr: (current.meta && current.meta.auftragsNr) || "",
+          kunde: (current.meta && current.meta.kunde) || "",
+          datum: (current.values && current.values.datum) || ""
+        },
+        photos: photos
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      const name = "EasyTec-Export-" + ((current.meta && current.meta.auftragsNr) || current.values.schadenNr || current.values.datum || current.id) + ".json";
+      a.href = URL.createObjectURL(blob);
+      a.download = name.replace(/[^\w.\-ÄÖÜäöüß]+/g, "_");
+      a.click();
+      URL.revokeObjectURL(a.href);
+      toast("Export für EasyTec gespeichert");
+    }
+    document.getElementById("btnExportEasyTec").addEventListener("click", () => { exportEasyTecJson(); });
     document.getElementById("btnOpenAuftrag").addEventListener("click", () => {
       const inp = document.getElementById("icloudFileInput");
       inp.value = "";
