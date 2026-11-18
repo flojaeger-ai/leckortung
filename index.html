@@ -569,6 +569,31 @@
     .choice-dialog p { margin: 0 0 16px; font-size: 14px; line-height: 1.45; color: var(--text); }
     .choice-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
 
+
+    /* Version 18: Unterschrift, Report, Dokumente */
+    .menu-sub { font-weight: 400; color: var(--danger); font-size: .8em; }
+    .sig-tabs { display: flex; background: #fff; border-bottom: 1px solid var(--line); margin: 0 calc(-1 * var(--page-pad, 0px)); }
+    .sig-tab { flex: 1; min-height: 46px; background: none; border: 0; border-bottom: 3px solid transparent; font: inherit; font-weight: 600; color: var(--muted); cursor: pointer; }
+    .sig-tab.active { color: var(--text); border-bottom-color: #f08a00; }
+    .sig-wrap { padding: 10px 0 24px; max-width: 760px; margin: 0 auto; }
+    .sig-head { background: #5b6573; color: #fff; font-size: 13px; font-weight: 700; letter-spacing: .02em; padding: 10px 12px; border-radius: 6px 6px 0 0; }
+    .sig-area { position: relative; background: #fff; border: 1px solid var(--line); border-top: 0; aspect-ratio: 88 / 38; width: 100%; max-height: 52vh; }
+    .sig-area canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
+    .sig-x { position: absolute; left: 10px; bottom: 6px; font-size: 22px; font-weight: 700; color: #777; pointer-events: none; }
+    .sig-area::after { content: ""; position: absolute; left: 10px; right: 10px; bottom: 30px; border-bottom: 1px solid #999; pointer-events: none; }
+    .sig-fields { margin-top: 12px; display: grid; gap: 10px; }
+    .sig-input { width: 100%; min-height: 44px; padding: 8px 12px; border: 0; border-radius: 6px; background: #e3e6ea; font: inherit; color: var(--text); }
+    .sig-mailrow { display: grid; grid-template-columns: 70px 1fr; align-items: center; gap: 8px; font-weight: 600; }
+    .sig-note { font-size: 12px; color: var(--muted); margin: 14px 2px 0; line-height: 1.4; }
+    .doc-card { padding: 12px 14px; }
+    .doc-stat { display: flex; align-items: center; gap: 10px; padding: 4px 0; font-size: 14px; }
+    .doc-gen { width: 100%; margin-top: 12px; min-height: 48px; font-size: 16px; }
+    .doc-hint { font-size: 12px; color: var(--muted); margin: 8px 4px 0; line-height: 1.4; }
+    .docs-dialog { width: min(460px, 100%); }
+    .docs-list { display: grid; gap: 8px; margin: 0 0 14px; }
+    .docs-file { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; min-height: 52px; padding: 8px 12px; }
+    .docs-file small { color: var(--muted); font-size: 12px; word-break: break-all; }
+
     /* Print / PDF – A4 portrait, Watersolution letter layout */
     @page { size: A4 portrait; margin: 0; }
     .print-root { display: none; }
@@ -952,6 +977,7 @@
       <button class="btn btn-ico" id="btnOpenAuftrag" title="Auftrag aus Datei öffnen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8l-2-2z"/></svg> 📂 Öffnen</button>
       <button class="btn" id="btnExport">JSON exportieren</button>
       <button class="btn btn-quiet" id="btnExportEasyTec" title="Fotoreihenfolge, Kommentare, Druck und Markierungen als JSON (ohne Bilder) für die Übergabe an EasyTec">Export für EasyTec</button>
+      <button class="btn primary" id="btnDocs" title="Leckortungsbericht (PDF), Servicereport (PDF) und Notizen (Word) erzeugen">Dokumente erzeugen (3)</button>
       <button class="btn" id="btnPrint">Drucken / PDF</button>
     </div>
     <input class="hidden-file" id="icloudFileInput" type="file" accept=".json,application/json" />
@@ -978,7 +1004,7 @@
 
   <script>
   (function () {
-    const APP_VERSION = 17; /* Version 17 */
+    const APP_VERSION = 18; /* Version 18 */
     const STORAGE_CURRENT = "leckortung.current";
     const STORAGE_LIST = "leckortung.reports";
     const DB_NAME = "leckortung";
@@ -1216,7 +1242,18 @@
         endzeit: "",
         notiz: "",
         ausgefArbeiten: "",
-        textFolgeauftrag: ""
+        textFolgeauftrag: "",
+        /* Servicereport (Dokument 2) */
+        auftragnehmer: "Watersolution GmbH\nFritz-Karl-Henkel-Straße 14\n67454 Haßloch",
+        zustaendig: "Nicht definiert",
+        einsatzort: "",
+        mitarbeiterName: "",
+        beschreibung1: "",
+        beschreibung2: "",
+        /* Namen unter den Unterschriften (die Unterschriften selbst werden nie gespeichert) */
+        sigNameMa: "",
+        sigNameKunde: "",
+        kundeEmail: ""
       };
     }
 
@@ -1613,6 +1650,8 @@
       if (view === "mitarbeiter") return "Mitarbeiter";
       if (view === "fotos") return "Fotos";
       if (view === "fotodetail") return "Fotosdetails";
+      if (view === "unterschrift") return "Unterschrift";
+      if (view === "report") return "Report";
       return "Auftrag";
     }
 
@@ -1624,8 +1663,11 @@
       if (view === "overview") {
         right = `<button class="hdr-btn hdr-btn-label hdr-icloud" id="btnICloudSave" title="In iCloud speichern" aria-label="In iCloud speichern">☁ iCloud speichern</button>`
           + hdrBtn("btnSave", "Auftrag speichern", ICO.save);
-      } else if (view === "bericht" || view === "mitarbeiter") {
+      } else if (view === "bericht" || view === "mitarbeiter" || view === "report") {
         right = hdrBtn("btnSave", "Auftrag speichern", ICO.save);
+      } else if (view === "unterschrift") {
+        right = hdrBtn("btnSigClear", "Unterschrift löschen", ICO.trash, "danger-icon")
+          + hdrBtn("btnSigSave", "Unterschrift übernehmen", ICO.save);
       } else if (view === "fotos") {
         right = hdrBtn("btnAddPhoto", "Foto hinzufügen", ICO.plus)
           + hdrBtn("btnSortPhotos", photoSortMode === "date" ? "Eigene Reihenfolge anzeigen" : "Nach Datum sortieren", ICO.sort);
@@ -1645,6 +1687,10 @@
       if (icloud) icloud.addEventListener("click", () => saveAuftragToICloud(current.id));
       const save = document.getElementById("btnSave");
       if (save) save.addEventListener("click", saveToList);
+      const sigClr = document.getElementById("btnSigClear");
+      if (sigClr) sigClr.addEventListener("click", sigClearCurrent);
+      const sigSv = document.getElementById("btnSigSave");
+      if (sigSv) sigSv.addEventListener("click", sigSaveClick);
       const add = document.getElementById("btnAddPhoto");
       if (add) add.addEventListener("click", () => document.getElementById("photoInput").click());
       const sort = document.getElementById("btnSortPhotos");
@@ -1807,6 +1853,8 @@
       const bOk = isBerichtFilled(current);
       const maOk = isMitarbeiterFilled(current);
       const fStatus = fotosStatus(current);
+      const sigOk = sigBothPresent();
+      const repOk = !!(String(m.auftragsNr || "").trim() && String(m.kunde || "").trim());
       const fTitle = fStatus === "ok" ? "ausgefüllt" : (fStatus === "missing" ? "Kommentar bei Druck-Foto fehlt" : "keine Fotos");
       return `<div class="overview-wrap">
         <div class="section"><div class="section-title">Details</div></div>
@@ -1840,6 +1888,18 @@
             <span class="menu-ico">${ICO.camera}</span>
             <span class="menu-label">Fotos</span>
             <span class="status-dot ${fStatus}" title="${fTitle}"></span>
+            <span class="chevron">${ICO.chevron}</span>
+          </button>
+          <button type="button" class="menu-item" data-goto="unterschrift">
+            <span class="menu-ico">${ICO.pencil}</span>
+            <span class="menu-label">Checklisten/Unterschrift</span>
+            <span class="status-dot ${sigOk ? "ok" : "missing"}" title="${sigOk ? "beide Unterschriften vorhanden" : "Unterschrift fehlt"}"></span>
+            <span class="chevron">${ICO.chevron}</span>
+          </button>
+          <button type="button" class="menu-item" data-goto="report">
+            <span class="menu-ico">${ICO.doc}</span>
+            <span class="menu-label">Report${sigOk ? "" : ' <small class="menu-sub">(Unterschrift fehlt)</small>'}</span>
+            <span class="status-dot ${repOk ? "ok" : "missing"}" title="${repOk ? "Auftrags-Nr. und Kunde vorhanden" : "Auftrags-Nr. oder Kunde fehlt"}"></span>
             <span class="chevron">${ICO.chevron}</span>
           </button>
         </div>
@@ -2435,6 +2495,14 @@
         main.innerHTML = renderFotoDetailSkeleton();
         bindMetaAndMit();
         fillPhotoImages();
+      } else if (view === "unterschrift") {
+        main.innerHTML = renderUnterschrift();
+        bindMetaAndMit();
+        bindSigPad();
+      } else if (view === "report") {
+        main.innerHTML = renderReport();
+        bindMetaAndMit();
+        bindReport();
       } else if (view === "bericht") {
         renderBerichtPanels(main);
       }
@@ -3112,6 +3180,961 @@
       closeDrawer();
       setTimeout(() => window.print(), 80);
     });
+
+    /* ================= Dokumente (3): PDF-Writer, DOCX-Writer, Unterschriften ================= */
+    /* Version 18 – erzeugt wie das echte EasyTec drei Dateien:
+       1) <Nr>_Leckortungsbericht.pdf  2) <Nr>_Servicereport.pdf  3) <Nr>_Notizen.docx
+       Unterschriften liegen NUR im Arbeitsspeicher (sigStore) – nie in localStorage, IndexedDB oder JSON-Exporten. */
+    const HELV_W = [278,278,355,556,556,889,667,191,333,333,389,584,278,333,278,278,556,556,556,556,556,556,556,556,556,556,278,278,584,584,584,556,1015,667,667,722,722,667,611,778,722,278,500,667,556,833,722,778,667,778,722,667,611,722,667,944,667,667,611,278,278,278,469,556,333,556,556,500,556,556,278,556,556,222,222,500,222,833,556,556,556,556,333,500,278,556,500,722,500,500,500,334,260,334,584,0,556,350,222,556,333,1000,556,556,333,1000,667,333,1000,350,611,350,350,222,222,333,333,350,556,1000,333,1000,500,333,944,350,500,667,278,333,556,556,556,556,260,556,333,737,370,556,584,333,737,552,400,549,333,333,333,576,537,333,333,333,365,556,834,834,834,611,667,667,667,667,667,667,1000,722,667,667,667,667,278,278,278,278,722,722,778,778,778,778,778,584,778,722,722,722,722,667,667,611,556,556,556,556,556,556,889,500,556,556,556,556,278,278,278,278,556,556,556,556,556,556,556,549,611,556,556,556,556,500,556,500];
+    const HELV_WB = [278,333,474,556,556,889,722,238,333,333,389,584,278,333,278,278,556,556,556,556,556,556,556,556,556,556,333,333,584,584,584,611,975,722,722,722,722,667,611,778,722,278,556,722,611,833,722,778,667,778,722,667,611,722,667,944,667,667,611,333,278,333,584,556,333,556,611,556,611,556,333,611,611,278,278,556,278,889,611,611,611,611,389,556,333,611,556,778,556,556,500,389,280,389,584,0,556,350,278,556,500,1000,556,556,333,1000,667,333,1000,350,611,350,350,278,278,500,500,350,556,1000,333,1000,556,333,944,350,500,667,278,333,556,556,556,556,280,556,333,737,370,556,584,333,737,552,400,549,333,333,333,576,556,333,333,333,365,556,834,834,834,611,722,722,722,722,722,722,1000,722,667,667,667,667,278,278,278,278,722,722,778,778,778,778,778,584,778,722,722,722,722,667,667,611,556,556,556,556,556,556,889,556,556,556,556,556,278,278,278,278,611,611,611,611,611,611,611,549,611,611,611,611,611,556,611,556];
+    const MM = 72 / 25.4;
+    const WIN1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
+    function winAnsiCode(cp) {
+      if (cp >= 32 && cp < 127) return cp;
+      if (cp >= 160 && cp <= 255) return cp;
+      if (WIN1252[cp]) return WIN1252[cp];
+      if (cp === 9 || cp === 0x2009 || cp === 0x202F) return 32;
+      return 63;
+    }
+    function winAnsiBytes(str) {
+      const out = [];
+      for (const ch of String(str)) out.push(winAnsiCode(ch.codePointAt(0)));
+      return out;
+    }
+    function textWidthPt(str, size, bold) {
+      const tab = bold ? HELV_WB : HELV_W;
+      let w = 0;
+      for (const c of winAnsiBytes(str)) w += tab[c - 32] || 0;
+      return w * size / 1000;
+    }
+    function textWidthMm(str, size, bold) { return textWidthPt(str, size, bold) / MM; }
+    function pdfNum(n) { return (Math.round(n * 1000) / 1000).toString(); }
+    function pdfRgb(hex, stroke) {
+      const m = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex || "#000000") || [0, "00", "00", "00"];
+      const c = [m[1], m[2], m[3]].map((h) => pdfNum(parseInt(h, 16) / 255)).join(" ");
+      return c + (stroke ? " RG" : " rg");
+    }
+
+    function PdfDoc() { this.pages = []; this.images = []; this.cur = null; }
+    PdfDoc.prototype.addPage = function () {
+      this.cur = { ops: [], imgs: new Set() };
+      this.pages.push(this.cur);
+      return this.cur;
+    };
+    PdfDoc.prototype.op = function (s) { this.cur.ops.push(s); };
+    /* Koordinaten in mm, Ursprung oben links; text(): y = Grundlinie */
+    PdfDoc.prototype.text = function (x, by, str, size, bold, color, charSpace) {
+      const hex = winAnsiBytes(str).map((c) => c.toString(16).padStart(2, "0")).join("");
+      this.op("BT /" + (bold ? "F2" : "F1") + " " + pdfNum(size) + " Tf " + pdfRgb(color || "#000000")
+        + " " + pdfNum(charSpace || 0) + " Tc"
+        + " " + pdfNum(x * MM) + " " + pdfNum((297 - by) * MM) + " Td <" + hex + "> Tj ET");
+    };
+    PdfDoc.prototype.rect = function (x, y, w, h, o) {
+      o = o || {};
+      let s = "q ";
+      if (o.fill) s += pdfRgb(o.fill) + " ";
+      if (o.stroke) s += pdfRgb(o.stroke, true) + " " + pdfNum((o.lw || 0.5)) + " w ";
+      s += pdfNum(x * MM) + " " + pdfNum((297 - y - h) * MM) + " " + pdfNum(w * MM) + " " + pdfNum(h * MM) + " re ";
+      s += o.fill && o.stroke ? "B" : (o.fill ? "f" : "S");
+      this.op(s + " Q");
+    };
+    PdfDoc.prototype.line = function (x1, y1, x2, y2, lw, color) {
+      this.op("q " + pdfRgb(color || "#000000", true) + " " + pdfNum(lw || 0.5) + " w "
+        + pdfNum(x1 * MM) + " " + pdfNum((297 - y1) * MM) + " m " + pdfNum(x2 * MM) + " " + pdfNum((297 - y2) * MM) + " l S Q");
+    };
+    /* Pfad in Punkt-Koordinaten einer Box (px,py = oben links in mm, s = mm pro Einheit) */
+    PdfDoc.prototype.shape = function (px, py, s, cmds, fill) {
+      const P = (x, y) => pdfNum((px + x * s) * MM) + " " + pdfNum((297 - (py + y * s)) * MM);
+      let out = "q " + pdfRgb(fill) + " ";
+      cmds.forEach((c) => {
+        if (c[0] === "M") out += P(c[1], c[2]) + " m ";
+        else if (c[0] === "C") out += P(c[1], c[2]) + " " + P(c[3], c[4]) + " " + P(c[5], c[6]) + " c ";
+      });
+      this.op(out + "h f Q");
+    };
+    PdfDoc.prototype.strokes = function (x, y, w, h, strokes, lw) {
+      if (!strokes || !strokes.length) return;
+      let out = "q 0 0 0 RG " + pdfNum(lw || 0.9) + " w 1 J 1 j ";
+      strokes.forEach((st) => {
+        if (!st.length) return;
+        st.forEach((pt, i) => {
+          const X = pdfNum((x + pt[0] * w) * MM), Y = pdfNum((297 - (y + pt[1] * h)) * MM);
+          out += X + " " + Y + (i === 0 ? " m " : " l ");
+        });
+        if (st.length === 1) {
+          const pt = st[0];
+          out += pdfNum((x + pt[0] * w) * MM) + " " + pdfNum((297 - (y + pt[1] * h)) * MM + 0.01) + " l ";
+        }
+        out += "S ";
+      });
+      this.op(out + "Q");
+    };
+    PdfDoc.prototype.addImage = function (bytes, w, h, comps) {
+      this.images.push({ bytes, w, h, comps });
+      return this.images.length - 1;
+    };
+    PdfDoc.prototype.image = function (idx, x, y, w, h) {
+      this.cur.imgs.add(idx);
+      this.op("q " + pdfNum(w * MM) + " 0 0 " + pdfNum(h * MM) + " " + pdfNum(x * MM) + " " + pdfNum((297 - y - h) * MM) + " cm /Im" + idx + " Do Q");
+    };
+    PdfDoc.prototype.build = function (title) {
+      const enc = new TextEncoder();
+      const chunks = [];
+      const offs = [];
+      let off = 0;
+      const push = (u8) => { chunks.push(u8); off += u8.length; };
+      const pushS = (s) => push(enc.encode(s));
+      const nImg = this.images.length;
+      const firstImg = 6;
+      const firstPage = firstImg + nImg;
+      const pageObjNum = (i) => firstPage + i * 2 + 1;
+      const contentObjNum = (i) => firstPage + i * 2;
+      const begin = (n) => { offs[n] = off; pushS(n + " 0 obj\n"); };
+      pushS("%PDF-1.4\n%\u00e2\u00e3\u00cf\u00d3\n");
+      begin(1); pushS("<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
+      begin(2);
+      pushS("<< /Type /Pages /Count " + this.pages.length + " /Kids [" + this.pages.map((p, i) => pageObjNum(i) + " 0 R").join(" ") + "] >>\nendobj\n");
+      begin(3); pushS("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>\nendobj\n");
+      begin(4); pushS("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>\nendobj\n");
+      const t16 = "FEFF" + Array.from(title || "Dokument").map((ch) => ch.codePointAt(0).toString(16).padStart(4, "0")).join("");
+      const d = new Date();
+      const z = (n) => String(n).padStart(2, "0");
+      begin(5);
+      pushS("<< /Title <" + t16 + "> /Producer (Leckortung Web-App) /CreationDate (D:" + d.getFullYear() + z(d.getMonth() + 1) + z(d.getDate()) + z(d.getHours()) + z(d.getMinutes()) + z(d.getSeconds()) + ") >>\nendobj\n");
+      this.images.forEach((im, i) => {
+        begin(firstImg + i);
+        const cs = im.comps === 1 ? "/DeviceGray" : "/DeviceRGB";
+        pushS("<< /Type /XObject /Subtype /Image /Width " + im.w + " /Height " + im.h + " /ColorSpace " + cs
+          + " /BitsPerComponent 8 /Filter /DCTDecode /Length " + im.bytes.length + " >>\nstream\n");
+        push(im.bytes);
+        pushS("\nendstream\nendobj\n");
+      });
+      this.pages.forEach((pg, i) => {
+        const content = enc.encode(pg.ops.join("\n"));
+        begin(contentObjNum(i));
+        pushS("<< /Length " + content.length + " >>\nstream\n");
+        push(content);
+        pushS("\nendstream\nendobj\n");
+        begin(pageObjNum(i));
+        const xo = Array.from(pg.imgs).map((n) => "/Im" + n + " " + (firstImg + n) + " 0 R").join(" ");
+        pushS("<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.276 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >>"
+          + (xo ? " /XObject << " + xo + " >>" : "") + " >> /Contents " + contentObjNum(i) + " 0 R >>\nendobj\n");
+      });
+      const total = firstPage + this.pages.length * 2;
+      const xrefAt = off;
+      pushS("xref\n0 " + total + "\n0000000000 65535 f \n");
+      for (let n = 1; n < total; n++) pushS(String(offs[n]).padStart(10, "0") + " 00000 n \n");
+      pushS("trailer\n<< /Size " + total + " /Root 1 0 R /Info 5 0 R >>\nstartxref\n" + xrefAt + "\n%%EOF\n");
+      const out = new Uint8Array(off);
+      let p = 0;
+      chunks.forEach((c) => { out.set(c, p); p += c.length; });
+      return out;
+    };
+
+    /* ----- Text-Layout-Helfer (mm / pt) ----- */
+    function wrapLines(str, widthMm, size, bold) {
+      const out = [];
+      String(str == null ? "" : str).replace(/\r\n?/g, "\n").split("\n").forEach((para) => {
+        if (para === "") { out.push(""); return; }
+        const words = para.split(" ");
+        let line = "";
+        const flush = () => { out.push(line); line = ""; };
+        words.forEach((w) => {
+          const cand = line === "" ? w : line + " " + w;
+          if (textWidthMm(cand, size, bold) <= widthMm) { line = cand; return; }
+          if (line !== "") flush();
+          if (textWidthMm(w, size, bold) <= widthMm) { line = w; return; }
+          let piece = "";
+          for (const ch of w) {
+            if (textWidthMm(piece + ch, size, bold) > widthMm && piece) { out.push(piece); piece = ""; }
+            piece += ch;
+          }
+          line = piece;
+        });
+        flush();
+      });
+      return out;
+    }
+    function baselineMm(top, size, f) {
+      const lhPt = size * f;
+      return top - 0.25 + ((lhPt - size * 1.117) / 2 + size * 0.905) / MM;
+    }
+    function lhMm(size, f) { return size * f / MM; }
+    function drawBox(doc, x, top, on) {
+      const s = 8.5 / MM;
+      doc.rect(x, top, s, s, { fill: "#ffffff", stroke: "#111111", lw: 0.7 });
+      if (on) {
+        const w = textWidthMm("X", 7.5, true);
+        doc.text(x + (s - w) / 2, top + s / 2 + 0.358 * 7.5 / MM, "X", 7.5, true, "#111111");
+      }
+    }
+    /* parts: string | {b:string} | {box:bool} | {sp:mm} */
+    function drawInline(doc, x, top, parts, size, f) {
+      let cx = x;
+      const base = baselineMm(top, size, f);
+      parts.forEach((p) => {
+        if (typeof p === "string" || (p && p.b != null)) {
+          const bold = typeof p !== "string";
+          const t = bold ? p.b : p;
+          doc.text(cx, base, t, size, bold, "#111111");
+          cx += textWidthMm(t, size, bold);
+        } else if (p && p.box !== undefined) {
+          cx += 1 / MM;
+          drawBox(doc, cx, base - 7.5 / MM, p.box);
+          cx += 8.5 / MM + 1.5 / MM;
+        } else if (p && p.sp) cx += p.sp;
+      });
+      return cx - x;
+    }
+    function ynParts(on) { return ["Ja ", { box: !!on }, "   Nein ", { box: !on }]; }
+    function noQ(s) { return s == null ? "" : String(s); }
+    function fmtDateDe(v) {
+      if (!v) return "";
+      const s = String(v);
+      let m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s);
+      if (m) return m[3] + "." + m[2] + "." + m[1];
+      return s;
+    }
+    function fmtDateTimeDe(v) {
+      if (!v) return "";
+      const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(String(v));
+      if (m) return m[3] + "." + m[2] + "." + m[1] + " " + m[4] + ":" + m[5];
+      return fmtDateDe(v);
+    }
+    function fmtTimeUhr(v) {
+      const m = /T(\d{2}):(\d{2})/.exec(String(v || ""));
+      return m ? m[1] + ":" + m[2] + " Uhr" : "";
+    }
+
+    /* ----- Logo + Fußzeile (wie Druckansicht) ----- */
+    const DROP_MAIN = [["M", 12, 1.6], ["C", 12, 1.6, 3.2, 15.4, 3.2, 23.2], ["C", 3.2, 28.06, 7.14, 32, 12, 32], ["C", 16.86, 32, 20.8, 28.06, 20.8, 23.2], ["C", 20.8, 15.4, 12, 1.6, 12, 1.6]];
+    const DROP_HI = [["M", 8.6, 22.2], ["C", 9.4, 25.6, 11.6, 27.6, 14.2, 27.8], ["C", 10.6, 29.4, 6.6, 27.0, 6.2, 23.0], ["C", 6.6, 22.2, 7.6, 21.8, 8.6, 22.2]];
+    /* Logo-Platzhalter: oben mittig bleibt der Platz frei. Sobald das Water-Solution-Logo vorliegt,
+       als JPEG (Base64) in WS_LOGO_JPEG eintragen – es wird dann zentriert, 22 pt hoch gezeichnet. */
+    const WS_LOGO_JPEG = "";
+    let wsLogoCache = null;
+    function drawLogo(doc) {
+      if (!WS_LOGO_JPEG) return;
+      if (!wsLogoCache) {
+        const bin = atob(WS_LOGO_JPEG);
+        const bytes = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+        const info = jpegInfo(bytes);
+        if (!info) return;
+        wsLogoCache = { bytes, w: info.w, h: info.h, comps: info.comps };
+      }
+      const h = 22 / MM, w = h * wsLogoCache.w / wsLogoCache.h;
+      if (!doc.__logoIdx && doc.__logoIdx !== 0) doc.__logoIdx = doc.addImage(wsLogoCache.bytes, wsLogoCache.w, wsLogoCache.h, wsLogoCache.comps);
+      doc.image(doc.__logoIdx, 105 - w / 2, 9, w, h);
+    }
+    function drawFooter(doc, pageNo) {
+      const blue = "#0b3d73";
+      const lh = 6.4 * 1.35 / MM;
+      const top = 297 - 7 - 3 * lh;
+      const pn = "Seite: " + pageNo;
+      const pnTop = top - 1.6 - 8 * 1.32 / MM;
+      doc.text(195 - textWidthMm(pn, 8, false), baselineMm(pnTop, 8, 1.32), pn, 8, false, blue);
+      const fr = 170 / 3.5;
+      const cols = [
+        { x: 15, t: ["Watersolution GmbH", "Fritz-Karl-Henkel-Straße 14, Halle 32+33", "67454 Haßloch"] },
+        { x: 15 + fr * 1.05 + 5, t: ["Handelsregister: HRB 68272", "Ust-ID: 31/650/40073", "Geschäftsführer: Marius Böhm, Andreas Koch, André Lehnert"] },
+        { x: 15 + fr * 2.5 + 10, t: ["VR Bank Südpfalz", "IBAN: DE07 5486 2500 0005 6550 99"] }
+      ];
+      cols.forEach((c) => c.t.forEach((ln, i) => doc.text(c.x, baselineMm(top + i * lh, 6.4, 1.35), ln, 6.4, false, blue)));
+    }
+
+    /* ----- 1) Leckortungsbericht (ohne Notiz!) ----- */
+    function buildLeckPdf(photoImgs) {
+      const meta = current.meta || {};
+      const v = current.values || {};
+      const doc = new PdfDoc();
+      const LEFT = 15, CW = 180, BOTTOM = 271, F = 1.32;
+      let pageNo = 0, y = 0, pm = 0;
+      function newPage() {
+        doc.addPage(); pageNo++;
+        drawLogo(doc); drawFooter(doc, pageNo);
+        y = 9 + 22 / MM; pm = 5; /* Kopf-Abstand 5 mm kollabiert mit dem ersten Rand */
+      }
+      const begin = (mt) => { y += Math.max(pm, mt); pm = 0; };
+      const end = (mb) => { pm = mb; };
+      const need = (h) => { if (y + h > BOTTOM) newPage(); };
+      const lineH = (fs, f) => lhMm(fs, f || F);
+      function textBlock(str, o) {
+        const fs = o.fs || 9.5, f = o.f || F, bold = !!o.bold, x = o.x == null ? LEFT : o.x, w = o.w || CW;
+        const lines = wrapLines(str, w, fs, bold);
+        lines.forEach((ln, i) => {
+          need(lineH(fs, f));
+          if (ln) doc.text(x, baselineMm(y, fs, f), ln, fs, bold, o.color || "#111111");
+          y += lineH(fs, f);
+        });
+        return lines.length;
+      }
+      function hU(t) {
+        begin(3.5);
+        need(lhMm(11, F) + 3);
+        doc.text(LEFT, baselineMm(y, 11, F), t, 11, true, "#111111");
+        y += lhMm(11, F) + 0.6;
+        doc.line(LEFT, y, LEFT + CW, y, 0.8, "#111111");
+        y += 0.28;
+        end(2);
+      }
+      function hSub(t) {
+        begin(2.6); need(lhMm(10, F) + 4);
+        doc.text(LEFT, baselineMm(y, 10, F), t, 10, true, "#111111");
+        y += lhMm(10, F);
+        end(0.8);
+      }
+      function bodyText(t) {
+        begin(0);
+        const startY = y;
+        textBlock(t, { fs: 9.5 });
+        const used = y - startY;
+        if (used < 7) y = startY + 7;
+        end(1.2);
+      }
+      function lineParts(parts, mb) {
+        begin(0); need(lineH(9.5));
+        drawInline(doc, LEFT, y, parts, 9.5, F);
+        y += lineH(9.5);
+        end(mb == null ? 1.3 : mb);
+      }
+      function cbGrid(items, cols, mt, mb) {
+        begin(mt == null ? 1 : mt);
+        const colW = (CW - (cols - 1) * 4) / cols;
+        const iconW = 8.5 / MM + 2;
+        for (let i = 0; i < items.length; i += cols) {
+          const row = items.slice(i, i + cols).map((it) => wrapLines(it.label, colW - iconW, 9, false));
+          const h = Math.max(...row.map((l) => Math.max(l.length * lhMm(9, F), 8.5 / MM)));
+          need(h);
+          row.forEach((lines, k) => {
+            const x = LEFT + k * (colW + 4);
+            const it = items[i + k];
+            drawBox(doc, x, y + (h - 8.5 / MM) / 2, !!it.on);
+            lines.forEach((ln, li) => doc.text(x + iconW, baselineMm(y + (h - lines.length * lhMm(9, F)) / 2 + li * lhMm(9, F), 9, F), ln, 9, false, "#111111"));
+          });
+          y += h + (i + cols < items.length ? 0.8 : 0);
+        }
+        end(mb == null ? 2.5 : mb);
+      }
+      const cb = (on, label) => ({ on: !!on, label });
+      const filled = (s) => !!String(s || "").trim();
+
+      /* Seite 1 */
+      newPage();
+      const berichtDatum = dateOnly(v.datum) || dateOnly(meta.terminVon) || dateOnly(todayDate());
+      const messDatum = dateOnly(v.messterminVon) || dateOnly(v.datum) || berichtDatum;
+      const objekt = [meta.kunde, meta.strasse, [meta.plz, meta.ort].filter(Boolean).join(" ")].filter(Boolean).join(", ");
+      const empf = [meta.anrede, meta.kunde, meta.strasse, [meta.plz, meta.ort].filter(Boolean).join(" ")].filter(Boolean);
+      begin(0);
+      const sender = "Watersolution GmbH - Fritz-Karl-Henkel-Straße 14 - 67454 Haßloch";
+      doc.text(LEFT, baselineMm(y, 8, F), sender, 8, false, "#111111");
+      doc.line(LEFT, baselineMm(y, 8, F) + 0.9 / MM, LEFT + textWidthMm(sender, 8, false), baselineMm(y, 8, F) + 0.9 / MM, 0.5, "#111111");
+      y += lhMm(8, F); end(4);
+      begin(0);
+      const colW2 = (CW - 8) / 2;
+      let ly = y;
+      empf.forEach((ln) => wrapLines(ln, colW2, 10, false).forEach((l) => { doc.text(LEFT, baselineMm(ly, 10, 1.4), l, 10, false, "#111111"); ly += lhMm(10, 1.4); }));
+      let ry = y;
+      const rx = LEFT + colW2 + 8;
+      doc.text(rx, baselineMm(ry, 8.5, 1.35), "Bitte bei Rückfragen und Zuschriften stets angeben", 8.5, false, "#111111");
+      ry += lhMm(8.5, 1.35) + 2;
+      doc.text(rx, baselineMm(ry, 11, 1.35), noQ(meta.auftragsNr), 11, true, "#111111");
+      ry += lhMm(11, 1.35) + 2;
+      doc.text(rx, baselineMm(ry, 8.5, 1.35), "Datum: " + berichtDatum, 8.5, false, "#111111");
+      ry += lhMm(8.5, 1.35) + 2.5;
+      wrapLines("Watersolution GmbH, Fritz-Karl-Henkel-Straße 14, 67454 Haßloch, Telefon: 06324 - 980 37 98, info@service-watersolution.de, www.service-watersolution.de", colW2, 8, false)
+        .forEach((l) => { doc.text(rx, baselineMm(ry, 8, 1.35), l, 8, false, "#111111"); ry += lhMm(8, 1.35); });
+      y = Math.max(ly, ry, y + lhMm(10, 1.4)); end(5);
+      begin(0);
+      [["Objekt:", objekt], ["Vers.-Schein-Nr.:", v.versicherungsNr], ["Schaden-Nr.:", v.schadenNr]].forEach(([k, val]) => {
+        const lines = wrapLines(noQ(val), 142, 9.5, false);
+        const kl = wrapLines(k, 35, 9.5, true);
+        const n = Math.max(lines.length, kl.length);
+        need(n * lineH(9.5) + 1.2);
+        kl.forEach((l, i) => doc.text(LEFT, baselineMm(y + 0.6 + i * lineH(9.5), 9.5, F), l, 9.5, true, "#111111"));
+        lines.forEach((l, i) => doc.text(LEFT + 38, baselineMm(y + 0.6 + i * lineH(9.5), 9.5, F), l, 9.5, false, "#111111"));
+        y += n * lineH(9.5) + 1.2;
+      });
+      end(4);
+      begin(3);
+      doc.text(LEFT, baselineMm(y, 15, F), "Schadenaufnahme", 15, true, "#111111");
+      y += lhMm(15, F); end(3.5);
+      begin(0);
+      {
+        const parts = ["Messtermin am: " + messDatum, "Uhrzeit von: " + fmtTimeUhr(v.messterminVon), "bis: " + fmtTimeUhr(v.messterminBis)];
+        let cx = LEFT;
+        parts.forEach((t) => { doc.text(cx, baselineMm(y, 9.5, F), t, 9.5, false, "#111111"); cx += textWidthMm(t, 9.5, false) + 8; });
+        y += lineH(9.5); end(1.4);
+      }
+      lineParts(["Messtechniker: " + noQ(v.messtechniker)]);
+      lineParts(["Mobil-Nr.: " + noQ(v.messtechnikerTel)]);
+      hU("Allgemeine Informationen");
+      hSub("Anwesende Personen");
+      cbGrid([cb(v.anwesendVn, "Versicherungsnehmer"), cb(v.anwesendMieter, "Mieter"), cb(v.anwesendEigentuemer, "Eigentümer"), cb(v.anwesendInstallateur, "Installateur"), cb(v.anwesendSonstige, "sonstige Person")], 2);
+      lineParts(["Person vor Ort: " + noQ(v.personVorOrt) + (v.personVorOrtTel ? "   Telefon-Nr.: " + v.personVorOrtTel : "")]);
+      hSub("Allgemeine Informationen"); bodyText(v.allgemeineInformationen);
+      hSub("Aufgabenstellung/vorgefundenes Schadensbild"); bodyText(v.schadensbild);
+      hSub("Kurzergebnis zur Schadensursache"); bodyText(v.schadensursache);
+      hSub("Kurzbeschreibung der durchgeführten Arbeiten"); bodyText(v.durchgefuehrteArbeiten);
+
+      /* Seite 2 */
+      newPage();
+      const leitungen = [
+        ["Kaltwasserleitung", v.kwGeprueft, v.kwDruckverlust],
+        ["Warmwasserleitung", v.wwGeprueft, v.wwDruckverlust],
+        ["Zirkulationsleitung", v.zirkGeprueft, v.zirkDruckverlust],
+        ["Heizungsleitung", v.hzGeprueft, v.hzDruckverlust],
+        ["Fußbodenheizung", v.fbhGeprueft, v.fbhDruckverlust],
+        ["Außenleitung", v.aussenGeprueft, v.aussenDruckverlust],
+        ["Abwasserleitung", v.awGeprueft, v.awUndicht],
+        ["Grundleitung", v.grundGeprueft, v.grundUndicht],
+        ["Regenleitung", v.regenGeprueft, v.regenUndicht],
+        ["Flachdach angestaut", v.flachdachGeprueft, v.flachdachUndicht],
+        ["sonstiges" + (v.sonstigesLeitung ? " (" + v.sonstigesLeitung + ")" : ""), filled(v.sonstigesLeitung), v.sonstigesUndicht]
+      ];
+      hU("Prüfungen");
+      lineParts(["Druckprüfung durchgeführt: "].concat(ynParts(v.druckpruefungDurchgefuehrt)));
+      lineParts(["Leitung: " + noQ(v.leitung)]);
+      lineParts(["Ergebnis: " + noQ(v.ergebnis)]);
+      {
+        begin(2);
+        const cw = 16, lw = CW - 4 * cw;
+        const rowH = 6.3, h1 = 2 * lhMm(8.5, F) + 2, h2 = 6.3;
+        need(h1 + h2 + rowH * leitungen.length);
+        const x0 = LEFT, bd = "#333333";
+        const cell = (x, yy, w, h, fill) => doc.rect(x, yy, w, h, { fill: fill || null, stroke: bd, lw: 0.5 });
+        const ctext = (t, x, yy, w, h, bold) => { const tw = textWidthMm(t, 8.5, bold); doc.text(x + (w - tw) / 2, baselineMm(yy + (h - lhMm(8.5, F)) / 2, 8.5, F), t, 8.5, bold, "#111111"); };
+        cell(x0, y, lw, h1 + h2, "#f3f3f3");
+        doc.text(x0 + 1.4, baselineMm(y + (h1 + h2 - lhMm(8.5, F)) / 2, 8.5, F), "Leitung", 8.5, true, "#111111");
+        cell(x0 + lw, y, 2 * cw, h1 - 0, "#f3f3f3"); ctext("geprüft", x0 + lw, y, 2 * cw, h1, true);
+        cell(x0 + lw + 2 * cw, y, 2 * cw, h1, "#f3f3f3");
+        doc.text(x0 + lw + 2 * cw + (2 * cw - textWidthMm("Druckverlust /", 8.5, true)) / 2, baselineMm(y + 1, 8.5, F), "Druckverlust /", 8.5, true, "#111111");
+        doc.text(x0 + lw + 2 * cw + (2 * cw - textWidthMm("Undicht", 8.5, true)) / 2, baselineMm(y + 1 + lhMm(8.5, F), 8.5, F), "Undicht", 8.5, true, "#111111");
+        ["Ja", "Nein", "Ja", "Nein"].forEach((t, i) => { cell(x0 + lw + i * cw, y + h1, cw, h2, "#f3f3f3"); ctext(t, x0 + lw + i * cw, y + h1, cw, h2, true); });
+        let yy = y + h1 + h2;
+        leitungen.forEach(([label, gep, flag]) => {
+          cell(x0, yy, lw, rowH);
+          doc.text(x0 + 1.4, baselineMm(yy + (rowH - lhMm(8.5, F)) / 2, 8.5, F), label, 8.5, false, "#111111");
+          [!!gep, !gep, !!flag, !flag].forEach((on, i) => {
+            cell(x0 + lw + i * cw, yy, cw, rowH);
+            drawBox(doc, x0 + lw + i * cw + (cw - 8.5 / MM) / 2, yy + (rowH - 8.5 / MM) / 2, on);
+          });
+          yy += rowH;
+        });
+        y = yy; end(3.5);
+      }
+      hSub("Methoden");
+      const tr = String(v.tracerKg || "").trim();
+      cbGrid([
+        cb(v.methodeFeuchte, "Feuchtigkeitsmessung"), cb(v.methodeAkustik, "Akustik"), cb(v.methodeLeitungsortung, "Leitungsortung"),
+        cb(tr && tr !== "0,0" && tr !== "0", "Trace-/Prüfgas  " + (v.tracerKg || "0,0") + " kg"),
+        cb(v.methodeThermografie, "Thermografie"), cb(v.methodeKanalkamera, "Kanalkamera"),
+        cb(v.methodeVideoendoskopie, "Videoendoskopie"), cb(v.methodeFaerbemittel, "Färbemittel"),
+        cb(filled(v.methodeSonstiges), "sonstige Methode" + (v.methodeSonstiges ? ": " + v.methodeSonstiges : ""))
+      ], 3);
+      lineParts(["Schadensstelle geöffnet: "].concat(ynParts(v.schadensstelleGeoeffnet), ["   durch: " + noQ(v.geoeffnetDurch)]));
+      lineParts(["Fliese(n) entnommen: "].concat(ynParts(v.fliesenEntnommen), ["   Anzahl: " + noQ(v.fliesenAnzahl == null ? "" : v.fliesenAnzahl)]));
+      lineParts(["Schadensursache gefunden: "].concat(ynParts(v.schadensursacheGefunden)));
+      lineParts(["Folgetermin Notwendig: "].concat(ynParts(v.folgeterminNotwendig)));
+      hSub("Wichtige Besonderheiten / Empfehlungen"); bodyText(v.besondereEmpfehlungen);
+      hSub("Hinweispflicht zum Messergebnis"); bodyText(v.hinweispflicht);
+      hSub("Messtechnik"); bodyText(v.messtechnik);
+
+      /* Seite 3 */
+      newPage();
+      const kosten = String(v.shKostenschaetzung || "");
+      hU("Schadenregulierer/Sachverständiger Versicherung");
+      lineParts(["Halten wir für erforderlich: "].concat(ynParts(v.svErforderlich)));
+      lineParts(["Wurde informiert: "].concat(ynParts(v.svInformiert)));
+      lineParts(["Name: " + noQ(v.svName)]);
+      hU("Leitungssystem - Versorgung");
+      cbGrid([cb(v.vsHeizung, "Heizung"), cb(v.vsFbh, "Fußbodenheizung"), cb(v.vsWarmwasser, "Warmwasser"), cb(v.vsKaltwasser, "Kaltwasser"), cb(v.vsRegenwasser, "Regenwasser"), cb(filled(v.vsSonstiges), "sonstiges" + (v.vsSonstiges ? ": " + v.vsSonstiges : ""))], 3);
+      cbGrid([cb(v.vsKupfer, "Kupfer"), cb(v.vsStahl, "Stahl"), cb(v.vsWicu, "WICU"), cb(v.vsMehrverbund, "Mehrverbundrohr"), cb(v.vsKunststoff, "Kunststoff"), cb(filled(v.vsMaterialSonstiges), "sonstiges" + (v.vsMaterialSonstiges ? ": " + v.vsMaterialSonstiges : ""))], 3);
+      hU("Leitungssystem - Entsorgung");
+      cbGrid([cb(v.enSammelleitung, "Abwassersammelleitung"), cb(v.enStrang, "Abwasserstrang"), cb(v.enGrundleitung, "Abwassergrundleitung"), cb(v.enRegenwasser, "Regenwasserleitung"), cb(filled(v.enSonstiges), "sonstiges" + (v.enSonstiges ? ": " + v.enSonstiges : "")), cb(v.enAbflussKunststoff, "Abfluss/Kunststoff"), cb(v.enAbflussGuss, "Abfluss/Guss"), cb(filled(v.enMaterialSonstiges), "sonstiges" + (v.enMaterialSonstiges ? ": " + v.enMaterialSonstiges : ""))], 3);
+      hU("Weitere Empfehlungen / weitere Maßnahmen");
+      {
+        const pairs = [["Lochfrasswiederverschluss: ", v.alLochfrass], ["Schwitzwasser/Kondenswasserbildung: ", v.alSchwitzwasser], ["Armatur defekt/undicht: ", v.alArmatur], ["Silikonfugen undicht: ", v.alSilikonfugen], ["Fliesenfugen undicht: ", v.alFliesenfugen], ["Muffenversatz: ", v.alMuffenversatz]];
+        begin(0);
+        const half = (CW - 4) / 2;
+        for (let i = 0; i < pairs.length; i += 2) {
+          need(lineH(9.5));
+          pairs.slice(i, i + 2).forEach((p, k) => drawInline(doc, LEFT + k * (half + 4), y, [p[0]].concat(ynParts(p[1])), 9.5, F));
+          y += lineH(9.5) + 1.3;
+        }
+        end(0);
+      }
+      if (v.alSonstiges) lineParts(["sonstiges: " + v.alSonstiges]);
+      y += 2.5;
+      {
+        begin(0); need(lineH(9.5));
+        const half2 = (CW - 4) / 2;
+        drawInline(doc, LEFT, y, ["Reparatur durch Installateur erforderlich: "].concat(ynParts(v.maReparaturInstallateur)), 9.5, F);
+        drawInline(doc, LEFT + half2 + 4, y, ["Sanierung erforderlich: "].concat(ynParts(v.maSanierung)), 9.5, F);
+        y += lineH(9.5); end(1.3);
+      }
+      lineParts(["Schadensaufnahme: " + noQ(v.maSchadensaufnahme)]);
+      lineParts(["Trocknung: " + noQ(v.maTrocknung)]);
+      lineParts(["Sofortmaßnahme: " + noQ(v.maSofortmassnahme)]);
+      cbGrid([cb(v.maDetailsTrocknungsangebot, "Details siehe Trocknungsangebot (folgt)")], 1, 0, 1.3);
+      lineParts(["sonstiges: " + noQ(v.maSonstiges)]);
+      hU("Erforderliche Gewerke");
+      cbGrid([cb(v.gwMaurer, "Maurer"), cb(v.gwFliesenleger, "Fliesenleger"), cb(v.gwDachdecker, "Dachdecker"), cb(v.gwBodenleger, "Bodenleger"), cb(v.gwMalerTrockenbauer, "Maler / Trockenbauer"), cb(v.gwTrocknung, "Trocknung / Leckortung"), cb(filled(v.gwSonstiges), "sonstiges" + (v.gwSonstiges ? ": " + v.gwSonstiges : ""))], 2);
+      hU("Eingeschätzte Schadenshöhe");
+      cbGrid([cb(/über\s*2000/i.test(kosten), "über 2000,00 €"), cb(/unter\s*2000/i.test(kosten), "unter 2000,00 €"), cb(/nicht einzuschätzen/i.test(kosten), "nicht einzuschätzen")], 3);
+      begin(0); need(lineH(8));
+      doc.text(LEFT, baselineMm(y, 8, F), "(keine Gesamtschadenermittlung)", 8, false, "#444444");
+      y += lineH(8);
+
+      /* Fotoseiten: nur Fotos mit Druck-Haken, in der Reihenfolge der Fotoliste */
+      let onPage = 0;
+      photoImgs.forEach(({ p, img }) => {
+        const parts = commentParts(p.comment || p.name);
+        const textW = CW - 82 - 7;
+        const tLines = wrapLines(parts.rest, textW, 9.5, false);
+        const textH = lhMm(10.5, F) + 3 + tLines.length * lhMm(9.5, 1.4);
+        let ih = 0, iw = 0;
+        if (img) {
+          iw = 80; ih = 80 * img.h / img.w;
+          if (ih > 68) { ih = 68; iw = 68 * img.w / img.h; }
+        }
+        const rowH = Math.max(68, textH, ih);
+        if (onPage === 0 || onPage >= 3 || y + rowH > BOTTOM) { newPage(); onPage = 0; y += pm; pm = 0; }
+        doc.text(LEFT, baselineMm(y, 10.5, F), parts.title, 10.5, true, "#111111");
+        let ty = y + lhMm(10.5, F) + 3;
+        tLines.forEach((ln) => { if (ln) doc.text(LEFT, baselineMm(ty, 9.5, 1.4), ln, 9.5, false, "#111111"); ty += lhMm(9.5, 1.4); });
+        if (img) doc.image(doc.addImage(img.bytes, img.w, img.h, img.comps), LEFT + 91 + 7 + (80 - iw) / 2, y, iw, ih);
+        y += rowH + 5;
+        onPage++;
+      });
+      return doc.build("Leckortungsbericht " + noQ(meta.auftragsNr));
+    }
+
+    /* ----- 2) Servicereport (Dokument 2) ----- */
+    function serviceData() {
+      const meta = current.meta || {};
+      const v = current.values || {};
+      const m = current.mitarbeiter || {};
+      const ortZeile = [meta.plz, meta.ort].filter(Boolean).join(" ");
+      const kundeAdr = [[meta.anrede, meta.kunde].filter(Boolean).join(" "), meta.strasse, ortZeile].filter(Boolean).join("\n");
+      const today = fmtDateDe(todayDate());
+      return {
+        nr: noQ(meta.auftragsNr || v.schadenNr),
+        kunde: kundeAdr,
+        auftragnehmer: noQ(m.auftragnehmer),
+        einsatzort: String(m.einsatzort || "").trim() ? m.einsatzort : kundeAdr,
+        zustaendig: String(m.zustaendig || "").trim() || "Nicht definiert",
+        start: fmtDateTimeDe(meta.terminVon || m.startzeit),
+        ende: fmtDateTimeDe(meta.terminBis || m.endzeit),
+        mitarbeiter: String(m.mitarbeiterName || "").trim() || noQ(v.messtechniker),
+        beschr1: String(m.beschreibung1 || "").trim() || [meta.kunde, meta.strasse, meta.ort].filter(Boolean).join(", "),
+        beschr2: String(m.beschreibung2 || "").trim() || noQ(meta.auftragsart),
+        arbeiten: noQ(m.ausgefArbeiten),
+        nameMa: String(m.sigNameMa || "").trim() || noQ(v.messtechniker),
+        nameKunde: String(m.sigNameKunde || "").trim() || noQ(meta.kunde),
+        datum: today
+      };
+    }
+
+    function buildServicePdf(sigs) {
+      const d = serviceData();
+      const doc = new PdfDoc();
+      doc.addPage();
+      const L = 15, W = 180, HALF = 90, GREY = "#d4d4d4", FS = 10, F = 1.3;
+      const pad = 2;
+      doc.text(L, 26, "Servicereport", 20, true);
+      doc.text(L, 34, "Auftrag : " + d.nr, 11, false);
+      let y = 40;
+      const head = (x, yy, w, t, h) => {
+        h = h || 7;
+        doc.rect(x, yy, w, h, { fill: GREY, stroke: "#000000", lw: 0.4 });
+        doc.text(x + pad, yy + h / 2 + 0.358 * FS / MM, t, FS, true);
+      };
+      const body = (x, yy, w, h, str, maxLines) => {
+        doc.rect(x, yy, w, h, { stroke: "#000000", lw: 0.4 });
+        let lines = wrapLines(str, w - 2 * pad, FS, false);
+        if (maxLines && lines.length > maxLines) { lines = lines.slice(0, maxLines); lines[maxLines - 1] = lines[maxLines - 1].replace(/\s*\S{0,2}$/, "") + " …"; }
+        lines.forEach((ln, i) => { if (ln) doc.text(x + pad, baselineMm(yy + pad + i * lhMm(FS, F), FS, F), ln, FS, false); });
+      };
+      const linesH = (str, w) => wrapLines(str, w - 2 * pad, FS, false).length * lhMm(FS, F) + 2 * pad;
+      [["Kunde", d.kunde, "Auftragnehmer", d.auftragnehmer], ["Einsatzort", d.einsatzort, "Zuständig", d.zustaendig]].forEach((r) => {
+        head(L, y, HALF, r[0]); head(L + HALF, y, HALF, r[2]);
+        y += 7;
+        const h = Math.max(14, linesH(r[1], HALF), linesH(r[3], HALF));
+        body(L, y, HALF, h, r[1], 6); body(L + HALF, y, HALF, h, r[3], 6);
+        y += h + 4;
+      });
+      head(L, y, 45, "Starttermin"); head(L + 45, y, 45, "Fertigtermin");
+      y += 7;
+      body(L, y, 45, 8, d.start); body(L + 45, y, 45, 8, d.ende);
+      y += 8 + 5;
+      head(L, y, HALF, "Mitarbeiter"); y += 7;
+      body(L, y, HALF, Math.max(8, linesH(d.mitarbeiter, HALF)), d.mitarbeiter, 3);
+      y += Math.max(8, linesH(d.mitarbeiter, HALF)) + 5;
+      head(L, y, W, "Beschreibung"); y += 7;
+      body(L, y, W, 8, d.beschr1, 1); y += 8;
+      body(L, y, W, 8, d.beschr2, 1); y += 8 + 5;
+      head(L, y, W, "Ausgeführte Arbeiten"); y += 7;
+      const SIG_Y = 232;
+      const avail = SIG_Y - 6 - y;
+      const maxLines = Math.max(1, Math.floor((avail - 2 * pad) / lhMm(FS, F)));
+      body(L, y, W, Math.max(20, Math.min(avail, linesH(d.arbeiten, W))), d.arbeiten, maxLines);
+      /* Unterschriften – Striche kommen live aus dem Speicher (sigs), nie aus Storage */
+      const BW = 88, BH = 38;
+      [["Unterschrift Mitarbeiter", d.nameMa, sigs && sigs.ma, L], ["Unterschrift Kunde", d.nameKunde, sigs && sigs.kunde, L + W - BW]].forEach(([cap, name, st, x]) => {
+        doc.rect(x, SIG_Y, BW, BH, { stroke: "#000000", lw: 0.4 });
+        doc.strokes(x, SIG_Y, BW, BH, st, 0.9);
+        doc.text(x, SIG_Y + BH + 5, cap, 9, false);
+        doc.text(x, SIG_Y + BH + 5 + lhMm(9, 1.25), (d.datum + " " + name).trim(), 9, false);
+      });
+      doc.text(L, 289, "Auftrag : " + d.nr, 9, false);
+      const pg = "1/1";
+      doc.text(L + W - textWidthMm(pg, 9, false), 289, pg, 9, false);
+      return doc.build("Servicereport " + d.nr);
+    }
+
+    /* ----- 3) Notizen als echte .docx (minimales OOXML, ZIP ohne Kompression) ----- */
+    const CRC_TABLE = (function () {
+      const t = new Uint32Array(256);
+      for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1); t[n] = c >>> 0; }
+      return t;
+    })();
+    function crc32(u8) { let c = 0xFFFFFFFF; for (let i = 0; i < u8.length; i++) c = CRC_TABLE[(c ^ u8[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+    function zipStore(files) {
+      const enc = new TextEncoder();
+      const parts = [], central = [];
+      let off = 0;
+      const now = new Date();
+      const dtime = (now.getHours() << 11) | (now.getMinutes() << 5) | (now.getSeconds() >> 1);
+      const ddate = ((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate();
+      files.forEach((f) => {
+        const name = enc.encode(f.name);
+        const data = typeof f.data === "string" ? enc.encode(f.data) : f.data;
+        const crc = crc32(data);
+        const lh = new DataView(new ArrayBuffer(30));
+        lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true); lh.setUint16(8, 0, true);
+        lh.setUint16(10, dtime, true); lh.setUint16(12, ddate, true); lh.setUint32(14, crc, true);
+        lh.setUint32(18, data.length, true); lh.setUint32(22, data.length, true); lh.setUint16(26, name.length, true); lh.setUint16(28, 0, true);
+        parts.push(new Uint8Array(lh.buffer), name, data);
+        const ch = new DataView(new ArrayBuffer(46));
+        ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true); ch.setUint16(10, 0, true);
+        ch.setUint16(12, dtime, true); ch.setUint16(14, ddate, true); ch.setUint32(16, crc, true);
+        ch.setUint32(20, data.length, true); ch.setUint32(24, data.length, true); ch.setUint16(28, name.length, true);
+        ch.setUint32(42, off, true);
+        central.push(new Uint8Array(ch.buffer), name);
+        off += 30 + name.length + data.length;
+      });
+      let csize = 0;
+      central.forEach((c) => { csize += c.length; });
+      const eo = new DataView(new ArrayBuffer(22));
+      eo.setUint32(0, 0x06054b50, true); eo.setUint16(8, files.length, true); eo.setUint16(10, files.length, true);
+      eo.setUint32(12, csize, true); eo.setUint32(16, off, true);
+      const all = parts.concat(central, [new Uint8Array(eo.buffer)]);
+      const total = all.reduce((n, p) => n + p.length, 0);
+      const out = new Uint8Array(total);
+      let p = 0;
+      all.forEach((a) => { out.set(a, p); p += a.length; });
+      return out;
+    }
+    function xmlEsc(s) {
+      return String(s == null ? "" : s).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\uFFFE\uFFFF]/g, "")
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+    function docxRun(text) {
+      return String(text).split("\t").map((seg, i) => (i ? "<w:r><w:tab/></w:r>" : "") + (seg === "" ? "" : '<w:r><w:t xml:space="preserve">' + xmlEsc(seg) + "</w:t></w:r>")).join("");
+    }
+    function buildNotizenDocx() {
+      const meta = current.meta || {};
+      const v = current.values || {};
+      const m = current.mitarbeiter || {};
+      const nr = noQ(meta.auftragsNr || v.schadenNr);
+      const datum = fmtDateDe(v.datum || meta.terminVon) || fmtDateDe(todayDate());
+      const paras = [];
+      paras.push('<w:p><w:pPr><w:pStyle w:val="Heading1"/></w:pPr>' + docxRun("Notizen" + (nr ? " – " + nr : "")) + "</w:p>");
+      if (meta.kunde) paras.push("<w:p>" + docxRun("Kunde: " + meta.kunde) + "</w:p>");
+      paras.push("<w:p>" + docxRun("Datum: " + datum) + "</w:p>");
+      paras.push("<w:p/>");
+      String(m.notiz || "").replace(/\r\n?/g, "\n").split("\n").forEach((ln) => { paras.push("<w:p>" + docxRun(ln) + "</w:p>"); });
+      const NS = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"';
+      const doc = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<w:document ' + NS + "><w:body>" + paras.join("")
+        + '<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1417" w:right="1417" w:bottom="1134" w:left="1417" w:header="708" w:footer="708" w:gutter="0"/></w:sectPr></w:body></w:document>';
+      const styles = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<w:styles ' + NS + '>'
+        + '<w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/><w:sz w:val="22"/><w:szCs w:val="22"/><w:lang w:val="de-DE"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="0" w:line="264" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults>'
+        + '<w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/><w:qFormat/></w:style>'
+        + '<w:style w:type="paragraph" w:styleId="Heading1"><w:name w:val="heading 1"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:qFormat/><w:pPr><w:keepNext/><w:spacing w:after="160"/><w:outlineLvl w:val="0"/></w:pPr><w:rPr><w:b/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr></w:style></w:styles>';
+      const ct = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/></Types>';
+      const rels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>';
+      const docRels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>';
+      return zipStore([
+        { name: "[Content_Types].xml", data: ct },
+        { name: "_rels/.rels", data: rels },
+        { name: "word/document.xml", data: doc },
+        { name: "word/_rels/document.xml.rels", data: docRels },
+        { name: "word/styles.xml", data: styles }
+      ]);
+    }
+
+    /* ----- JPEG-Helfer: Fotos 1:1 als DCT in die PDF einbetten ----- */
+    function jpegInfo(b) {
+      if (!b || b.length < 4 || b[0] !== 0xFF || b[1] !== 0xD8) return null;
+      let i = 2;
+      while (i + 9 < b.length) {
+        if (b[i] !== 0xFF) { i++; continue; }
+        const mk = b[i + 1];
+        if (mk === 0xFF) { i++; continue; }
+        if (mk === 0xD8 || (mk >= 0xD0 && mk <= 0xD7) || mk === 0x01) { i += 2; continue; }
+        const len = (b[i + 2] << 8) | b[i + 3];
+        if (mk >= 0xC0 && mk <= 0xCF && mk !== 0xC4 && mk !== 0xC8 && mk !== 0xCC) {
+          return { h: (b[i + 5] << 8) | b[i + 6], w: (b[i + 7] << 8) | b[i + 8], comps: b[i + 9] };
+        }
+        i += 2 + len;
+      }
+      return null;
+    }
+    function reencodeJpeg(blob) {
+      return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(blob);
+        const img = new Image();
+        img.onload = () => {
+          const c = document.createElement("canvas");
+          c.width = img.naturalWidth; c.height = img.naturalHeight;
+          const ctx = c.getContext("2d");
+          ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, c.width, c.height);
+          ctx.drawImage(img, 0, 0);
+          URL.revokeObjectURL(url);
+          c.toBlob((b) => b ? resolve(b) : reject(new Error("encode")), "image/jpeg", 0.92);
+        };
+        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("load")); };
+        img.src = url;
+      });
+    }
+    async function blobToJpegImg(blob) {
+      let bytes = new Uint8Array(await blob.arrayBuffer());
+      let info = jpegInfo(bytes);
+      if (!info || (info.comps !== 3 && info.comps !== 1)) {
+        bytes = new Uint8Array(await (await reencodeJpeg(blob)).arrayBuffer());
+        info = jpegInfo(bytes);
+      }
+      if (!info) return null;
+      return { bytes, w: info.w, h: info.h, comps: info.comps };
+    }
+    async function collectPhotoImages() {
+      const out = [];
+      for (const p of orderedPhotos().filter((x) => x.druck)) {
+        let img = null;
+        try {
+          const rec = await idbGetPhoto(current.id, p.id);
+          const b = displayBlob(rec);
+          if (b) img = await blobToJpegImg(b);
+        } catch (e) { console.warn("photo", e); }
+        if (img) out.push({ p, img });
+      }
+      return out;
+    }
+
+    /* ----- Unterschriften: NUR im Arbeitsspeicher ----- */
+    const sigStore = { owner: null, ma: [], kunde: [] };
+    let sigTab = "ma";
+    function sigClearAll() { sigStore.ma = []; sigStore.kunde = []; sigStore.owner = null; }
+    function sigSyncOwner() {
+      if (sigStore.owner && sigStore.owner !== current.id) { sigStore.ma = []; sigStore.kunde = []; }
+      sigStore.owner = current.id;
+    }
+    function sigPresent(k) { sigSyncOwner(); return sigStore[k].length > 0; }
+    function sigBothPresent() { return sigPresent("ma") && sigPresent("kunde"); }
+
+    function renderUnterschrift() {
+      sigSyncOwner();
+      const isK = sigTab === "kunde";
+      const m = current.mitarbeiter || {};
+      const meta = current.meta || {};
+      const nameId = isK ? "sigNameKunde" : "sigNameMa";
+      const namePh = isK ? ([meta.anrede, meta.kunde].filter(Boolean).join(" ") || "Name des Kunden") : ((current.values && current.values.messtechniker) || "Name des Monteurs");
+      return `<div class="sig-tabs" role="tablist">
+          <button type="button" class="sig-tab${!isK ? " active" : ""}" data-sigtab="ma" role="tab" aria-selected="${!isK}">Monteur Auftrag</button>
+          <button type="button" class="sig-tab${isK ? " active" : ""}" data-sigtab="kunde" role="tab" aria-selected="${isK}">Kunde Auftrag</button>
+        </div>
+        <div class="sig-wrap">
+          <div class="sig-head">${isK ? "UNTERSCHRIFT DES KUNDEN FÜR DEN AUFTRAG" : "UNTERSCHRIFT DES MONTEURS FÜR DEN AUFTRAG"}</div>
+          <div class="sig-area"><canvas id="sigCanvas" aria-label="Unterschriftsfeld"></canvas><span class="sig-x" aria-hidden="true">X</span></div>
+          <div class="sig-fields">
+            <input type="text" class="sig-input" data-mit="${nameId}" id="mit-${nameId}" value="${attr(m[nameId] || "")}" placeholder="${attr(namePh)}" aria-label="Name" />
+            ${isK ? `<div class="sig-mailrow"><label for="mit-kundeEmail">E-Mail</label><input type="email" class="sig-input" data-mit="kundeEmail" id="mit-kundeEmail" value="${attr(m.kundeEmail || "")}" placeholder="E-Mail-Adresse nicht vorhanden" /></div>` : ""}
+          </div>
+          <p class="sig-note">Die Unterschrift bleibt nur im Arbeitsspeicher und wird nach dem Erzeugen der Dokumente oder beim Neuladen gelöscht. Sie wird nie gespeichert.</p>
+        </div>`;
+    }
+
+    function bindSigPad() {
+      const canvas = document.getElementById("sigCanvas");
+      if (!canvas) return;
+      const key = sigTab;
+      const ctx = canvas.getContext("2d");
+      function size() {
+        const dpr = window.devicePixelRatio || 1;
+        const r = canvas.getBoundingClientRect();
+        canvas.width = Math.max(1, Math.round(r.width * dpr));
+        canvas.height = Math.max(1, Math.round(r.height * dpr));
+        redraw();
+      }
+      function redraw() {
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = "#111"; ctx.fillStyle = "#111";
+        ctx.lineWidth = Math.max(2, canvas.width / 300);
+        ctx.lineCap = "round"; ctx.lineJoin = "round";
+        sigStore[key].forEach((st) => {
+          if (!st.length) return;
+          ctx.beginPath();
+          st.forEach((pt, i) => { const x = pt[0] * canvas.width, y = pt[1] * canvas.height; if (i) ctx.lineTo(x, y); else ctx.moveTo(x, y); });
+          if (st.length === 1) ctx.lineTo(st[0][0] * canvas.width + 0.01, st[0][1] * canvas.height);
+          ctx.stroke();
+        });
+      }
+      size();
+      let cur = null;
+      const pt = (e) => {
+        const r = canvas.getBoundingClientRect();
+        return [Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)), Math.min(1, Math.max(0, (e.clientY - r.top) / r.height))];
+      };
+      canvas.addEventListener("pointerdown", (e) => {
+        e.preventDefault();
+        sigSyncOwner();
+        try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+        cur = [pt(e)];
+        sigStore[key].push(cur);
+        redraw();
+      });
+      canvas.addEventListener("pointermove", (e) => {
+        if (!cur) return;
+        e.preventDefault();
+        const evs = (e.getCoalescedEvents && e.getCoalescedEvents()) || [e];
+        (evs.length ? evs : [e]).forEach((ev) => cur.push(pt(ev)));
+        redraw();
+      });
+      const done = () => { cur = null; };
+      canvas.addEventListener("pointerup", done);
+      canvas.addEventListener("pointercancel", done);
+      canvas.addEventListener("contextmenu", (e) => e.preventDefault());
+      window.addEventListener("resize", () => { if (document.getElementById("sigCanvas") === canvas) size(); });
+      main.querySelectorAll("[data-sigtab]").forEach((b) => b.addEventListener("click", () => {
+        sigTab = b.getAttribute("data-sigtab");
+        renderMain();
+      }));
+    }
+    function sigClearCurrent() {
+      sigSyncOwner();
+      sigStore[sigTab] = [];
+      if (view === "unterschrift") renderMain();
+      toast("Unterschrift gelöscht");
+    }
+    function sigSaveClick() {
+      sigSyncOwner();
+      toast("Unterschrift übernommen (nur Arbeitsspeicher, wird nicht gespeichert)");
+      showView("overview");
+    }
+
+    /* ----- Report-Ansicht (Servicereport-Felder + Dokumente erzeugen) ----- */
+    function renderReport() {
+      sigSyncOwner();
+      const m = current.mitarbeiter || {};
+      const v = current.values || {};
+      const meta = current.meta || {};
+      const f = (id, label, ph, area) => `<div class="row${area ? " label-top" : ""}"><label class="lbl" for="mit-${id}">${label}</label>${mitInput(id, "text", ph, area)}</div>`;
+      const stat = (k, t) => `<div class="doc-stat"><span class="status-dot ${sigPresent(k) ? "ok" : "missing"}"></span>${t}: ${sigPresent(k) ? "vorhanden" : "fehlt"}</div>`;
+      return `<div class="section" style="margin-top:8px"><div class="section-title">Servicereport</div></div>
+        <div class="card">
+          ${f("auftragnehmer", "Auftragnehmer", "", true)}
+          ${f("zustaendig", "Zuständig", "Nicht definiert", false)}
+          ${f("einsatzort", "Einsatzort", "leer = Kundenadresse", true)}
+          ${f("mitarbeiterName", "Mitarbeiter", v.messtechniker || "z. B. DÜW-WS-850 WSB", false)}
+          ${f("beschreibung1", "Beschreibung", [meta.kunde, meta.strasse, meta.ort].filter(Boolean).join(", ") || "z. B. WS WEG Am Schlossberg 10, Maikammer", false)}
+          ${f("beschreibung2", "Beschreibung 2", meta.auftragsart || "z. B. Wasserschaden", false)}
+        </div>
+        <p class="doc-hint">Starttermin und Fertigtermin kommen aus „Termin von/bis“ in den Auftragsdetails (sonst Start-/Endzeit unter Mitarbeiter). „Ausgeführte Arbeiten“ steht unter Mitarbeiter.</p>
+        <div class="section"><div class="section-title">Dokumente</div></div>
+        <div class="card doc-card">
+          ${stat("ma", "Unterschrift Monteur")}
+          ${stat("kunde", "Unterschrift Kunde")}
+          <button type="button" class="btn primary doc-gen" id="btnDocsGen">Dokumente erzeugen (3)</button>
+          <p class="doc-hint">Erzeugt Leckortungsbericht (PDF), Servicereport (PDF) und Notizen (Word). Danach werden die Unterschriften aus dem Speicher gelöscht.</p>
+        </div>`;
+    }
+    function bindReport() {
+      const b = document.getElementById("btnDocsGen");
+      if (b) b.addEventListener("click", () => { erzeugeDokumente(); });
+    }
+
+    /* ----- Export: drei Dateien + Ergebnis-Fenster ----- */
+    function safeFilePart(s) { return String(s || "").trim().replace(/[^\w.\-ÄÖÜäöüß]+/g, "_").replace(/^_+|_+$/g, ""); }
+    let docsBusy = false;
+    async function erzeugeDokumente() {
+      if (docsBusy) return;
+      docsBusy = true;
+      try {
+        if (view === "fotodetail") readPhotoDetailIntoModel();
+        persistCurrent();
+        sigSyncOwner();
+        toast("Dokumente werden erzeugt…");
+        const meta = current.meta || {};
+        const base = safeFilePart(meta.auftragsNr || (current.values && current.values.schadenNr) || (current.values && current.values.datum) || current.id) || "Auftrag";
+        const photoImgs = await collectPhotoImages();
+        const pdf1 = buildLeckPdf(photoImgs);
+        const pdf2 = buildServicePdf({ ma: sigStore.ma, kunde: sigStore.kunde });
+        const docx = buildNotizenDocx();
+        const files = [
+          new File([pdf1], base + "_Leckortungsbericht.pdf", { type: "application/pdf" }),
+          new File([pdf2], base + "_Servicereport.pdf", { type: "application/pdf" }),
+          new File([docx], base + "_Notizen.docx", { type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" })
+        ];
+        sigClearAll();
+        if (view === "unterschrift" || view === "report" || view === "overview") renderMain();
+        showDocsSheet(files);
+      } catch (err) {
+        console.error(err);
+        toast("Dokumente konnten nicht erzeugt werden.", true);
+      } finally {
+        docsBusy = false;
+      }
+    }
+
+    function fileSizeLabel(f) {
+      return f.size > 1048576 ? (f.size / 1048576).toFixed(1).replace(".", ",") + " MB" : Math.max(1, Math.round(f.size / 1024)) + " KB";
+    }
+    function isCoarse() { try { return window.matchMedia("(pointer: coarse)").matches; } catch (e) { return false; } }
+    function closeDocsSheet() {
+      const o = document.getElementById("docsOverlay");
+      if (o) o.remove();
+    }
+    async function saveFiles(files) {
+      if (isCoarse() && files.length && navigator.canShare && navigator.canShare({ files })) {
+        try { await navigator.share({ files }); return; } catch (err) {
+          if (err && (err.name === "AbortError" || err.name === "NotAllowedError")) return;
+        }
+      }
+      for (let i = 0; i < files.length; i++) {
+        downloadBlobFile(files[i]);
+        await new Promise((r) => setTimeout(r, 500));
+      }
+    }
+    function showDocsSheet(files) {
+      closeDocsSheet();
+      const labels = ["Leckortungsbericht (PDF)", "Servicereport (PDF)", "Notizen (Word)"];
+      const o = document.createElement("div");
+      o.className = "choice-overlay open";
+      o.id = "docsOverlay";
+      o.innerHTML = `<div class="choice-dialog docs-dialog" role="dialog" aria-modal="true" aria-labelledby="docsTitle">
+        <h3 id="docsTitle">Dokumente erstellt</h3>
+        <p>Tippen Sie jedes Dokument einzeln an, um es zu speichern oder zu teilen. Die Unterschriften wurden aus dem Speicher gelöscht.</p>
+        <div class="docs-list">${files.map((f, i) => `<button type="button" class="btn docs-file" data-doc="${i}"><span>${escapeHtml(labels[i] || f.name)}</span><small>${escapeHtml(f.name)} · ${fileSizeLabel(f)}</small></button>`).join("")}</div>
+        <div class="choice-actions"><button type="button" class="btn primary" id="docsAll">Alle speichern (3)</button><button type="button" class="btn" id="docsClose">Schließen</button></div>
+      </div>`;
+      document.body.appendChild(o);
+      o.querySelectorAll("[data-doc]").forEach((b) => b.addEventListener("click", () => saveFiles([files[Number(b.getAttribute("data-doc"))]])));
+      document.getElementById("docsAll").addEventListener("click", () => saveFiles(files));
+      document.getElementById("docsClose").addEventListener("click", closeDocsSheet);
+    }
+    document.getElementById("btnDocs").addEventListener("click", () => { closeDrawer(); erzeugeDokumente(); });
 
     /* Offline: register ./sw.js only (no blob fallback — it can pin stale versions) */
     function setupServiceWorker() {
