@@ -628,12 +628,6 @@
     .art-in { min-width: 0; min-height: 40px; border: 1px solid var(--line); border-radius: 8px; padding: 0 8px; font: inherit; font-size: 14px; }
     @media (max-width: 700px) { .art-row { grid-template-columns: 1fr 1fr 44px; } .art-text { grid-column: 1 / 3; } }
 
-    /* Version 21: dreiwertige Ja/Nein-Schalter */
-    .tri { display: inline-flex; border: 1.5px solid #8b96a5; border-radius: 8px; overflow: hidden; background: #fff; flex-shrink: 0; justify-self: end; }
-    .tri-btn { min-width: 58px; min-height: 40px; padding: 0 12px; border: 0; background: #fff; color: var(--text); font: inherit; font-weight: 600; font-size: 15px; cursor: pointer; }
-    .tri-btn + .tri-btn { border-left: 1.5px solid #8b96a5; }
-    .tri-btn.on { background: var(--blue); color: #fff; }
-    .row.pair .tri { justify-self: end; }
     /* Version 18: Unterschrift, Report, Dokumente */
     .menu-sub { font-weight: 400; color: var(--danger); font-size: .8em; }
     .sig-tabs { display: flex; background: #fff; border-bottom: 1px solid var(--line); margin: 0 calc(-1 * var(--page-pad, 0px)); }
@@ -1085,7 +1079,7 @@
 
   <script>
   (function () {
-    const APP_VERSION = 22; /* Version 22 */
+    const APP_VERSION = 23; /* Version 23 */
     const STORAGE_CURRENT = "leckortung.current";
     const STORAGE_LIST = "leckortung.reports";
     const DB_NAME = "leckortung";
@@ -1261,7 +1255,8 @@
     ];
 
 
-    /* Version 21: Ja/Nein-Fragen sind dreiwertig: true = Ja, false = Nein, null = nicht beantwortet */
+    /* Version 23: Ja/Nein-Fragen sind wieder einfache Kästchen: true = Ja (angehakt), alles andere = nicht beantwortet (null).
+       Im PDF ist bei angehakt „Ja“ angekreuzt; „Nein“ wird nie automatisch angekreuzt. */
     const TRI_IDS = new Set([
       "schadensstelleGeoeffnet", "fliesenEntnommen", "schadensursacheGefunden", "folgeterminNotwendig",
       "druckpruefungDurchgefuehrt", "svErforderlich", "svInformiert",
@@ -1375,11 +1370,10 @@
         serverNr: a.serverNr || ""
       };
       if (!Array.isArray(out.mitarbeiter.artikel)) out.mitarbeiter.artikel = freshMitarbeiter().artikel;
-      /* Altdaten (vor Version 21): ein Häkchen = Ja bleibt Ja; false war nicht von „unbeantwortet“ unterscheidbar → null */
+      /* Version 23: nur true (= Ja / angehakt) bleibt erhalten; false, "nein", null usw. → null (nicht angehakt) */
       TRI_IDS.forEach((id) => {
         const val = out.values[id];
-        if (a.triState === true) { if (val !== true && val !== false) out.values[id] = null; }
-        else out.values[id] = val === true ? true : null;
+        out.values[id] = (val === true || val === "ja") ? true : null;
       });
       return out;
     }
@@ -1612,7 +1606,7 @@
       if (BERICHT_TEXT_FIELDS.some((k) => String(v[k] || "").trim())) return true;
       return allFieldMeta().some((f) => {
         if (f.type !== "checkbox") return false;
-        if (TRI_IDS.has(f.id)) return v[f.id] === true || v[f.id] === false;
+        if (TRI_IDS.has(f.id)) return v[f.id] === true;
         const def = defaultValue(f);
         return !!v[f.id] && !def;
       });
@@ -1852,37 +1846,11 @@
     }
 
     /* ---------- Render fields (Bericht) ---------- */
-    function triHtml(id, val) {
-      return `<span class="tri" data-tri="${id}" role="group" aria-label="Ja oder Nein">`
-        + `<button type="button" class="tri-btn${val === true ? " on" : ""}" data-v="ja" aria-pressed="${val === true}">Ja</button>`
-        + `<button type="button" class="tri-btn${val === false ? " on" : ""}" data-v="nein" aria-pressed="${val === false}">Nein</button></span>`;
-    }
-    function bindTri(container) {
-      container.querySelectorAll(".tri").forEach((box) => {
-        const id = box.getAttribute("data-tri");
-        box.querySelectorAll(".tri-btn").forEach((btn) => btn.addEventListener("click", () => {
-          const want = btn.getAttribute("data-v") === "ja";
-          const cur = current.values[id];
-          current.values[id] = (cur === want) ? null : want; /* nochmal antippen = zurück auf unbeantwortet */
-          const now = current.values[id];
-          box.querySelectorAll(".tri-btn").forEach((b2) => {
-            const on = (b2.getAttribute("data-v") === "ja") ? now === true : now === false;
-            b2.classList.toggle("on", on);
-            b2.setAttribute("aria-pressed", String(on));
-          });
-          persistCurrent();
-        }));
-      });
-    }
-
     function inputHtml(f) {
       const val = current.values[f.id];
       const ph = f.placeholder ? ` placeholder="${attr(f.placeholder)}"` : "";
       if (f.type === "textarea") {
         return `<textarea id="f-${f.id}" data-id="${f.id}"${ph}>${escapeHtml(val)}</textarea>`;
-      }
-      if (f.type === "checkbox" && TRI_IDS.has(f.id)) {
-        return triHtml(f.id, val);
       }
       if (f.type === "checkbox") {
         return `<input type="checkbox" id="f-${f.id}" data-id="${f.id}" ${val ? "checked" : ""} />`;
@@ -1960,12 +1928,11 @@
         closeCard();
         return `<section class="panel${t.id === activeTab ? " active" : ""}" id="panel-${t.id}" role="tabpanel">${chunks.join("")}</section>`;
       }).join("");
-      bindTri(container);
       container.querySelectorAll("[data-id]").forEach((el) => {
         const id = el.getAttribute("data-id");
         const ev = (el.type === "checkbox" || el.tagName === "SELECT") ? "change" : "input";
         el.addEventListener(ev, () => {
-          current.values[id] = el.type === "checkbox" ? el.checked : el.value;
+          current.values[id] = el.type === "checkbox" ? (TRI_IDS.has(id) ? (el.checked ? true : null) : el.checked) : el.value;
           persistCurrent();
         });
       });
@@ -3269,11 +3236,11 @@
           datum: (current.values && current.values.datum) || ""
         },
         photos: photos,
-        /* Version 21 (additiv): Ja/Nein-Antworten. "ja" | "nein" | null (= nicht beantwortet, beide Kästchen leer) */
-        jaNeinFormat: "ja | nein | null (null = nicht beantwortet)",
+        /* Ja/Nein-Fragen (Kästchen): "ja" = angehakt (im PDF „Ja“ angekreuzt), null = nicht angehakt (beide PDF-Kästchen leer). "nein" kommt nicht vor. */
+        jaNeinFormat: "ja | null (null = nicht angehakt, beide Kästchen im PDF leer)",
         jaNein: (function () {
           const o = {};
-          TRI_IDS.forEach((id) => { const x = (current.values || {})[id]; o[id] = x === true ? "ja" : (x === false ? "nein" : null); });
+          TRI_IDS.forEach((id) => { const x = (current.values || {})[id]; o[id] = x === true ? "ja" : null; });
           return o;
         })()
       };
@@ -3355,7 +3322,7 @@
       return `<span class="bx">${on ? "X" : ""}</span>`;
     }
     function yn(on) {
-      return `<span class="yn">Ja ${bx(on === true)}&nbsp; Nein ${bx(on === false)}</span>`;
+      return `<span class="yn">Ja ${bx(on === true)}&nbsp; Nein ${bx(false)}</span>`;
     }
     function cbItem(on, label) {
       return `<div class="cb-item">${bx(!!on)}<span>${escapeHtml(label)}</span></div>`;
@@ -3461,9 +3428,9 @@
       const pruefRows = leitungen.map((row) => `<tr>
         <td class="lbl">${ptxt(row.label)}</td>
         <td class="ctr">${bx(row.gepr === true)}</td>
-        <td class="ctr">${bx(row.gepr === false)}</td>
+        <td class="ctr">${bx(false)}</td>
         <td class="ctr">${bx(row.flag === true)}</td>
-        <td class="ctr">${bx(row.flag === false)}</td>
+        <td class="ctr">${bx(false)}</td>
       </tr>`).join("");
 
       const page2 = `
@@ -3961,7 +3928,7 @@
         row((top) => {
           doc.text(LEFT, baselineMm(top, FS, FL), label, FS, false, "#111111");
           boxLabel(px(0.36), top, on === true, "Ja");
-          boxLabel(px(0.43), top, on === false, "Nein");
+          boxLabel(px(0.43), top, false, "Nein"); /* Nein wird nie automatisch angekreuzt */
           if (extra) {
             if (extra.box !== undefined) boxLabel(px(0.57), top, extra.box, extra.label);
             else doc.text(px(0.57), baselineMm(top, FS, FL), extra.text, FS, false, "#111111");
@@ -4091,7 +4058,7 @@
         leitungen.forEach(([label, gep, flag]) => {
           cell(x0, yy, lw, rowH);
           doc.text(x0 + 1.2, baselineMm(yy + (rowH - LH) / 2, FS, FL), label, FS, false, "#111111");
-          [gep === true, gep === false, flag === true, flag === false].forEach((on, i) => {
+          [gep === true, false, flag === true, false].forEach((on, i) => {
             cell(x0 + lw + i * cw, yy, cw, rowH);
             drawBox(doc, x0 + lw + i * cw + (cw - BOX) / 2, yy + (rowH - BOX) / 2, on);
           });
