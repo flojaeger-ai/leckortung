@@ -1012,6 +1012,27 @@
 
       .toast { max-width: calc(100vw - 24px - var(--sal) - var(--sar)); }
     }
+
+    /* Version 28: Vergrößern-Icon an mehrzeiligen Textfeldern + Vollbild-Editor */
+    .ta-wrap { position: relative; width: 100%; min-width: 0; }
+    .ta-wrap > textarea { display: block; resize: none !important; padding-right: 44px; padding-bottom: 36px; }
+    .ta-exp { position: absolute; right: 6px; bottom: 6px; width: 32px; height: 32px; padding: 0; border-radius: 8px; border: 1px solid var(--line); background: rgba(255,255,255,.94); color: var(--blue); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .ta-exp svg { width: 18px; height: 18px; fill: currentColor; }
+    .ta-exp:hover { background: var(--blue-light); }
+    .ta-wrap > textarea:disabled ~ .ta-exp { display: none; }
+    .ta-overlay { position: fixed; left: 0; right: 0; top: 0; height: 100%; z-index: 300; background: #fff; display: none; flex-direction: column; }
+    .ta-overlay.open { display: flex; }
+    .ta-head { display: flex; align-items: center; gap: 10px; padding: calc(10px + var(--sat)) max(12px, var(--sar)) 10px max(12px, var(--sal)); background: var(--blue); color: #fff; }
+    .ta-head .ta-title { flex: 1; min-width: 0; font-size: 18px; font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ta-ico { width: 44px; height: 44px; border: 0; border-radius: 10px; background: rgba(255,255,255,.16); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
+    .ta-ico svg { width: 24px; height: 24px; fill: currentColor; }
+    .ta-done { min-height: 44px; padding: 0 20px; font-size: 16px; background: #fff; color: var(--blue); border-color: #fff; }
+    .ta-big { flex: 1; min-height: 0; width: 100%; border: 0; outline: none; resize: none; padding: 16px max(16px, var(--sar)) 16px max(16px, var(--sal)); font: inherit; font-size: 20px; line-height: 1.5; color: var(--text); background: #fff; }
+    .ta-foot { padding: 8px max(16px, var(--sar)) calc(8px + var(--sab)) max(16px, var(--sal)); border-top: 1px solid var(--line); font-size: 14px; color: var(--muted); text-align: right; min-height: 20px; }
+    .ta-foot.warn { color: #b26a00; font-weight: 600; }
+    .ta-foot.over { color: var(--danger); font-weight: 600; }
+    .ta-foot .char-hint { margin-left: 10px; }
+    @media print { .ta-exp, .ta-overlay { display: none !important; } }
   </style>
 </head>
 <body>
@@ -1079,7 +1100,7 @@
 
   <script>
   (function () {
-    const APP_VERSION = 27; /* Version 27 */
+    const APP_VERSION = 28; /* Version 28 */
     const STORAGE_CURRENT = "leckortung.current";
     const STORAGE_LIST = "leckortung.reports";
     const DB_NAME = "leckortung";
@@ -5463,6 +5484,102 @@
         else toast("Datei konnte nicht geöffnet werden.", true);
       }
     }
+
+
+    /* ================= Version 28: Vergrößern-Icon an allen mehrzeiligen Textfeldern ================= */
+    const ICO_EXPAND = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3h7v7h-2V6.41l-5.3 5.3-1.4-1.42L17.59 5H14V3zM3 14h2v3.59l5.3-5.3 1.4 1.42L6.41 19H10v2H3v-7z"/></svg>';
+    const ICO_SHRINK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.7 4.7 15.4 10H19v2h-7V5h2v3.6l5.3-5.3 1.4 1.4zM4.7 20.7l-1.4-1.4L8.6 14H5v-2h7v7h-2v-3.6l-5.3 5.3z"/></svg>';
+    let taTarget = null;
+    function taLabelOf(ta) {
+      const l = ta.id && document.querySelector('label[for="' + ta.id + '"]');
+      if (l && l.textContent.trim()) return l.textContent.trim();
+      const fg = ta.closest(".fg"); const cap = fg && fg.querySelector(".fg-cap");
+      if (cap && cap.textContent.trim()) return cap.textContent.trim();
+      return ta.getAttribute("aria-label") || "Text";
+    }
+    function taOverlayEl() {
+      let o = document.getElementById("taOverlay");
+      if (o) return o;
+      o = document.createElement("div");
+      o.id = "taOverlay"; o.className = "ta-overlay"; o.setAttribute("role", "dialog"); o.setAttribute("aria-modal", "true"); o.setAttribute("aria-labelledby", "taTitle");
+      o.innerHTML = `<div class="ta-head"><button type="button" class="ta-ico" id="taShrink" aria-label="Verkleinern" title="Verkleinern">${ICO_SHRINK}</button><div class="ta-title" id="taTitle"></div><button type="button" class="btn ta-done" id="taDone">Fertig</button></div><textarea id="taBig" class="ta-big" aria-labelledby="taTitle"></textarea><div class="ta-foot" id="taCount"></div>`;
+      document.body.appendChild(o);
+      document.getElementById("taShrink").addEventListener("click", closeTaEditor);
+      document.getElementById("taDone").addEventListener("click", closeTaEditor);
+      document.getElementById("taBig").addEventListener("input", updateTaCount);
+      o.addEventListener("keydown", (e) => { if (e.key === "Escape") { e.preventDefault(); closeTaEditor(); } });
+      const fit = () => {
+        const vv = window.visualViewport;
+        if (vv) { o.style.top = vv.offsetTop + "px"; o.style.height = vv.height + "px"; }
+        else { o.style.top = "0px"; o.style.height = window.innerHeight + "px"; }
+      };
+      o.__fit = fit;
+      if (window.visualViewport) { window.visualViewport.addEventListener("resize", fit); window.visualViewport.addEventListener("scroll", fit); }
+      window.addEventListener("resize", fit);
+      return o;
+    }
+    function updateTaCount() {
+      const el = document.getElementById("taCount"), big = document.getElementById("taBig");
+      if (!el || !big) return;
+      if (!taTarget || taTarget.id !== "mit-notiz") { el.textContent = ""; el.className = "ta-foot"; return; }
+      const n = (big.value || "").length;
+      el.className = "ta-foot" + (n >= NOTIZ_LIMIT ? " over" : (n >= NOTIZ_WARN ? " warn" : ""));
+      el.innerHTML = n + " / " + NOTIZ_LIMIT + (n > NOTIZ_LIMIT ? '<span class="char-hint">EasyTec-Limit überschritten</span>' : "");
+    }
+    function openTaEditor(ta) {
+      if (!ta || ta.disabled) return;
+      const o = taOverlayEl();
+      taTarget = ta;
+      document.getElementById("taTitle").textContent = taLabelOf(ta);
+      const big = document.getElementById("taBig");
+      big.value = ta.value;
+      big.placeholder = ta.getAttribute("placeholder") || "";
+      big.readOnly = !!ta.readOnly;
+      o.classList.add("open");
+      document.body.style.overflow = "hidden";
+      o.__fit();
+      updateTaCount();
+      big.focus();
+      try { big.setSelectionRange(big.value.length, big.value.length); } catch (e) {}
+      big.scrollTop = big.scrollHeight;
+    }
+    /* Fertig / Verkleinern / Esc: Text zurück ins Feld, input+change auslösen (Speichern, Zeichenzähler, Pflichtfeld-Hinweise) */
+    function closeTaEditor() {
+      const o = document.getElementById("taOverlay");
+      if (!o || !o.classList.contains("open")) return;
+      const big = document.getElementById("taBig"), ta = taTarget;
+      o.classList.remove("open");
+      document.body.style.overflow = "";
+      taTarget = null;
+      if (ta && ta.isConnected && ta.value !== big.value) {
+        ta.value = big.value;
+        ta.dispatchEvent(new Event("input", { bubbles: true }));
+        ta.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+      if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    }
+    function enhanceTextareas(root) {
+      const list = [];
+      if (root.matches && root.matches("textarea")) list.push(root);
+      if (root.querySelectorAll) root.querySelectorAll("textarea").forEach((t) => list.push(t));
+      list.forEach((ta) => {
+        if (ta.dataset.taEnh || ta.closest("#taOverlay") || !ta.parentNode) return;
+        ta.dataset.taEnh = "1";
+        const wrap = document.createElement("div");
+        wrap.className = "ta-wrap";
+        ta.parentNode.insertBefore(wrap, ta);
+        wrap.appendChild(ta);
+        const b = document.createElement("button");
+        b.type = "button"; b.className = "ta-exp"; b.title = "Vergrößern"; b.setAttribute("aria-label", "Textfeld vergrößern");
+        b.innerHTML = ICO_EXPAND;
+        b.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); openTaEditor(ta); });
+        wrap.appendChild(b);
+      });
+    }
+    new MutationObserver((muts) => {
+      muts.forEach((m) => m.addedNodes.forEach((n) => { if (n.nodeType === 1) enhanceTextareas(n); }));
+    }).observe(document.body, { childList: true, subtree: true });
+    enhanceTextareas(document.body);
 
 
     /* Init */
