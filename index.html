@@ -1033,6 +1033,8 @@
     .ta-foot.over { color: var(--danger); font-weight: 600; }
     .ta-foot .char-hint { margin-left: 10px; }
     @media print { .ta-exp, .ta-overlay { display: none !important; } }
+      .pdfed-frame { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; background: #fff; z-index: 500; display: none; }
+    .pdfed-frame.open { display: block; }
   </style>
 </head>
 <body>
@@ -1100,7 +1102,7 @@
 
   <script>
   (function () {
-    const APP_VERSION = 28; /* Version 28 */
+    const APP_VERSION = 29; /* Version 29 */
     const STORAGE_CURRENT = "leckortung.current";
     const STORAGE_LIST = "leckortung.reports";
     const DB_NAME = "leckortung";
@@ -2047,6 +2049,11 @@
             <span class="status-dot ${repOk ? "ok" : "missing"}" title="${repOk ? "Auftrags-Nr. und Kunde vorhanden" : "Auftrags-Nr. oder Kunde fehlt"}"></span>
             <span class="chevron">${ICO.chevron}</span>
           </button>
+          <button type="button" class="menu-item" data-goto="pdfeditor" id="menuPdfEditor">
+            <span class="menu-ico">${ICO.pencil}</span>
+            <span class="menu-label">PDF bearbeiten</span>
+            <span class="chevron">${ICO.chevron}</span>
+          </button>
         </div>
       </div>`;
     }
@@ -2239,6 +2246,7 @@
         el.addEventListener("click", () => {
           const dest = el.getAttribute("data-goto");
           if (dest === "bericht") { activeTab = TABS[0].id; showView("bericht"); }
+          else if (dest === "pdfeditor") openPdfEditor();
           else showView(dest);
         });
       });
@@ -4662,6 +4670,62 @@
         downloadBlobFile(files[i]);
         await new Promise((r) => setTimeout(r, 500));
       }
+    }
+    /* ---------- PDF-Editor (eigener Ordner pdf-editor/, im iframe; Export über saveFiles) ----------
+       Es wird nichts dauerhaft gespeichert (kein localStorage/IndexedDB im eingebetteten Editor):
+       Unterschriften werden pro Dokument frisch gezeichnet und nur ins exportierte PDF eingebettet. */
+    let pdfEdFrame = null, pdfEdReady = false;
+    function pdfEdDocs() {
+      return [{ kind: "lb", label: "Leckortungsbericht dieses Auftrags öffnen" }, { kind: "sr", label: "Servicereport dieses Auftrags öffnen" }];
+    }
+    function pdfEdPost(msg, transfer) {
+      if (pdfEdFrame && pdfEdFrame.contentWindow) pdfEdFrame.contentWindow.postMessage(msg, location.origin, transfer || []);
+    }
+    async function pdfEdSendDoc(kind) {
+      try {
+        if (!current) throw new Error("Kein Auftrag");
+        if (view === "fotodetail") readPhotoDetailIntoModel();
+        persistCurrent();
+        sigSyncOwner();
+        const meta = current.meta || {};
+        const base = safeFilePart(meta.auftragsNr || (current.values && current.values.schadenNr) || (current.values && current.values.datum) || current.id) || "Auftrag";
+        let bytes, name;
+        if (kind === "lb") { bytes = buildLeckPdf(await collectPhotoImages()); name = base + "_Leckortungsbericht.pdf"; }
+        else { bytes = buildServicePdf({ ma: sigStore.ma, kunde: sigStore.kunde }); name = base + "_Servicereport.pdf"; }
+        const buf = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+        pdfEdPost({ type: "pdfed-open", name, buffer: buf }, [buf]);
+      } catch (err) {
+        console.error(err);
+        pdfEdPost({ type: "pdfed-error", message: "Dokument konnte nicht erzeugt werden." });
+      }
+    }
+    function openPdfEditor() {
+      if (!pdfEdFrame) {
+        pdfEdFrame = document.createElement("iframe");
+        pdfEdFrame.id = "pdfEditorFrame";
+        pdfEdFrame.className = "pdfed-frame";
+        pdfEdFrame.title = "PDF bearbeiten";
+        pdfEdFrame.setAttribute("allow", "clipboard-write");
+        pdfEdFrame.src = "pdf-editor/index.html?v=" + APP_VERSION;
+        document.body.appendChild(pdfEdFrame);
+        window.addEventListener("message", (e) => {
+          if (e.origin !== location.origin || !pdfEdFrame || e.source !== pdfEdFrame.contentWindow || !e.data) return;
+          const d = e.data;
+          if (d.type === "pdfed-ready") { pdfEdReady = true; pdfEdPost({ type: "pdfed-docs", docs: pdfEdDocs() }); }
+          else if (d.type === "pdfed-close") closePdfEditor();
+          else if (d.type === "pdfed-fetch") pdfEdSendDoc(d.kind === "sr" ? "sr" : "lb");
+          else if (d.type === "pdfed-save" && d.buffer) {
+            const name = String(d.name || "Dokument.pdf").replace(/[\\/]/g, "_");
+            saveFiles([new File([d.buffer], name, { type: "application/pdf" })]);
+          }
+        });
+      } else if (pdfEdReady) pdfEdPost({ type: "pdfed-docs", docs: pdfEdDocs() });
+      pdfEdFrame.classList.add("open");
+      document.body.classList.add("pdfed-open");
+    }
+    function closePdfEditor() {
+      if (pdfEdFrame) pdfEdFrame.classList.remove("open");
+      document.body.classList.remove("pdfed-open");
     }
     function showDocsSheet(files) {
       closeDocsSheet();
