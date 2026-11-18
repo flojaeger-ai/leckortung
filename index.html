@@ -1079,7 +1079,7 @@
 
   <script>
   (function () {
-    const APP_VERSION = 24; /* Version 24 */
+    const APP_VERSION = 25; /* Version 25 */
     const STORAGE_CURRENT = "leckortung.current";
     const STORAGE_LIST = "leckortung.reports";
     const DB_NAME = "leckortung";
@@ -1308,6 +1308,7 @@
       return values;
     }
 
+    const AUFTRAGSART_OPTIONS = ["Leckageortung", "Wasserschadenbesichtigung"];
     const ANREDE_OPTIONS = ["", "Herr", "Frau", "Firma", "Familie", "Eheleute", "Herr und Frau", "WEG"];
 
     function freshMeta() {
@@ -1318,7 +1319,7 @@
         plz: "",
         ort: "",
         strasse: "",
-        auftragsart: "Leckageortung, (L)",
+        auftragsart: "Leckageortung",
         terminVon: "",
         terminBis: "",
         projekt: ""
@@ -1373,6 +1374,10 @@
       /* Version 24: Anrede "Herrn" → "Herr" */
       if (out.meta.anrede === "Herrn") out.meta.anrede = "Herr";
       if (out.meta.anrede === "Herrn und Frau") out.meta.anrede = "Herr und Frau";
+      /* Version 25: Auftragsart als Auswahl */
+      if (/^leckageortung/i.test(String(out.meta.auftragsart || "").trim())) out.meta.auftragsart = "Leckageortung";
+      else if (/^(wasserschaden|schadenaufnahme)/i.test(String(out.meta.auftragsart || "").trim())) out.meta.auftragsart = "Wasserschadenbesichtigung";
+      else if (!String(out.meta.auftragsart || "").trim()) out.meta.auftragsart = "Leckageortung";
       /* Version 23: nur true (= Ja / angehakt) bleibt erhalten; false, "nein", null usw. → null (nicht angehakt) */
       TRI_IDS.forEach((id) => {
         const val = out.values[id];
@@ -1986,7 +1991,7 @@
           <div class="row"><label class="lbl" for="meta-plz">PLZ</label>${metaInput("plz", "text")}</div>
           <div class="row"><label class="lbl" for="meta-ort">Ort</label>${metaInput("ort", "text")}</div>
           <div class="row"><label class="lbl" for="meta-strasse">Straße</label>${metaInput("strasse", "text")}</div>
-          <div class="row"><label class="lbl" for="meta-auftragsart">Auftragsart</label>${metaInput("auftragsart", "text")}</div>
+          <div class="row"><label class="lbl" for="meta-auftragsart">Auftragsart</label><select id="meta-auftragsart" data-meta="auftragsart">${(AUFTRAGSART_OPTIONS.includes(m.auftragsart) || !m.auftragsart ? AUFTRAGSART_OPTIONS : [m.auftragsart].concat(AUFTRAGSART_OPTIONS)).map((o) => `<option value="${attr(o)}"${m.auftragsart === o ? " selected" : ""}>${escapeHtml(o)}</option>`).join("")}</select></div>
           <div class="row"><label class="lbl" for="meta-terminVon">Termin von</label>${metaInput("terminVon", "datetime-local")}</div>
           <div class="row"><label class="lbl" for="meta-terminBis">Termin bis</label>${metaInput("terminBis", "datetime-local")}</div>
         </div>
