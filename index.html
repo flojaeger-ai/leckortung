@@ -1079,7 +1079,7 @@
 
   <script>
   (function () {
-    const APP_VERSION = 23; /* Version 23 */
+    const APP_VERSION = 24; /* Version 24 */
     const STORAGE_CURRENT = "leckortung.current";
     const STORAGE_LIST = "leckortung.reports";
     const DB_NAME = "leckortung";
@@ -1308,7 +1308,7 @@
       return values;
     }
 
-    const ANREDE_OPTIONS = ["", "Herrn", "Frau", "Firma", "Familie", "Eheleute", "Herrn und Frau"];
+    const ANREDE_OPTIONS = ["", "Herr", "Frau", "Firma", "Familie", "Eheleute", "Herr und Frau", "WEG"];
 
     function freshMeta() {
       return {
@@ -1370,6 +1370,9 @@
         serverNr: a.serverNr || ""
       };
       if (!Array.isArray(out.mitarbeiter.artikel)) out.mitarbeiter.artikel = freshMitarbeiter().artikel;
+      /* Version 24: Anrede "Herrn" → "Herr" */
+      if (out.meta.anrede === "Herrn") out.meta.anrede = "Herr";
+      if (out.meta.anrede === "Herrn und Frau") out.meta.anrede = "Herr und Frau";
       /* Version 23: nur true (= Ja / angehakt) bleibt erhalten; false, "nein", null usw. → null (nicht angehakt) */
       TRI_IDS.forEach((id) => {
         const val = out.values[id];
@@ -2774,7 +2777,7 @@
             -> { "auftraege": [ Auftrag, ... ] }   (oder direkt ein Array)
             Auftrag = {
               "nr": "WA260489-001",              // Pflicht, eindeutiger Schlüssel (alternativ "auftragsNr")
-              "kunde": "Max Mustermann", "anrede": "Herrn",
+              "kunde": "Max Mustermann", "anrede": "Herr",
               "strasse": "Hambacher Straße 25", "plz": "67433", "ort": "Neustadt an der Weinstraße",
               "auftragsart": "Leckageortung, (L)",  // optional
               "projekt": "WS WEG Am Schlossberg 10, Maikammer",  // optional
