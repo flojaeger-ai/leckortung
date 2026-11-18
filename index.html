@@ -493,7 +493,7 @@
     }
     .overlay.open { opacity: 1; pointer-events: auto; }
     .drawer {
-      position: fixed; top: 0; left: 0; bottom: 0; width: min(420px, 92vw);
+      position: fixed; top: 0; left: 0; bottom: 0; width: 100%;
       background: #fff; z-index: 60;
       transform: translateX(calc(-100% - 40px));
       transition: transform .22s ease, box-shadow .22s ease, visibility 0s linear .22s;
@@ -569,6 +569,64 @@
     .choice-dialog p { margin: 0 0 16px; font-size: 14px; line-height: 1.45; color: var(--text); }
     .choice-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
 
+
+
+    /* Version 22: Aufträge-Liste (Vollbild), Report-Vorschau */
+    .drawer-actions { border-bottom: 0; border-top: 1px solid var(--line); padding-bottom: max(12px, var(--sab)); }
+    .drawer-head-r { display: flex; gap: 4px; }
+    .drawer-head h2 { flex: 1; margin-left: 10px; }
+    .auf-filter { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; padding: 10px max(14px, var(--sal)); background: #f4f7fa; border-bottom: 1px solid var(--line); }
+    .auf-filter select, .auf-filter input[type=search] { min-height: 40px; border: 1px solid var(--line); border-radius: 8px; padding: 0 10px; font: inherit; font-size: 15px; background: #fff; }
+    .auf-filter select { flex: 0 1 240px; }
+    .auf-filter input[type=search] { flex: 1 1 220px; min-width: 0; }
+    .auf-checks { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; font-size: 14px; }
+    .auf-checks label { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+    .auf-checks input[type=checkbox] { width: 20px; height: 20px; min-width: 20px; }
+    .auf-count { appearance: none; border: 0; border-bottom: 1px solid var(--line); background: #fff; text-align: left; padding: 8px max(14px, var(--sal)); font: inherit; font-size: 13px; color: var(--muted); cursor: pointer; }
+    .auf-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 8px; align-items: start; }
+    .auf-grid + .app-version { margin-top: 12px; }
+    .auf-card { margin-bottom: 0; }
+    .auf-card.done { background: #f7faf7; }
+    .auf-nr { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 2px; }
+    .auf-nr strong { display: inline !important; margin: 0 !important; font-size: 16px !important; }
+    .auf-new { background: #e53935; color: #fff; font-size: 11px; font-weight: 700; letter-spacing: .04em; border-radius: 4px; padding: 2px 7px; }
+    .auf-chip { font-size: 12px; font-weight: 600; border-radius: 999px; padding: 2px 9px; }
+    .auf-chip.ok { background: #e3f4e6; color: #1b6b2c; }
+    .auf-chip.warn { background: #fff0d6; color: #8a5a00; }
+    .auf-line { font-size: 13.5px; color: var(--text); line-height: 1.35; }
+    .auf-line.auf-name { font-weight: 600; }
+    .auf-line.auf-art, .auf-line.auf-proj, .auf-line.auf-zeit { color: var(--muted); font-size: 13px; }
+    .auf-card .report-actions .btn { padding: 8px 10px; }
+    @keyframes sync-spin { to { transform: rotate(360deg); } }
+    .hdr-btn.spin svg { animation: sync-spin 1s linear infinite; }
+    .hdr-flag { color: #fff; }
+    .rp-status { margin: 8px 0 0; padding: 8px 12px; border-radius: 8px; font-weight: 600; font-size: 14px; }
+    .rp-status.ok { background: #e3f4e6; color: #1b6b2c; }
+    .rp-status.warn { background: #fff0d6; color: #8a5a00; }
+    .rp-wrap { margin: 10px 0 0; overflow-x: auto; }
+    .rp-paper { position: relative; background: #fff; border: 1px solid #c9d0d9; box-shadow: 0 2px 8px rgba(0,0,0,.12); padding: 18px 18px 22px; max-width: 760px; margin: 0 auto; font-size: 12.5px; color: #000; overflow: hidden; }
+    .rp-title { font-weight: 700; font-size: 17px; }
+    .rp-nr { font-size: 14px; margin: 2px 0 12px; }
+    .rp-t { border-collapse: collapse; width: 100%; margin-bottom: 12px; table-layout: fixed; }
+    .rp-t th, .rp-t td { border: 1px solid #000; padding: 4px 6px; text-align: left; vertical-align: top; line-height: 1.35; word-wrap: break-word; }
+    .rp-t th { background: #d4d4d4; font-weight: 700; }
+    .rp-t .r { text-align: right; }
+    .rp-narrow { width: 34%; min-width: 230px; }
+    .rp-narrow th { width: 42%; }
+    .rp-two th, .rp-two td { width: 50%; }
+    .rp-t.rp-two td { min-height: 3.5em; height: 4.4em; }
+    .rp-art th:nth-child(1) { width: 17%; } .rp-art th:nth-child(3) { width: 11%; } .rp-art th:nth-child(4) { width: 11%; } .rp-art th:nth-child(5) { width: 14%; }
+    .rp-sum th, .rp-sum td { background: #fff; }
+    .rp-sum th { background: #d4d4d4; }
+    .rp-ed { cursor: pointer; }
+    .rp-ed:hover { background: #eaf2fb; }
+    .rp-wm { position: absolute; inset: 0; pointer-events: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='170'><text x='150' y='90' text-anchor='middle' transform='rotate(-30 150 85)' font-family='Helvetica,Arial,sans-serif' font-size='28' font-weight='700' fill='%23888' fill-opacity='.22'>Unterschrift fehlt</text></svg>");
+      background-repeat: repeat; }
+    .art-ed { display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; }
+    .art-row { display: grid; grid-template-columns: 1.1fr 2.4fr .7fr .7fr .9fr 44px; gap: 6px; align-items: center; }
+    .art-in { min-width: 0; min-height: 40px; border: 1px solid var(--line); border-radius: 8px; padding: 0 8px; font: inherit; font-size: 14px; }
+    @media (max-width: 700px) { .art-row { grid-template-columns: 1fr 1fr 44px; } .art-text { grid-column: 1 / 3; } }
 
     /* Version 21: dreiwertige Ja/Nein-Schalter */
     .tri { display: inline-flex; border: 1.5px solid #8b96a5; border-radius: 8px; overflow: hidden; background: #fff; flex-shrink: 0; justify-self: end; }
@@ -973,11 +1031,29 @@
   <div class="overlay" id="overlay" hidden></div>
   <aside class="drawer" id="drawer" aria-hidden="true" role="dialog" aria-labelledby="drawerTitle">
     <div class="drawer-head">
-      <h2 id="drawerTitle">Aufträge</h2>
-      <button class="hdr-btn" id="btnCloseDrawer" aria-label="Schließen">
-        <svg viewBox="0 0 24 24"><path d="M18.3 5.7 12 12l6.3 6.3-1.4 1.4L10.6 13.4 4.3 19.7 2.9 18.3 9.2 12 2.9 5.7 4.3 4.3l6.3 6.3 6.3-6.3z"/></svg>
+      <button class="hdr-btn" id="btnCloseDrawer" aria-label="Zurück">
+        <svg viewBox="0 0 24 24"><path d="M15.4 4.6 13.99 3.2 5.2 12l8.79 8.8 1.41-1.4L8 12z"/></svg>
       </button>
+      <h2 id="drawerTitle">Aufträge</h2>
+      <div class="drawer-head-r">
+        <button class="hdr-btn" id="btnSettings" aria-label="Einstellungen" title="Einstellungen">⚙</button>
+        <button class="hdr-btn" id="btnSyncList" aria-label="Synchronisieren" title="Synchronisieren: neue Aufträge holen, abgeschlossene senden">
+          <svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6a6 6 0 0 1 6 6c0 1-.25 1.97-.7 2.8l1.46 1.46A8 8 0 0 0 20 12a8 8 0 0 0-8-8zm0 14a6 6 0 0 1-6-6c0-1 .25-1.97.7-2.8L5.24 7.74A8 8 0 0 0 4 12a8 8 0 0 0 8 8v3l4-4-4-4v3z"/></svg>
+        </button>
+      </div>
     </div>
+    <div class="auf-filter">
+      <select id="aufKat" aria-label="Kategorie"></select>
+      <input type="search" id="aufSuche" placeholder="Suchen" aria-label="Suchen" autocomplete="off" />
+      <div class="auf-checks" role="group" aria-label="Suchen in">
+        <label><input type="checkbox" id="auf-name" /> Name</label>
+        <label><input type="checkbox" id="auf-nr" /> Auftrags-Nr</label>
+        <label><input type="checkbox" id="auf-adresse" /> Adresse</label>
+        <label><input type="checkbox" id="auf-alle" checked /> Alle</label>
+      </div>
+    </div>
+    <button type="button" class="auf-count" id="aufCount" title="Sortierung umkehren"></button>
+    <div class="report-list" id="reportList"></div>
     <div class="drawer-actions">
       <button class="btn primary" id="btnNew">Neuer Auftrag</button>
       <button class="btn btn-ico" id="btnOpenAuftrag" title="Auftrag aus Datei öffnen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8l-2-2z"/></svg> 📂 Öffnen</button>
@@ -987,7 +1063,6 @@
       <button class="btn" id="btnPrint">Drucken / PDF</button>
     </div>
     <input class="hidden-file" id="icloudFileInput" type="file" accept=".json,application/json" />
-    <div class="report-list" id="reportList"></div>
   </aside>
 
   <div class="lightbox" id="lightbox" hidden>
@@ -1010,7 +1085,7 @@
 
   <script>
   (function () {
-    const APP_VERSION = 21; /* Version 21 */
+    const APP_VERSION = 22; /* Version 22 */
     const STORAGE_CURRENT = "leckortung.current";
     const STORAGE_LIST = "leckortung.reports";
     const DB_NAME = "leckortung";
@@ -1250,7 +1325,8 @@
         strasse: "",
         auftragsart: "Leckageortung, (L)",
         terminVon: "",
-        terminBis: ""
+        terminBis: "",
+        projekt: ""
       };
     }
 
@@ -1268,6 +1344,10 @@
         mitarbeiterName: "",
         beschreibung1: "",
         beschreibung2: "",
+        artikel: [
+          { nr: "WSORT0001", text: "Leckageortung", menge: "1,00", einheit: "Stck", pos: "01.0010" },
+          { nr: "MV10101", text: "Energiekostenzuschlag für Leckageortung", menge: "1,00", einheit: "psch", pos: "01.0020" }
+        ],
         /* Namen unter den Unterschriften (die Unterschriften selbst werden nie gespeichert) */
         sigNameMa: "",
         sigNameKunde: "",
@@ -1286,8 +1366,15 @@
         mitarbeiter: Object.assign(freshMitarbeiter(), a.mitarbeiter || {}),
         photos: Array.isArray(a.photos) ? a.photos.map(migratePhoto) : [],
         photoSortMode: a.photoSortMode === "date" ? "date" : "custom",
-        triState: true
+        triState: true,
+        neu: !!a.neu,
+        status: a.status === "abgeschlossen" ? "abgeschlossen" : "offen",
+        sync: a.sync === "wartet" || a.sync === "gesendet" ? a.sync : null,
+        abgeschlossenAm: a.abgeschlossenAm || null,
+        syncedAt: a.syncedAt || null,
+        serverNr: a.serverNr || ""
       };
+      if (!Array.isArray(out.mitarbeiter.artikel)) out.mitarbeiter.artikel = freshMitarbeiter().artikel;
       /* Altdaten (vor Version 21): ein Häkchen = Ja bleibt Ja; false war nicht von „unbeantwortet“ unterscheidbar → null */
       TRI_IDS.forEach((id) => {
         const val = out.values[id];
@@ -1689,8 +1776,13 @@
       if (view === "overview") {
         right = `<button class="hdr-btn hdr-btn-label hdr-icloud" id="btnICloudSave" title="In iCloud speichern" aria-label="In iCloud speichern">☁ iCloud speichern</button>`
           + hdrBtn("btnSave", "Auftrag speichern", ICO.save);
-      } else if (view === "bericht" || view === "mitarbeiter" || view === "report") {
-        right = hdrBtn("btnSave", "Auftrag speichern", ICO.save);
+      } else if (view === "report") {
+        right = hdrBtn("btnSigGo", "Zur Unterschrift", SIGN_ICON)
+          + hdrBtn("btnSave", "Auftrag speichern", ICO.save)
+          + hdrBtn("btnFinish", "Auftrag abschließen und synchronisieren", FLAG_ICON, "hdr-flag");
+      } else if (view === "bericht" || view === "mitarbeiter") {
+        right = hdrBtn("btnSigGo", "Zur Unterschrift", SIGN_ICON)
+          + hdrBtn("btnSave", "Auftrag speichern", ICO.save);
       } else if (view === "unterschrift") {
         right = hdrBtn("btnSigClear", "Unterschrift löschen", ICO.trash, "danger-icon")
           + hdrBtn("btnSigSave", "Unterschrift übernehmen", ICO.save);
@@ -1713,6 +1805,10 @@
       if (icloud) icloud.addEventListener("click", () => saveAuftragToICloud(current.id));
       const save = document.getElementById("btnSave");
       if (save) save.addEventListener("click", saveToList);
+      const sigGo = document.getElementById("btnSigGo");
+      if (sigGo) sigGo.addEventListener("click", () => showView("unterschrift"));
+      const fin = document.getElementById("btnFinish");
+      if (fin) fin.addEventListener("click", abschliessenClick);
       const sigClr = document.getElementById("btnSigClear");
       if (sigClr) sigClr.addEventListener("click", sigClearCurrent);
       const sigSv = document.getElementById("btnSigSave");
@@ -2677,7 +2773,9 @@
     function openAuftrag(id) {
       const found = reports.find((r) => r.id === id);
       if (!found) return;
+      found.neu = false;
       current = migrateAuftrag(JSON.parse(JSON.stringify(found)));
+      persistList();
       photoSortMode = current.photoSortMode === "date" ? "date" : "custom";
       ensurePhotoOrder();
       persistCurrent();
@@ -2701,29 +2799,314 @@
       toast("Auftrag gelöscht");
     }
 
+    /* ================= Aufträge-Liste (wie EasyTec) + Sync-Schicht (Version 22) =================
+       Einstellungen: localStorage "leckortung.settings" = { "serverUrl": "https://server.example" } (leer = nicht eingerichtet).
+
+       Server-API (erwartetes JSON):
+       GET  {serverUrl}/auftraege
+            -> { "auftraege": [ Auftrag, ... ] }   (oder direkt ein Array)
+            Auftrag = {
+              "nr": "WA260489-001",              // Pflicht, eindeutiger Schlüssel (alternativ "auftragsNr")
+              "kunde": "Max Mustermann", "anrede": "Herrn",
+              "strasse": "Hambacher Straße 25", "plz": "67433", "ort": "Neustadt an der Weinstraße",
+              "auftragsart": "Leckageortung, (L)",  // optional
+              "projekt": "WS WEG Am Schlossberg 10, Maikammer",  // optional
+              "start": "2026-11-18T08:00", "ende": "2026-11-18T11:00"   // optional, ISO lokal
+            }
+            Bereits vorhandene Nummern werden nicht überschrieben; neue erscheinen mit "NEW"-Badge.
+       POST {serverUrl}/auftraege/{nr}   Content-Type: application/json
+            Body = { "format": "leckortung-auftrag", "formatVersion": 1, "appVersion": 22, "auftragsNr", "status": "abgeschlossen",
+                     "abgeschlossenAm": ISO, "meta": {...}, "values": {...}, "mitarbeiter": {...},
+                     "photos": [ { order, id, name, comment, druck, annotated, annotationsRelative: [...] } ] }
+            Fotos nur als Metadaten (ohne Bilddaten). Unterschriften sind NIE enthalten (sie existieren nur im Arbeitsspeicher
+            und landen ausschließlich in den lokal erzeugten PDFs). Antwort 2xx = angenommen.
+    */
+    const STORAGE_SETTINGS = "leckortung.settings";
+    function loadSettings() {
+      try { return Object.assign({ serverUrl: "" }, JSON.parse(localStorage.getItem(STORAGE_SETTINGS) || "{}")); }
+      catch (e) { return { serverUrl: "" }; }
+    }
+    function saveSettings(s) { try { localStorage.setItem(STORAGE_SETTINGS, JSON.stringify(s)); } catch (e) {} }
+    function serverBase() {
+      const u = String(loadSettings().serverUrl || "").trim().replace(/\/+$/, "");
+      return /^https?:\/\//i.test(u) ? u : "";
+    }
+
+    const SYNC_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4V1L8 5l4 4V6a6 6 0 0 1 6 6c0 1-.25 1.97-.7 2.8l1.46 1.46A8 8 0 0 0 20 12a8 8 0 0 0-8-8zm0 14a6 6 0 0 1-6-6c0-1 .25-1.97.7-2.8L5.24 7.74A8 8 0 0 0 4 12a8 8 0 0 0 8 8v3l4-4-4-4v3z"/></svg>';
+    const FLAG_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.4" y="3" width="2" height="18"/><path d="M5.4 4h3.5v3.5H5.4zM12 4h3.5v3.5H12zM8.9 7.5h3.1V11H8.9zM15.5 7.5H19V11h-3.5zM5.4 11h3.5v3.5H5.4zM12 11h3.5v3.5H12z"/><rect x="5.4" y="4" width="13.6" height="10.5" fill="none" stroke="currentColor" stroke-width="1"/></svg>';
+    const SIGN_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path transform="translate(0,-2.2) scale(.95)" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/><rect x="3" y="20.2" width="18" height="1.8" rx=".9"/></svg>';
+
+    /* ---------- Listen-Ansicht ---------- */
+    const aufState = { kat: "alle", q: "", name: false, nr: false, adresse: false, alle: true, asc: true };
+    function aufStart(r) {
+      return (r.meta && r.meta.terminVon) || (r.values && (r.values.messterminVon || r.values.datum)) || r.createdAt || r.updatedAt || "";
+    }
+    function aufAdresse(r) {
+      const m = r.meta || {};
+      return [m.strasse, [m.plz, m.ort].filter(Boolean).join(" ")].filter(Boolean).join(", ");
+    }
+    function aufProjekt(r) {
+      const m = r.meta || {}, v = r.values || {};
+      return String(m.projekt || "").trim() || [v.versicherungsgesellschaft, v.schadenNr].filter((x) => String(x || "").trim()).join(", ");
+    }
+    function aufArt(r) { return String((r.meta && r.meta.auftragsart) || "").trim(); }
+    function aufMatches(r) {
+      const m = r.meta || {};
+      if (aufState.kat === "neu" && !r.neu) return false;
+      if (aufState.kat === "offen" && r.status === "abgeschlossen") return false;
+      if (aufState.kat === "abgeschlossen" && r.status !== "abgeschlossen") return false;
+      if (aufState.kat === "wartet" && r.sync !== "wartet") return false;
+      if (aufState.kat.indexOf("art:") === 0 && aufArt(r) !== aufState.kat.slice(4)) return false;
+      const q = aufState.q.trim().toLowerCase();
+      if (!q) return true;
+      const parts = [];
+      if (aufState.alle || aufState.name) parts.push(m.kunde);
+      if (aufState.alle || aufState.nr) parts.push(m.auftragsNr);
+      if (aufState.alle || aufState.adresse) parts.push(aufAdresse(r));
+      if (aufState.alle) parts.push(aufArt(r), aufProjekt(r), m.anrede, (r.values || {}).schadenNr);
+      return parts.join(" \n ").toLowerCase().indexOf(q) >= 0;
+    }
+    function aufStatusChips(r) {
+      let h = "";
+      if (r.status === "abgeschlossen") {
+        h += r.sync === "wartet"
+          ? '<span class="auf-chip warn" title="Abgeschlossen, wartet auf Sync">⟳ Wartet auf Sync</span>'
+          : '<span class="auf-chip ok">✓ Abgeschlossen' + (r.sync === "gesendet" ? " · gesendet" : "") + "</span>";
+      }
+      return h;
+    }
+    function renderAufFilter() {
+      const sel = document.getElementById("aufKat");
+      if (!sel) return;
+      const arts = Array.from(new Set(reports.map(aufArt).filter(Boolean))).sort();
+      const opts = [["alle", "Alle Kategorien"], ["neu", "Neu"], ["offen", "Offen"], ["abgeschlossen", "Abgeschlossen"], ["wartet", "Wartet auf Sync"]]
+        .concat(arts.map((a) => ["art:" + a, a]));
+      if (!opts.some((o) => o[0] === aufState.kat)) aufState.kat = "alle";
+      sel.innerHTML = opts.map((o) => `<option value="${attr(o[0])}"${o[0] === aufState.kat ? " selected" : ""}>${escapeHtml(o[1])}</option>`).join("");
+      document.getElementById("aufSuche").value = aufState.q;
+      ["name", "nr", "adresse", "alle"].forEach((k) => { document.getElementById("auf-" + k).checked = !!aufState[k]; });
+    }
+    function bindAufFilter() {
+      document.getElementById("aufKat").addEventListener("change", (e) => { aufState.kat = e.target.value; renderReportList(); });
+      document.getElementById("aufSuche").addEventListener("input", (e) => { aufState.q = e.target.value; renderReportList(); });
+      ["name", "nr", "adresse", "alle"].forEach((k) => document.getElementById("auf-" + k).addEventListener("change", (e) => {
+        aufState[k] = e.target.checked;
+        if (k === "alle" && e.target.checked) { aufState.name = aufState.nr = aufState.adresse = false; }
+        else if (e.target.checked) aufState.alle = false;
+        if (!aufState.name && !aufState.nr && !aufState.adresse) aufState.alle = true;
+        renderAufFilter();
+        renderReportList();
+      }));
+      document.getElementById("aufCount").addEventListener("click", () => { aufState.asc = !aufState.asc; renderReportList(); });
+    }
     function renderReportList() {
       const box = document.getElementById("reportList");
       const version = '<div class="app-version">Version ' + APP_VERSION + '</div>';
-      sortReportsNewestFirst();
-      if (!reports.length) {
-        box.innerHTML = '<div class="empty-list">Noch keine gespeicherten Aufträge. Tippen Sie oben rechts auf das Speichern-Symbol.</div>' + version;
+      renderAufFilter();
+      const all = reports.slice();
+      const list = all.filter(aufMatches);
+      list.sort((a, b) => {
+        const da = Date.parse(aufStart(a)) || 0, db = Date.parse(aufStart(b)) || 0;
+        const d = aufState.asc ? da - db : db - da;
+        return d || String((a.meta || {}).auftragsNr || "").localeCompare(String((b.meta || {}).auftragsNr || ""));
+      });
+      const n = list.length;
+      document.getElementById("aufCount").textContent = (n === 1 ? "1 Eintrag gefunden" : n + " Einträge gefunden")
+        + ", Sortiert nach Startdatum (" + (aufState.asc ? "A-Z" : "Z-A") + ")";
+      if (!all.length) {
+        box.innerHTML = '<div class="empty-list">Noch keine Aufträge. Tippen Sie auf „Neuer Auftrag“ oder holen Sie Aufträge über das Sync-Symbol oben rechts.</div>' + version;
         return;
       }
-      box.innerHTML = reports.map((r) => {
-        const t = auftragListLabel(r);
+      if (!n) {
+        box.innerHTML = '<div class="empty-list">Keine Aufträge für diese Suche.</div>' + version;
+        return;
+      }
+      box.innerHTML = '<div class="auf-grid">' + list.map((r) => {
+        const m = r.meta || {};
         const isCurrent = r.id === current.id;
-        return `<div class="report-item${isCurrent ? " current" : ""}" data-open="${r.id}"${isCurrent ? " aria-current=\"true\"" : ""}">
+        const nr = String(m.auftragsNr || "").trim() || "Ohne Nummer";
+        const ortZeile = [m.plz, m.ort].filter(Boolean).join(" ");
+        const start = fmtDateTimeDe(m.terminVon), ende = fmtDateTimeDe(m.terminBis);
+        const zeit = (start || ende) ? ((start ? "Start: " + start : "") + (start && ende ? " · " : "") + (ende ? "Ende: " + ende : "")) : "";
+        const lines = [
+          ["auf-name", [m.anrede, m.kunde].filter((x) => String(x || "").trim()).join(" ") || "Ohne Kunde"],
+          ["", ortZeile], ["", m.strasse], ["auf-art", aufArt(r)], ["auf-proj", aufProjekt(r)], ["auf-zeit", zeit]
+        ].filter((l) => String(l[1] || "").trim());
+        return `<div class="report-item auf-card${isCurrent ? " current" : ""}${r.status === "abgeschlossen" ? " done" : ""}" data-open="${r.id}"${isCurrent ? ' aria-current="true"' : ""}>
           <div class="meta">
-            <strong>${escapeHtml(t.nr)}</strong>
-            <span>${escapeHtml(t.kunde)} · ${escapeHtml(t.date)}</span>
+            <div class="auf-nr"><strong>${escapeHtml(nr)}</strong>${r.neu ? '<span class="auf-new">NEW</span>' : ""}${aufStatusChips(r)}</div>
+            ${lines.map((l) => `<div class="auf-line ${l[0]}">${escapeHtml(l[1])}</div>`).join("")}
           </div>
           <div class="report-actions">
-            <button type="button" class="btn btn-icloud" data-icloud="${r.id}" title="In iCloud speichern">☁ iCloud speichern</button>
-            <button class="btn danger" data-del="${r.id}">Löschen</button>
+            <button type="button" class="btn btn-icloud" data-icloud="${r.id}" title="In iCloud speichern">☁</button>
+            <button class="btn danger" data-del="${r.id}" title="Auftrag löschen">Löschen</button>
           </div>
         </div>`;
-      }).join("") + version;
+      }).join("") + "</div>" + version;
     }
+
+    /* ---------- Sync ---------- */
+    let syncBusy = false;
+    function setSyncSpin(on) {
+      document.querySelectorAll("#btnSyncList, #btnSyncHdr").forEach((b) => b.classList.toggle("spin", !!on));
+    }
+    function auftragFromServer(s) {
+      const nr = String(s.nr || s.auftragsNr || "").trim();
+      if (!nr) return null;
+      const meta = Object.assign(freshMeta(), {
+        auftragsNr: nr, anrede: s.anrede || "", kunde: s.kunde || "", strasse: s.strasse || "", plz: s.plz || "", ort: s.ort || "",
+        projekt: s.projekt || "", terminVon: s.start || s.terminVon || "", terminBis: s.ende || s.terminBis || ""
+      });
+      if (s.auftragsart) meta.auftragsart = s.auftragsart;
+      return migrateAuftrag({ id: uid("r"), createdAt: nowIso(), updatedAt: nowIso(), meta, neu: true, serverNr: nr });
+    }
+    async function buildServerPayload(a) {
+      const photos = [];
+      const list = (a.photos || []).slice().sort((x, y) => (Number(x.sortiernummer) || 0) - (Number(y.sortiernummer) || 0));
+      for (let i = 0; i < list.length; i++) {
+        const p = list[i];
+        let w = 0, h = 0;
+        try { const rec = await idbGetPhoto(a.id, p.id); if (rec && rec.width) { w = rec.width; h = rec.height; } } catch (e) {}
+        const anns = Array.isArray(p.annotations) ? p.annotations : [];
+        photos.push({
+          order: i + 1, id: p.id, name: p.name || "", comment: p.comment || "", druck: !!p.druck, annotated: !!p.annotated,
+          annotationsRelative: (w && h) ? anns.map((s) => annotToRelative(s, w, h)) : []
+        });
+      }
+      return {
+        format: "leckortung-auftrag", formatVersion: 1, appVersion: APP_VERSION,
+        auftragsNr: (a.meta && a.meta.auftragsNr) || a.serverNr || "",
+        status: a.status === "abgeschlossen" ? "abgeschlossen" : "offen",
+        abgeschlossenAm: a.abgeschlossenAm || null,
+        meta: JSON.parse(JSON.stringify(a.meta || {})),
+        values: JSON.parse(JSON.stringify(a.values || {})),
+        mitarbeiter: JSON.parse(JSON.stringify(a.mitarbeiter || {})),
+        photos
+      };
+    }
+    async function postAuftrag(a) {
+      const base = serverBase();
+      const nr = (a.meta && a.meta.auftragsNr) || a.serverNr || a.id;
+      const payload = await buildServerPayload(a);
+      const res = await fetch(base + "/auftraege/" + encodeURIComponent(nr), {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+    }
+    function markSent(id) {
+      const t = (current.id === id) ? current : null;
+      const e = reports.find((r) => r.id === id);
+      [t, e].forEach((x) => { if (x) { x.sync = "gesendet"; x.syncedAt = nowIso(); } });
+      if (t) persistCurrent();
+      persistList();
+    }
+    function showSyncHint() {
+      showChoiceDialog("Server noch nicht eingerichtet",
+        "Sobald der Firmenserver bereit ist, tragen Sie unter „Einstellungen“ die Adresse ein. Dann holt dieser Knopf neue Aufträge und schickt abgeschlossene Aufträge zurück. Bis dahin bleibt alles lokal gespeichert.",
+        [{ label: "Einstellungen", value: "set" }, { label: "OK", value: "ok", primary: true }]
+      ).then((v) => { if (v === "set") showSettingsDialog(); });
+    }
+    async function syncNow() {
+      if (syncBusy) return;
+      const base = serverBase();
+      if (!base) { showSyncHint(); return; }
+      syncBusy = true; setSyncSpin(true);
+      let neu = 0, gesendet = 0, fehler = 0;
+      try {
+        syncCurrentIntoList();
+        try {
+          const res = await fetch(base + "/auftraege", { headers: { Accept: "application/json" } });
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          const data = await res.json();
+          const arr = Array.isArray(data) ? data : (data && Array.isArray(data.auftraege) ? data.auftraege : []);
+          arr.forEach((s) => {
+            const a = auftragFromServer(s || {});
+            if (!a) return;
+            const nr = a.meta.auftragsNr;
+            if (reports.some((r) => ((r.meta || {}).auftragsNr || r.serverNr) === nr)) return;
+            reports.push(JSON.parse(JSON.stringify(a)));
+            neu++;
+          });
+          persistList();
+        } catch (e) { console.warn("sync get", e); fehler++; }
+        for (const r of reports.filter((x) => x.status === "abgeschlossen" && x.sync === "wartet")) {
+          try { await postAuftrag(r); markSent(r.id); gesendet++; } catch (e) { console.warn("sync post", e); fehler++; }
+        }
+        renderReportList();
+        if (view === "report") renderMain();
+        toast(fehler && !neu && !gesendet ? "Server nicht erreichbar – später erneut versuchen"
+          : (neu + (neu === 1 ? " neuer Auftrag" : " neue Aufträge") + ", " + gesendet + " gesendet" + (fehler ? " (" + fehler + " Fehler)" : "")), !!fehler && !neu && !gesendet);
+      } finally {
+        syncBusy = false; setSyncSpin(false);
+      }
+    }
+
+    /* ---------- Auftrag abschließen (Zielflagge, nur in der Report-Ansicht) ---------- */
+    async function abschliessenClick() {
+      if (view === "fotodetail") readPhotoDetailIntoModel();
+      persistCurrent();
+      const done = current.status === "abgeschlossen";
+      const choice = await showChoiceDialog(
+        done ? "Auftrag bereits abgeschlossen" : "Auftrag abschließen?",
+        done ? "Dieser Auftrag ist als abgeschlossen markiert. Erneut an den Server senden oder wieder öffnen?"
+             : "Der Auftrag wird als abgeschlossen markiert und an den Firmenserver gesendet. Ohne eingerichteten Server wartet er lokal auf den nächsten Sync.",
+        done
+          ? [{ label: "Abbrechen", value: "cancel" }, { label: "Wieder öffnen", value: "open" }, { label: "Erneut senden", value: "go", primary: true }]
+          : [{ label: "Abbrechen", value: "cancel" }, { label: "Abschließen", value: "go", primary: true }]
+      );
+      if (choice === "open") {
+        current.status = "offen"; current.sync = null; current.abgeschlossenAm = null;
+      } else if (choice === "go") {
+        if (!done) { current.status = "abgeschlossen"; current.abgeschlossenAm = nowIso(); }
+        current.sync = "wartet";
+      } else return;
+      current.updatedAt = nowIso();
+      persistCurrent();
+      syncCurrentIntoList(); persistList();
+      if (choice === "go") {
+        if (serverBase()) {
+          try {
+            toast("Auftrag wird gesendet…");
+            await postAuftrag(current);
+            markSent(current.id);
+            toast("Auftrag abgeschlossen und gesendet");
+          } catch (e) {
+            console.warn(e);
+            toast("Abgeschlossen – Server nicht erreichbar, wartet auf Sync", true);
+          }
+        } else toast("Abgeschlossen – wartet auf Sync (Server noch nicht eingerichtet)");
+      } else toast("Auftrag wieder geöffnet");
+      renderReportList();
+      if (view === "report") renderMain();
+    }
+
+    /* ---------- Einstellungen ---------- */
+    function showSettingsDialog() {
+      const old = document.getElementById("settingsOverlay");
+      if (old) old.remove();
+      const o = document.createElement("div");
+      o.className = "choice-overlay open";
+      o.id = "settingsOverlay";
+      o.innerHTML = `<div class="choice-dialog" role="dialog" aria-modal="true" aria-labelledby="setTitle">
+        <h3 id="setTitle">Einstellungen</h3>
+        <p>Server-Adresse für den Sync (leer = nicht eingerichtet). Beispiel: https://server.firma.de/api</p>
+        <input type="url" id="setServer" class="sig-input" placeholder="https://…" value="${attr(loadSettings().serverUrl || "")}" autocomplete="off" />
+        <div class="choice-actions" style="margin-top:14px"><button type="button" class="btn" id="setCancel">Abbrechen</button><button type="button" class="btn primary" id="setSave">Speichern</button></div>
+      </div>`;
+      document.body.appendChild(o);
+      document.getElementById("setCancel").addEventListener("click", () => o.remove());
+      document.getElementById("setSave").addEventListener("click", () => {
+        const u = document.getElementById("setServer").value.trim();
+        if (u && !/^https?:\/\//i.test(u)) { toast("Bitte mit http:// oder https:// beginnen", true); return; }
+        saveSettings({ serverUrl: u });
+        o.remove();
+        toast(u ? "Server gespeichert" : "Server-Adresse entfernt");
+      });
+    }
+    document.getElementById("btnSyncList").addEventListener("click", syncNow);
+    document.getElementById("btnSettings").addEventListener("click", showSettingsDialog);
+    bindAufFilter();
+
 
     document.getElementById("reportList").addEventListener("click", (e) => {
       const icloudBtn = e.target.closest("[data-icloud]");
@@ -2741,6 +3124,7 @@
     const drawer = document.getElementById("drawer");
     const overlay = document.getElementById("overlay");
     function openDrawer() {
+      syncCurrentIntoList(); persistList();
       renderReportList();
       overlay.hidden = false;
       requestAnimationFrame(() => {
@@ -3814,7 +4198,8 @@
         mitarbeiter: String(m.mitarbeiterName || "").trim() || noQ(v.messtechniker),
         beschr1: String(m.beschreibung1 || "").trim() || [meta.kunde, meta.strasse, meta.ort].filter(Boolean).join(", "),
         beschr2: String(m.beschreibung2 || "").trim() || noQ(meta.auftragsart),
-        arbeiten: noQ(m.ausgefArbeiten),
+        arbeiten: String(m.ausgefArbeiten || "").trim() || "Nicht definiert",
+        artikel: artikelRows().map((r) => ({ nr: noQ(r.nr), text: noQ(r.text), menge: noQ(r.menge), einheit: noQ(r.einheit), pos: noQ(r.pos) })),
         nameMa: String(m.sigNameMa || "").trim() || noQ(v.messtechniker),
         nameKunde: String(m.sigNameKunde || "").trim() || noQ(meta.kunde),
         datum: today
@@ -3855,7 +4240,7 @@
       let y = 31;
 
       /* 1) Kunde | Auftragnehmer und Einsatzort | Zuständig: EINE durchgehende Tabelle */
-      [["Kunde", d.kunde, "Auftragnehmer", d.auftragnehmer], ["Einsatzort", d.einsatzort, "Zuständig", d.zustaendig]].forEach((r) => {
+      [["Kunde", d.kunde, "Auftragnehmer", d.auftragnehmer], ["Standort", d.einsatzort, "Zuständig", d.zustaendig]].forEach((r) => {
         label(L, y, HALF, HH, r[0]); label(L + HALF, y, HALF, HH, r[2]);
         y += HH;
         const h = Math.max(textH(r[1], HALF, 3), textH(r[3], HALF, 3));
@@ -3883,10 +4268,26 @@
       content(L, y, W, textH(d.beschr1, W, 1), d.beschr1, 2); y += textH(d.beschr1, W, 1);
       content(L, y, W, textH(d.beschr2, W, 1), d.beschr2, 2); y += textH(d.beschr2, W, 1);
       label(L, y, W, HH, "Ausgeführte Arbeiten"); y += HH;
-      const maxArb = Math.max(2, Math.floor((236 - y - 2 * PAD) / lh));
+      const maxArb = Math.max(2, Math.min(10, Math.floor((236 - y - 2 * PAD) / lh)));
       const ah = textH(d.arbeiten, W, 1);
       content(L, y, W, Math.min(ah, maxArb * lh + 2 * PAD), d.arbeiten, maxArb);
       y += Math.min(ah, maxArb * lh + 2 * PAD);
+
+      /* 4b) Artikeltabelle (Artikel-Nr. | Beschreibung | Anzahl | Einheit | Position-Nr.) + Material Gesamt */
+      {
+        const cw = [28, 92, 18, 20, 22];
+        const xs = []; cw.reduce((acc, w, i) => { xs[i] = acc; return acc + w; }, L);
+        ["Artikel-Nr.", "Beschreibung", "Anzahl", "Einheit", "Position-Nr."].forEach((t, i) => label(xs[i], y, cw[i], HH, t));
+        y += HH;
+        d.artikel.forEach((r) => {
+          const h = textH(r.text, cw[1], 1);
+          [r.nr, r.text, r.menge, r.einheit, r.pos].forEach((t, i) => content(xs[i], y, cw[i], h, t, 3));
+          y += h;
+        });
+        label(L, y, cw[0] + cw[1], HH, "Material Gesamt");
+        valueMid(L + cw[0] + cw[1], y, W - cw[0] - cw[1], HH, "0,00");
+        y += HH;
+      }
 
       /* 5) Unterschriften: ca. 45 pt unter dem Text, zwei aneinanderstoßende Boxen, linksbündig */
       y += 45 / MM;
@@ -4150,23 +4551,82 @@
     }
 
     /* ----- Report-Ansicht (Servicereport-Felder + Dokumente erzeugen) ----- */
+    /* ----- Report-Seite: Live-Vorschau des Servicereports + Bearbeitung darunter ----- */
+    function artikelRows() {
+      const a = current.mitarbeiter && current.mitarbeiter.artikel;
+      return (Array.isArray(a) ? a : []).filter((r) => r && [r.nr, r.text, r.menge, r.einheit, r.pos].some((x) => String(x || "").trim()));
+    }
+    function reportPreviewHtml() {
+      const d = serviceData();
+      const missing = !(sigPresent("ma") && sigPresent("kunde"));
+      const nl = (s) => escapeHtml(s).replace(/\n/g, "<br>");
+      const ed = (id, s) => `<td data-edit="${id}" class="rp-ed">${nl(s)}</td>`;
+      const rows = artikelRows();
+      return `<div class="rp-paper${missing ? " rp-missing" : ""}" id="rpPaper">
+        <div class="rp-title">Service Report</div>
+        <div class="rp-nr">Auftrag:${escapeHtml(d.nr)}</div>
+        <table class="rp-t rp-two">
+          <tr><th>Kunde</th><th>Auftragnehmer</th></tr>
+          <tr><td>${nl(d.kunde)}</td>${ed("auftragnehmer", d.auftragnehmer)}</tr>
+          <tr><th>Standort</th><th>Zuständig</th></tr>
+          <tr>${ed("einsatzort", d.einsatzort)}${ed("zustaendig", d.zustaendig)}</tr>
+        </table>
+        <table class="rp-t rp-narrow">
+          <tr><th>Starttermin</th><td>${escapeHtml(d.start)}</td></tr>
+          <tr><th>Fertigtermin</th><td>${escapeHtml(d.ende)}</td></tr>
+        </table>
+        <table class="rp-t rp-narrow">
+          <tr><th>Mitarbeiter</th></tr>
+          <tr>${ed("mitarbeiterName", d.mitarbeiter)}</tr>
+        </table>
+        <table class="rp-t">
+          <tr><th>Beschreibung</th></tr>
+          <tr>${ed("beschreibung1", d.beschr1)}</tr>
+          <tr>${ed("beschreibung2", d.beschr2)}</tr>
+          <tr><th>Ausgeführte Arbeiten</th></tr>
+          <tr>${ed("ausgefArbeiten", d.arbeiten)}</tr>
+        </table>
+        <table class="rp-t rp-art">
+          <tr><th>Artikel-Nr.</th><th>Beschreibung</th><th class="r">Anzahl</th><th>Einheit</th><th>Position-Nr.</th></tr>
+          ${rows.map((r) => `<tr><td>${escapeHtml(r.nr)}</td><td>${escapeHtml(r.text)}</td><td class="r">${escapeHtml(r.menge)}</td><td>${escapeHtml(r.einheit)}</td><td>${escapeHtml(r.pos)}</td></tr>`).join("")}
+          <tr class="rp-sum"><th colspan="2">Material Gesamt</th><td colspan="3">0,00</td></tr>
+        </table>
+        ${missing ? '<div class="rp-wm" aria-hidden="true"></div>' : ""}
+      </div>`;
+    }
+    function artikelEditorHtml() {
+      const a = Array.isArray(current.mitarbeiter.artikel) ? current.mitarbeiter.artikel : [];
+      const cols = [["nr", "Artikel-Nr."], ["text", "Beschreibung"], ["menge", "Anzahl"], ["einheit", "Einheit"], ["pos", "Position-Nr."]];
+      return `<div class="art-ed">
+        ${a.map((r, i) => `<div class="art-row" data-art-row="${i}">
+          ${cols.map((c) => `<input type="text" class="art-in art-${c[0]}" data-art="${i}:${c[0]}" value="${attr(r[c[0]] || "")}" placeholder="${c[1]}" aria-label="${c[1]}" />`).join("")}
+          <button type="button" class="icon-btn" data-art-del="${i}" title="Position löschen" aria-label="Position löschen">${ICO.trash}</button>
+        </div>`).join("")}
+        <button type="button" class="btn" id="btnArtAdd">+ Position hinzufügen</button>
+      </div>`;
+    }
     function renderReport() {
       sigSyncOwner();
-      const m = current.mitarbeiter || {};
       const v = current.values || {};
       const meta = current.meta || {};
       const f = (id, label, ph, area) => `<div class="row${area ? " label-top" : ""}"><label class="lbl" for="mit-${id}">${label}</label>${mitInput(id, "text", ph, area)}</div>`;
       const stat = (k, t) => `<div class="doc-stat"><span class="status-dot ${sigPresent(k) ? "ok" : "missing"}"></span>${t}: ${sigPresent(k) ? "vorhanden" : "fehlt"}</div>`;
-      return `<div class="section" style="margin-top:8px"><div class="section-title">Servicereport</div></div>
+      const st = current.status === "abgeschlossen"
+        ? `<div class="rp-status ${current.sync === "wartet" ? "warn" : "ok"}">${current.sync === "wartet" ? "⟳ Abgeschlossen – wartet auf Sync" : "✓ Abgeschlossen" + (current.sync === "gesendet" ? " und gesendet" : "")}</div>` : "";
+      return `${st}<div class="rp-wrap" id="rpWrap">${reportPreviewHtml()}</div>
+        <p class="doc-hint">Vorschau des Servicereports. Zum Ändern ein Feld in der Vorschau antippen oder unten bearbeiten. Starttermin und Fertigtermin kommen aus „Termin von/bis“ in den Auftragsdetails.</p>
+        <div class="section"><div class="section-title">Felder bearbeiten</div></div>
         <div class="card">
           ${f("auftragnehmer", "Auftragnehmer", "", true)}
           ${f("zustaendig", "Zuständig", "Nicht definiert", false)}
-          ${f("einsatzort", "Einsatzort", "leer = Kundenadresse", true)}
+          ${f("einsatzort", "Standort", "leer = Kundenadresse", true)}
           ${f("mitarbeiterName", "Mitarbeiter", v.messtechniker || "z. B. DÜW-WS-850 WSB", false)}
           ${f("beschreibung1", "Beschreibung", [meta.kunde, meta.strasse, meta.ort].filter(Boolean).join(", ") || "z. B. WS WEG Am Schlossberg 10, Maikammer", false)}
           ${f("beschreibung2", "Beschreibung 2", meta.auftragsart || "z. B. Wasserschaden", false)}
+          ${f("ausgefArbeiten", "Ausgeführte Arbeiten", "Nicht definiert", true)}
         </div>
-        <p class="doc-hint">Starttermin und Fertigtermin kommen aus „Termin von/bis“ in den Auftragsdetails (sonst Start-/Endzeit unter Mitarbeiter). „Ausgeführte Arbeiten“ steht unter Mitarbeiter.</p>
+        <div class="section"><div class="section-title">Artikelpositionen</div></div>
+        <div class="card" id="artCard">${artikelEditorHtml()}</div>
         <div class="section"><div class="section-title">Dokumente</div></div>
         <div class="card doc-card">
           ${stat("ma", "Unterschrift Monteur")}
@@ -4175,9 +4635,40 @@
           <p class="doc-hint">Erzeugt Leckortungsbericht (PDF), Servicereport (PDF) und Notizen (Word). Danach werden die Unterschriften aus dem Speicher gelöscht.</p>
         </div>`;
     }
+    function refreshReportPreview() {
+      const w = document.getElementById("rpWrap");
+      if (w) { w.innerHTML = reportPreviewHtml(); bindPreviewEdit(); }
+    }
+    function bindPreviewEdit() {
+      document.querySelectorAll("#rpWrap [data-edit]").forEach((td) => td.addEventListener("click", () => {
+        const el = document.getElementById("mit-" + td.getAttribute("data-edit"));
+        if (el) { el.scrollIntoView({ block: "center", behavior: "smooth" }); el.focus({ preventScroll: true }); }
+      }));
+    }
     function bindReport() {
       const b = document.getElementById("btnDocsGen");
       if (b) b.addEventListener("click", () => { erzeugeDokumente(); });
+      bindPreviewEdit();
+      main.querySelectorAll("[data-mit]").forEach((el) => el.addEventListener("input", refreshReportPreview));
+      const card = document.getElementById("artCard");
+      const bindArt = () => {
+        card.querySelectorAll("[data-art]").forEach((el) => el.addEventListener("input", () => {
+          const [i, k] = el.getAttribute("data-art").split(":");
+          current.mitarbeiter.artikel[Number(i)][k] = el.value;
+          persistCurrent(); refreshReportPreview();
+        }));
+        card.querySelectorAll("[data-art-del]").forEach((el) => el.addEventListener("click", () => {
+          current.mitarbeiter.artikel.splice(Number(el.getAttribute("data-art-del")), 1);
+          persistCurrent(); card.innerHTML = artikelEditorHtml(); bindArt(); refreshReportPreview();
+        }));
+        document.getElementById("btnArtAdd").addEventListener("click", () => {
+          current.mitarbeiter.artikel.push({ nr: "", text: "", menge: "1,00", einheit: "Stck", pos: "" });
+          persistCurrent(); card.innerHTML = artikelEditorHtml(); bindArt(); refreshReportPreview();
+          const ins = card.querySelectorAll(".art-row"); const last = ins[ins.length - 1];
+          if (last) last.querySelector("input").focus();
+        });
+      };
+      bindArt();
     }
 
     /* ----- Export: drei Dateien + Ergebnis-Fenster ----- */
