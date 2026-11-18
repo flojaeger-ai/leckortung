@@ -1054,7 +1054,7 @@
       <button class="btn" id="btnExport">JSON exportieren</button>
       <button class="btn btn-quiet" id="btnExportEasyTec" title="Fotoreihenfolge, Kommentare, Druck und Markierungen als JSON (ohne Bilder) für die Übergabe an EasyTec">Export für EasyTec</button>
       <button class="btn primary" id="btnDocs" title="Leckortungsbericht (PDF), Servicereport (PDF) und Notizen (Word) erzeugen">Dokumente erzeugen (3)</button>
-      <button class="btn" id="btnPrint">Drucken / PDF</button>
+      <button class="btn" id="btnPrint">Leckortungsbericht (PDF)</button>
     </div>
     <input class="hidden-file" id="icloudFileInput" type="file" accept=".json,application/json" />
   </aside>
@@ -1079,7 +1079,7 @@
 
   <script>
   (function () {
-    const APP_VERSION = 25; /* Version 25 */
+    const APP_VERSION = 26; /* Version 26 */
     const STORAGE_CURRENT = "leckortung.current";
     const STORAGE_LIST = "leckortung.reports";
     const DB_NAME = "leckortung";
@@ -3594,10 +3594,20 @@
     }
 
     document.getElementById("btnPrint").addEventListener("click", async () => {
-      persistCurrent();
-      await buildPrint();
-      closeDrawer();
-      setTimeout(() => window.print(), 80);
+      /* Version 26: erzeugt den Leckortungsbericht im neuen Layout (wie "Dokumente erzeugen"), nicht mehr den alten Browser-Druck */
+      try {
+        if (view === "fotodetail") readPhotoDetailIntoModel();
+        persistCurrent();
+        closeDrawer();
+        toast("Leckortungsbericht wird erzeugt…");
+        const meta = current.meta || {};
+        const base = safeFilePart(meta.auftragsNr || (current.values && current.values.schadenNr) || (current.values && current.values.datum) || current.id) || "Auftrag";
+        const pdf1 = buildLeckPdf(await collectPhotoImages());
+        await saveFiles([new File([pdf1], base + "_Leckortungsbericht.pdf", { type: "application/pdf" })]);
+      } catch (err) {
+        console.error(err);
+        toast("Leckortungsbericht konnte nicht erzeugt werden.", true);
+      }
     });
 
     /* ================= Dokumente (3): PDF-Writer, DOCX-Writer, Unterschriften ================= */
