@@ -1004,7 +1004,7 @@
 
   <script>
   (function () {
-    const APP_VERSION = 19; /* Version 19 */
+    const APP_VERSION = 20; /* Version 20 */
     const STORAGE_CURRENT = "leckortung.current";
     const STORAGE_LIST = "leckortung.reports";
     const DB_NAME = "leckortung";
@@ -3361,11 +3361,11 @@
     }
     function lhMm(size, f) { return size * f / MM; }
     function drawBox(doc, x, top, on) {
-      const s = 8.5 / MM;
-      doc.rect(x, top, s, s, { fill: "#ffffff", stroke: "#111111", lw: 0.7 });
+      const s = 8 / MM;
+      doc.rect(x, top, s, s, { fill: "#ffffff", stroke: "#111111", lw: 0.6 });
       if (on) {
-        const w = textWidthMm("X", 7.5, true);
-        doc.text(x + (s - w) / 2, top + s / 2 + 0.358 * 7.5 / MM, "X", 7.5, true, "#111111");
+        const w = textWidthMm("X", 7, true);
+        doc.text(x + (s - w) / 2, top + s / 2 + 0.358 * 7 / MM, "X", 7, true, "#111111");
       }
     }
     /* parts: string | {b:string} | {box:bool} | {sp:mm} */
@@ -3469,55 +3469,71 @@
         });
         return lines.length;
       }
-      function hU(t) {
-        begin(3.5);
-        need(lhMm(11, F) + 3);
-        doc.text(LEFT, baselineMm(y, 11, F), t, 11, true, "#111111");
-        y += lhMm(11, F) + 0.6;
-        doc.line(LEFT, y, LEFT + CW, y, 0.8, "#111111");
-        y += 0.28;
-        end(2);
+      /* ---- Version 20: kompakter Stil (7,5 pt), Kästchen vor dem Text, feste Spalten ---- */
+      const FS = 7.5, FL = 1.3, LH = lhMm(FS, FL), BOX = 8 / MM;
+      const px = (pct) => LEFT + pct * CW;
+      const filled = (s) => !!String(s || "").trim();
+      const cb = (on, label) => ({ on: !!on, label });
+      function hU(t) { /* große, unterstrichene Überschrift */
+        begin(3.5); need(lhMm(11, F) + 12);
+        const base = baselineMm(y, 11, F);
+        doc.text(LEFT, base, t, 11, true, "#111111");
+        doc.line(LEFT, base + 1.1 / MM, LEFT + textWidthMm(t, 11, true), base + 1.1 / MM, 0.8, "#111111");
+        y += lhMm(11, F); end(1.8);
       }
-      function hSub(t) {
-        begin(2.6); need(lhMm(10, F) + 4);
-        doc.text(LEFT, baselineMm(y, 10, F), t, 10, true, "#111111");
-        y += lhMm(10, F);
-        end(0.8);
+      function hSub(t) { /* kleine fette Überschrift */
+        begin(2.4); need(LH * 3);
+        doc.text(LEFT, baselineMm(y, FS, FL), t, FS, true, "#111111");
+        y += LH; end(0.5);
       }
       function bodyText(t) {
         begin(0);
-        const startY = y;
-        textBlock(t, { fs: 9.5 });
-        const used = y - startY;
-        if (used < 7) y = startY + 7;
-        end(1.2);
-      }
-      function lineParts(parts, mb) {
-        begin(0); need(lineH(9.5));
-        drawInline(doc, LEFT, y, parts, 9.5, F);
-        y += lineH(9.5);
-        end(mb == null ? 1.3 : mb);
-      }
-      function cbGrid(items, cols, mt, mb) {
-        begin(mt == null ? 1 : mt);
-        const colW = (CW - (cols - 1) * 4) / cols;
-        const iconW = 8.5 / MM + 2;
-        for (let i = 0; i < items.length; i += cols) {
-          const row = items.slice(i, i + cols).map((it) => wrapLines(it.label, colW - iconW, 9, false));
-          const h = Math.max(...row.map((l) => Math.max(l.length * lhMm(9, F), 8.5 / MM)));
-          need(h);
-          row.forEach((lines, k) => {
-            const x = LEFT + k * (colW + 4);
-            const it = items[i + k];
-            drawBox(doc, x, y + (h - 8.5 / MM) / 2, !!it.on);
-            lines.forEach((ln, li) => doc.text(x + iconW, baselineMm(y + (h - lines.length * lhMm(9, F)) / 2 + li * lhMm(9, F), 9, F), ln, 9, false, "#111111"));
-          });
-          y += h + (i + cols < items.length ? 0.8 : 0);
+        const lines = wrapLines(t, CW, FS, false);
+        const n = Math.max(lines.length, 2);
+        need(Math.min(n, 3) * LH);
+        for (let i = 0; i < n; i++) {
+          need(LH);
+          if (lines[i]) doc.text(LEFT, baselineMm(y, FS, FL), lines[i], FS, false, "#111111");
+          y += LH;
         }
-        end(mb == null ? 2.5 : mb);
+        end(1);
       }
-      const cb = (on, label) => ({ on: !!on, label });
-      const filled = (s) => !!String(s || "").trim();
+      function row(draw, h) { begin(0); need(h || LH); draw(y); y += (h || LH); end(0.8); }
+      function boxLabel(x, top, on, label, bold) {
+        drawBox(doc, x, top + (LH - BOX) / 2, !!on);
+        if (label) doc.text(x + BOX + 1.4, baselineMm(top, FS, FL), label, FS, !!bold, "#111111");
+      }
+      /* Kästchen-Gruppe: zwei Spalten, zweite Spalte bei colPct der Inhaltsbreite */
+      function cbPairs(items, colPct) {
+        for (let i = 0; i < items.length; i += 2) {
+          row((top) => {
+            boxLabel(LEFT, top, items[i].on, items[i].label);
+            if (items[i + 1]) boxLabel(px(colPct), top, items[i + 1].on, items[i + 1].label);
+          });
+        }
+      }
+      /* Zeile "Label  [ ] Ja  [ ] Nein" mit festen Spalten; extra = Zusatz bei 57 % */
+      function ynRow(label, on, extra) {
+        row((top) => {
+          doc.text(LEFT, baselineMm(top, FS, FL), label, FS, false, "#111111");
+          boxLabel(px(0.36), top, !!on, "Ja");
+          boxLabel(px(0.43), top, !on, "Nein");
+          if (extra) {
+            if (extra.box !== undefined) boxLabel(px(0.57), top, extra.box, extra.label);
+            else doc.text(px(0.57), baselineMm(top, FS, FL), extra.text, FS, false, "#111111");
+          }
+        });
+      }
+      /* Zeile "Label:  Wert" – Wert bei 20 % */
+      function kv(label, value) {
+        begin(0);
+        const lines = wrapLines(noQ(value), CW * 0.8, FS, false);
+        const n = Math.max(1, lines.length);
+        need(n * LH);
+        doc.text(LEFT, baselineMm(y, FS, FL), label, FS, false, "#111111");
+        lines.forEach((ln, i) => { if (ln) doc.text(px(0.2), baselineMm(y + i * LH, FS, FL), ln, FS, false, "#111111"); });
+        y += n * LH; end(0.8);
+      }
 
       /* Seite 1 */
       newPage();
@@ -3558,141 +3574,151 @@
       end(4);
       begin(3);
       doc.text(LEFT, baselineMm(y, 15, F), "Schadenaufnahme", 15, true, "#111111");
-      y += lhMm(15, F); end(3.5);
+      y += lhMm(15, F); end(3);
       begin(0);
       {
-        const parts = ["Messtermin am: " + messDatum, "Uhrzeit von: " + fmtTimeUhr(v.messterminVon), "bis: " + fmtTimeUhr(v.messterminBis)];
+        const base = baselineMm(y, 9.5, F);
         let cx = LEFT;
-        parts.forEach((t) => { doc.text(cx, baselineMm(y, 9.5, F), t, 9.5, false, "#111111"); cx += textWidthMm(t, 9.5, false) + 8; });
-        y += lineH(9.5); end(1.4);
+        [["Messtermin am: ", messDatum], ["   Uhrzeit von: ", fmtTimeUhr(v.messterminVon)], ["   bis: ", fmtTimeUhr(v.messterminBis)]].forEach(([l, val]) => {
+          doc.text(cx, base, l, 9.5, true, "#111111"); cx += textWidthMm(l, 9.5, true);
+          doc.text(cx, base, val, 9.5, false, "#111111"); cx += textWidthMm(val, 9.5, false);
+        });
+        y += lineH(9.5); end(1.2);
       }
-      lineParts(["Messtechniker: " + noQ(v.messtechniker)]);
-      lineParts(["Mobil-Nr.: " + noQ(v.messtechnikerTel)]);
+      [["Messtechniker: ", v.messtechniker], ["Mobil-Nr.: ", v.messtechnikerTel]].forEach(([l, val]) => {
+        begin(0); need(lineH(9.5));
+        const base = baselineMm(y, 9.5, F);
+        doc.text(LEFT, base, l, 9.5, true, "#111111");
+        doc.text(LEFT + textWidthMm(l, 9.5, true), base, noQ(val), 9.5, false, "#111111");
+        y += lineH(9.5); end(1.2);
+      });
+
+      /* Allgemeine Informationen */
       hU("Allgemeine Informationen");
       hSub("Anwesende Personen");
-      cbGrid([cb(v.anwesendVn, "Versicherungsnehmer"), cb(v.anwesendMieter, "Mieter"), cb(v.anwesendEigentuemer, "Eigentümer"), cb(v.anwesendInstallateur, "Installateur"), cb(v.anwesendSonstige, "sonstige Person")], 2);
-      lineParts(["Person vor Ort: " + noQ(v.personVorOrt) + (v.personVorOrtTel ? "   Telefon-Nr.: " + v.personVorOrtTel : "")]);
+      cbPairs([cb(v.anwesendVn, "Versicherungsnehmer"), cb(v.anwesendMieter, "Mieter"), cb(v.anwesendEigentuemer, "Eigentümer"), cb(v.anwesendInstallateur, "Installateur")], 0.45);
+      row((top) => {
+        boxLabel(LEFT, top, v.anwesendSonstige, "sonstige Person:");
+        doc.text(LEFT + BOX + 1.4 + textWidthMm("sonstige Person:", FS, false) + 1.5, baselineMm(top, FS, FL),
+          noQ(v.personVorOrt) + (v.personVorOrtTel ? "   Telefon-Nr.: " + v.personVorOrtTel : ""), FS, false, "#111111");
+      });
       hSub("Allgemeine Informationen"); bodyText(v.allgemeineInformationen);
-      hSub("Aufgabenstellung/vorgefundenes Schadensbild"); bodyText(v.schadensbild);
+      hSub("Vorgefundenes Schadensbild"); bodyText(v.schadensbild);
       hSub("Kurzergebnis zur Schadensursache"); bodyText(v.schadensursache);
       hSub("Kurzbeschreibung der durchgeführten Arbeiten"); bodyText(v.durchgefuehrteArbeiten);
+      begin(1.5);
+      ynRow("Schadensstelle geöffnet", v.schadensstelleGeoeffnet, { text: "durch: " + noQ(v.geoeffnetDurch) });
+      ynRow("Fliese(n) entnommen", v.fliesenEntnommen, { text: "Anzahl: " + noQ(v.fliesenAnzahl == null ? "" : v.fliesenAnzahl) });
+      ynRow("Schadensursache gefunden", v.schadensursacheGefunden, { box: !!v.folgeterminNotwendig, label: "Folgetermin Notwendig" });
 
-      /* Seite 2 */
-      newPage();
-      const leitungen = [
-        ["Kaltwasserleitung", v.kwGeprueft, v.kwDruckverlust],
-        ["Warmwasserleitung", v.wwGeprueft, v.wwDruckverlust],
-        ["Zirkulationsleitung", v.zirkGeprueft, v.zirkDruckverlust],
-        ["Heizungsleitung", v.hzGeprueft, v.hzDruckverlust],
-        ["Fußbodenheizung", v.fbhGeprueft, v.fbhDruckverlust],
-        ["Außenleitung", v.aussenGeprueft, v.aussenDruckverlust],
-        ["Abwasserleitung", v.awGeprueft, v.awUndicht],
-        ["Grundleitung", v.grundGeprueft, v.grundUndicht],
-        ["Regenleitung", v.regenGeprueft, v.regenUndicht],
-        ["Flachdach angestaut", v.flachdachGeprueft, v.flachdachUndicht],
-        ["sonstiges" + (v.sonstigesLeitung ? " (" + v.sonstigesLeitung + ")" : ""), filled(v.sonstigesLeitung), v.sonstigesUndicht]
-      ];
-      hU("Prüfungen");
-      lineParts(["Druckprüfung durchgeführt: "].concat(ynParts(v.druckpruefungDurchgefuehrt)));
-      lineParts(["Leitung: " + noQ(v.leitung)]);
-      lineParts(["Ergebnis: " + noQ(v.ergebnis)]);
+      /* Prüfungen */
+      begin(0); need(82); /* Überschrift, Zeilen und Tabelle zusammenhalten */
+      hSub("Prüfungen");
+      ynRow("Druckprüfung durchgeführt", v.druckpruefungDurchgefuehrt);
+      kv("Leitung:", v.leitung);
+      kv("Ergebnis:", v.ergebnis);
       {
-        begin(2);
-        const cw = 16, lw = CW - 4 * cw;
-        const rowH = 6.3, h1 = 2 * lhMm(8.5, F) + 2, h2 = 6.3;
-        need(h1 + h2 + rowH * leitungen.length);
+        const leitungen = [
+          ["Kaltwasserleitung", v.kwGeprueft, v.kwDruckverlust],
+          ["Warmwasserleitung", v.wwGeprueft, v.wwDruckverlust],
+          ["Zirkulationsleitung", v.zirkGeprueft, v.zirkDruckverlust],
+          ["Heizungsleitung", v.hzGeprueft, v.hzDruckverlust],
+          ["Fußbodenheizung", v.fbhGeprueft, v.fbhDruckverlust],
+          ["Außenleitung", v.aussenGeprueft, v.aussenDruckverlust],
+          ["Abwasserleitung", v.awGeprueft, v.awUndicht],
+          ["Grundleitung", v.grundGeprueft, v.grundUndicht],
+          ["Regenleitung", v.regenGeprueft, v.regenUndicht],
+          ["Flachdach angestaut", v.flachdachGeprueft, v.flachdachUndicht],
+          ["sonstiges" + (v.sonstigesLeitung ? " (" + v.sonstigesLeitung + ")" : ""), filled(v.sonstigesLeitung), v.sonstigesUndicht]
+        ];
+        begin(1.5);
+        const cw = 18, lw = CW - 72, rowH = 5, hh = 5;
+        const tw = lw + 4 * cw;
+        need(hh + 5 + rowH * leitungen.length);
         const x0 = LEFT, bd = "#333333";
-        const cell = (x, yy, w, h, fill) => doc.rect(x, yy, w, h, { fill: fill || null, stroke: bd, lw: 0.5 });
-        const ctext = (t, x, yy, w, h, bold) => { const tw = textWidthMm(t, 8.5, bold); doc.text(x + (w - tw) / 2, baselineMm(yy + (h - lhMm(8.5, F)) / 2, 8.5, F), t, 8.5, bold, "#111111"); };
-        cell(x0, y, lw, h1 + h2, "#f3f3f3");
-        doc.text(x0 + 1.4, baselineMm(y + (h1 + h2 - lhMm(8.5, F)) / 2, 8.5, F), "Leitung", 8.5, true, "#111111");
-        cell(x0 + lw, y, 2 * cw, h1 - 0, "#f3f3f3"); ctext("geprüft", x0 + lw, y, 2 * cw, h1, true);
-        cell(x0 + lw + 2 * cw, y, 2 * cw, h1, "#f3f3f3");
-        doc.text(x0 + lw + 2 * cw + (2 * cw - textWidthMm("Druckverlust /", 8.5, true)) / 2, baselineMm(y + 1, 8.5, F), "Druckverlust /", 8.5, true, "#111111");
-        doc.text(x0 + lw + 2 * cw + (2 * cw - textWidthMm("Undicht", 8.5, true)) / 2, baselineMm(y + 1 + lhMm(8.5, F), 8.5, F), "Undicht", 8.5, true, "#111111");
-        ["Ja", "Nein", "Ja", "Nein"].forEach((t, i) => { cell(x0 + lw + i * cw, y + h1, cw, h2, "#f3f3f3"); ctext(t, x0 + lw + i * cw, y + h1, cw, h2, true); });
-        let yy = y + h1 + h2;
+        const cell = (x, yy, w, h, fill) => doc.rect(x, yy, w, h, { fill: fill || null, stroke: bd, lw: 0.4 });
+        const ctext = (t, x, yy, w, h) => { const w2 = textWidthMm(t, FS, true); doc.text(x + (w - w2) / 2, baselineMm(yy + (h - LH) / 2, FS, FL), t, FS, true, "#111111"); };
+        cell(x0, y, lw, hh + 5, "#f3f3f3");
+        doc.text(x0 + 1.2, baselineMm(y + (hh + 5 - LH) / 2, FS, FL), "Leitung", FS, true, "#111111");
+        cell(x0 + lw, y, 2 * cw, 5, "#f3f3f3"); ctext("geprüft", x0 + lw, y, 2 * cw, 5);
+        cell(x0 + lw + 2 * cw, y, 2 * cw, 5, "#f3f3f3"); ctext("Druckverlust / Undicht", x0 + lw + 2 * cw, y, 2 * cw, 5);
+        ["Ja", "Nein", "Ja", "Nein"].forEach((t, i) => { cell(x0 + lw + i * cw, y + 5, cw, hh, "#f3f3f3"); ctext(t, x0 + lw + i * cw, y + 5, cw, hh); });
+        let yy = y + 5 + hh;
         leitungen.forEach(([label, gep, flag]) => {
           cell(x0, yy, lw, rowH);
-          doc.text(x0 + 1.4, baselineMm(yy + (rowH - lhMm(8.5, F)) / 2, 8.5, F), label, 8.5, false, "#111111");
+          doc.text(x0 + 1.2, baselineMm(yy + (rowH - LH) / 2, FS, FL), label, FS, false, "#111111");
           [!!gep, !gep, !!flag, !flag].forEach((on, i) => {
             cell(x0 + lw + i * cw, yy, cw, rowH);
-            drawBox(doc, x0 + lw + i * cw + (cw - 8.5 / MM) / 2, yy + (rowH - 8.5 / MM) / 2, on);
+            drawBox(doc, x0 + lw + i * cw + (cw - BOX) / 2, yy + (rowH - BOX) / 2, on);
           });
           yy += rowH;
         });
-        y = yy; end(3.5);
+        y = yy; end(1.5);
       }
       hSub("Methoden");
-      const tr = String(v.tracerKg || "").trim();
-      cbGrid([
-        cb(v.methodeFeuchte, "Feuchtigkeitsmessung"), cb(v.methodeAkustik, "Akustik"), cb(v.methodeLeitungsortung, "Leitungsortung"),
-        cb(tr && tr !== "0,0" && tr !== "0", "Trace-/Prüfgas  " + (v.tracerKg || "0,0") + " kg"),
-        cb(v.methodeThermografie, "Thermografie"), cb(v.methodeKanalkamera, "Kanalkamera"),
-        cb(v.methodeVideoendoskopie, "Videoendoskopie"), cb(v.methodeFaerbemittel, "Färbemittel"),
-        cb(filled(v.methodeSonstiges), "sonstige Methode" + (v.methodeSonstiges ? ": " + v.methodeSonstiges : ""))
-      ], 3);
-      lineParts(["Schadensstelle geöffnet: "].concat(ynParts(v.schadensstelleGeoeffnet), ["   durch: " + noQ(v.geoeffnetDurch)]));
-      lineParts(["Fliese(n) entnommen: "].concat(ynParts(v.fliesenEntnommen), ["   Anzahl: " + noQ(v.fliesenAnzahl == null ? "" : v.fliesenAnzahl)]));
-      lineParts(["Schadensursache gefunden: "].concat(ynParts(v.schadensursacheGefunden)));
-      lineParts(["Folgetermin Notwendig: "].concat(ynParts(v.folgeterminNotwendig)));
+      {
+        const tr = String(v.tracerKg || "").trim();
+        cbPairs([
+          cb(v.methodeFeuchte, "Feuchtigkeitsmessung"), cb(v.methodeAkustik, "Akustik"),
+          cb(v.methodeLeitungsortung, "Leitungsortung"), cb(tr && tr !== "0,0" && tr !== "0", "Trace-/Prüfgas  " + (v.tracerKg || "0,0") + " kg"),
+          cb(v.methodeThermografie, "Thermografie"), cb(v.methodeKanalkamera, "Kanalkamera"),
+          cb(v.methodeVideoendoskopie, "Videoendoskopie"), cb(v.methodeFaerbemittel, "Färbemittel")
+        ], 0.45);
+        row((top) => boxLabel(LEFT, top, filled(v.methodeSonstiges), "sonstige Methode:" + (v.methodeSonstiges ? " " + v.methodeSonstiges : "")));
+      }
       hSub("Wichtige Besonderheiten / Empfehlungen"); bodyText(v.besondereEmpfehlungen);
       hSub("Hinweispflicht zum Messergebnis"); bodyText(v.hinweispflicht);
       hSub("Messtechnik"); bodyText(v.messtechnik);
 
-      /* Seite 3 */
-      newPage();
-      const kosten = String(v.shKostenschaetzung || "");
-      hU("Schadenregulierer/Sachverständiger Versicherung");
-      lineParts(["Halten wir für erforderlich: "].concat(ynParts(v.svErforderlich)));
-      lineParts(["Wurde informiert: "].concat(ynParts(v.svInformiert)));
-      lineParts(["Name: " + noQ(v.svName)]);
-      hU("Leitungssystem - Versorgung");
-      cbGrid([cb(v.vsHeizung, "Heizung"), cb(v.vsFbh, "Fußbodenheizung"), cb(v.vsWarmwasser, "Warmwasser"), cb(v.vsKaltwasser, "Kaltwasser"), cb(v.vsRegenwasser, "Regenwasser"), cb(filled(v.vsSonstiges), "sonstiges" + (v.vsSonstiges ? ": " + v.vsSonstiges : ""))], 3);
-      cbGrid([cb(v.vsKupfer, "Kupfer"), cb(v.vsStahl, "Stahl"), cb(v.vsWicu, "WICU"), cb(v.vsMehrverbund, "Mehrverbundrohr"), cb(v.vsKunststoff, "Kunststoff"), cb(filled(v.vsMaterialSonstiges), "sonstiges" + (v.vsMaterialSonstiges ? ": " + v.vsMaterialSonstiges : ""))], 3);
-      hU("Leitungssystem - Entsorgung");
-      cbGrid([cb(v.enSammelleitung, "Abwassersammelleitung"), cb(v.enStrang, "Abwasserstrang"), cb(v.enGrundleitung, "Abwassergrundleitung"), cb(v.enRegenwasser, "Regenwasserleitung"), cb(filled(v.enSonstiges), "sonstiges" + (v.enSonstiges ? ": " + v.enSonstiges : "")), cb(v.enAbflussKunststoff, "Abfluss/Kunststoff"), cb(v.enAbflussGuss, "Abfluss/Guss"), cb(filled(v.enMaterialSonstiges), "sonstiges" + (v.enMaterialSonstiges ? ": " + v.enMaterialSonstiges : ""))], 3);
-      hU("Weitere Empfehlungen / weitere Maßnahmen");
+      hSub("Schadenregulierer/Sachverständiger Versicherung");
+      ynRow("Halten wir für erforderlich", v.svErforderlich);
+      ynRow("Wurde informiert", v.svInformiert);
+      kv("Name:", v.svName);
+      hSub("Leitungssystem - Versorgung");
+      cbPairs([cb(v.vsHeizung, "Heizung"), cb(v.vsFbh, "Fußbodenheizung"), cb(v.vsWarmwasser, "Warmwasser"), cb(v.vsKaltwasser, "Kaltwasser"), cb(v.vsRegenwasser, "Regenwasser"), cb(filled(v.vsSonstiges), "sonstiges:" + (v.vsSonstiges ? " " + v.vsSonstiges : ""))], 0.45);
+      cbPairs([cb(v.vsKupfer, "Kupfer"), cb(v.vsStahl, "Stahl"), cb(v.vsWicu, "WICU"), cb(v.vsMehrverbund, "Mehrverbundrohr"), cb(v.vsKunststoff, "Kunststoff"), cb(filled(v.vsMaterialSonstiges), "sonstiges:" + (v.vsMaterialSonstiges ? " " + v.vsMaterialSonstiges : ""))], 0.45);
+      hSub("Leitungssystem - Entsorgung");
+      cbPairs([cb(v.enSammelleitung, "Abwassersammelleitung"), cb(v.enStrang, "Abwasserstrang"), cb(v.enGrundleitung, "Abwassergrundleitung"), cb(v.enRegenwasser, "Regenwasserleitung"), cb(filled(v.enSonstiges), "sonstiges:" + (v.enSonstiges ? " " + v.enSonstiges : "")), cb(v.enAbflussKunststoff, "Abfluss/Kunststoff"), cb(v.enAbflussGuss, "Abfluss/Guss"), cb(filled(v.enMaterialSonstiges), "sonstiges:" + (v.enMaterialSonstiges ? " " + v.enMaterialSonstiges : ""))], 0.45);
+
+      /* Weitere Empfehlungen / Gewerke / Schadenshöhe – direkt vor den Fotos */
+      hSub("Weitere Empfehlungen/ weitere Maßnahmen");
+      row((top) => {
+        boxLabel(LEFT, top, v.maReparaturInstallateur, "Reparatur durch Installateur erforderlich");
+        boxLabel(px(0.57), top, v.maSanierung, "Sanierung erforderlich");
+      });
+      kv("Schadensaufnahme:", v.maSchadensaufnahme);
+      kv("Trocknung:", v.maTrocknung);
+      kv("Sofortmaßnahme:", v.maSofortmassnahme);
+      row((top) => boxLabel(LEFT, top, v.maDetailsTrocknungsangebot, "Details siehe Trocknungsangebot (folgt)"));
+      y += LH * 0.6;
+      row((top) => boxLabel(LEFT, top, filled(v.maSonstiges), "sonstiges:" + (v.maSonstiges ? " " + v.maSonstiges : "")));
+      ynRow("Lochfrasswiederverschluss", v.alLochfrass);
+      ynRow("Schwitzwasser/Kondenswasserbildung", v.alSchwitzwasser);
+      ynRow("Armatur defekt/undicht", v.alArmatur);
+      ynRow("Silikonfugen undicht", v.alSilikonfugen);
+      ynRow("Fliesenfugen undicht", v.alFliesenfugen);
+      ynRow("Muffenversatz", v.alMuffenversatz);
+      kv("sonstiges:", v.alSonstiges);
+
+      hSub("Erforderliche Gewerke");
+      cbPairs([cb(v.gwMaurer, "Maurer"), cb(v.gwFliesenleger, "Fliesenleger"), cb(v.gwDachdecker, "Dachdecker"), cb(v.gwBodenleger, "Bodenleger"), cb(v.gwMalerTrockenbauer, "Maler / Trockenbauer"), cb(v.gwTrocknung, "Trocknung / Leckortung")], 0.38);
+      row((top) => boxLabel(LEFT, top, filled(v.gwSonstiges), "sonstiges:" + (v.gwSonstiges ? " " + v.gwSonstiges : "")));
+
+      hSub("Eingeschätzte Schadenshöhe");
       {
-        const pairs = [["Lochfrasswiederverschluss: ", v.alLochfrass], ["Schwitzwasser/Kondenswasserbildung: ", v.alSchwitzwasser], ["Armatur defekt/undicht: ", v.alArmatur], ["Silikonfugen undicht: ", v.alSilikonfugen], ["Fliesenfugen undicht: ", v.alFliesenfugen], ["Muffenversatz: ", v.alMuffenversatz]];
-        begin(0);
-        const half = (CW - 4) / 2;
-        for (let i = 0; i < pairs.length; i += 2) {
-          need(lineH(9.5));
-          pairs.slice(i, i + 2).forEach((p, k) => drawInline(doc, LEFT + k * (half + 4), y, [p[0]].concat(ynParts(p[1])), 9.5, F));
-          y += lineH(9.5) + 1.3;
-        }
-        end(0);
+        const kosten = String(v.shKostenschaetzung || "");
+        row((top) => boxLabel(LEFT, top, /über\s*2000/i.test(kosten), "über 2000,00 €"));
+        row((top) => boxLabel(LEFT, top, /unter\s*2000/i.test(kosten), "unter 2000,00 €"));
+        row((top) => boxLabel(LEFT, top, /nicht einzuschätzen/i.test(kosten), "nicht einzuschätzen"));
       }
-      if (v.alSonstiges) lineParts(["sonstiges: " + v.alSonstiges]);
-      y += 2.5;
-      {
-        begin(0); need(lineH(9.5));
-        const half2 = (CW - 4) / 2;
-        drawInline(doc, LEFT, y, ["Reparatur durch Installateur erforderlich: "].concat(ynParts(v.maReparaturInstallateur)), 9.5, F);
-        drawInline(doc, LEFT + half2 + 4, y, ["Sanierung erforderlich: "].concat(ynParts(v.maSanierung)), 9.5, F);
-        y += lineH(9.5); end(1.3);
-      }
-      lineParts(["Schadensaufnahme: " + noQ(v.maSchadensaufnahme)]);
-      lineParts(["Trocknung: " + noQ(v.maTrocknung)]);
-      lineParts(["Sofortmaßnahme: " + noQ(v.maSofortmassnahme)]);
-      cbGrid([cb(v.maDetailsTrocknungsangebot, "Details siehe Trocknungsangebot (folgt)")], 1, 0, 1.3);
-      lineParts(["sonstiges: " + noQ(v.maSonstiges)]);
-      hU("Erforderliche Gewerke");
-      cbGrid([cb(v.gwMaurer, "Maurer"), cb(v.gwFliesenleger, "Fliesenleger"), cb(v.gwDachdecker, "Dachdecker"), cb(v.gwBodenleger, "Bodenleger"), cb(v.gwMalerTrockenbauer, "Maler / Trockenbauer"), cb(v.gwTrocknung, "Trocknung / Leckortung"), cb(filled(v.gwSonstiges), "sonstiges" + (v.gwSonstiges ? ": " + v.gwSonstiges : ""))], 2);
-      hU("Eingeschätzte Schadenshöhe");
-      cbGrid([cb(/über\s*2000/i.test(kosten), "über 2000,00 €"), cb(/unter\s*2000/i.test(kosten), "unter 2000,00 €"), cb(/nicht einzuschätzen/i.test(kosten), "nicht einzuschätzen")], 3);
-      begin(0); need(lineH(8));
-      doc.text(LEFT, baselineMm(y, 8, F), "(keine Gesamtschadenermittlung)", 8, false, "#444444");
-      y += lineH(8);
 
       /* Fotoseiten: nur Fotos mit Druck-Haken, in der Reihenfolge der Fotoliste */
       let onPage = 0;
       photoImgs.forEach(({ p, img }) => {
-        const parts = commentParts(p.comment || p.name);
         const textW = CW - 82 - 7;
-        const tLines = wrapLines(parts.rest, textW, 9.5, false);
-        const textH = lhMm(10.5, F) + 3 + tLines.length * lhMm(9.5, 1.4);
+        /* gesamter Kommentar einheitlich: normale Schrift, 7,5 pt, alle Zeilen gleich */
+        const tLines = wrapLines(String(p.comment || p.name || "").replace(/^\n+|\n+$/g, ""), textW, FS, false);
+        const textH = tLines.length * LH;
         let ih = 0, iw = 0;
         if (img) {
           iw = 80; ih = 80 * img.h / img.w;
@@ -3700,9 +3726,8 @@
         }
         const rowH = Math.max(68, textH, ih);
         if (onPage === 0 || onPage >= 3 || y + rowH > BOTTOM) { newPage(); onPage = 0; y += pm; pm = 0; }
-        doc.text(LEFT, baselineMm(y, 10.5, F), parts.title, 10.5, true, "#111111");
-        let ty = y + lhMm(10.5, F) + 3;
-        tLines.forEach((ln) => { if (ln) doc.text(LEFT, baselineMm(ty, 9.5, 1.4), ln, 9.5, false, "#111111"); ty += lhMm(9.5, 1.4); });
+        let ty = y;
+        tLines.forEach((ln) => { if (ln) doc.text(LEFT, baselineMm(ty, FS, FL), ln, FS, false, "#111111"); ty += LH; });
         if (img) doc.image(doc.addImage(img.bytes, img.w, img.h, img.comps), LEFT + 91 + 7 + (80 - iw) / 2, y, iw, ih);
         y += rowH + 5;
         onPage++;
