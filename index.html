@@ -1004,7 +1004,7 @@
 
   <script>
   (function () {
-    const APP_VERSION = 18; /* Version 18 */
+    const APP_VERSION = 19; /* Version 19 */
     const STORAGE_CURRENT = "leckortung.current";
     const STORAGE_LIST = "leckortung.reports";
     const DB_NAME = "leckortung";
@@ -3740,56 +3740,86 @@
       const d = serviceData();
       const doc = new PdfDoc();
       doc.addPage();
-      const L = 15, W = 180, HALF = 90, GREY = "#d4d4d4", FS = 10, F = 1.3;
-      const pad = 2;
-      doc.text(L, 26, "Servicereport", 20, true);
-      doc.text(L, 34, "Auftrag : " + d.nr, 11, false);
-      let y = 40;
-      const head = (x, yy, w, t, h) => {
-        h = h || 7;
-        doc.rect(x, yy, w, h, { fill: GREY, stroke: "#000000", lw: 0.4 });
-        doc.text(x + pad, yy + h / 2 + 0.358 * FS / MM, t, FS, true);
+      const L = 15, W = 180, HALF = W / 2, GREY = "#d4d4d4", FS = 7.5, F = 1.25, PAD = 1.3, BD = 0.35;
+      const lh = lhMm(FS, F);
+      const NARROW = 190 / MM; /* ca. 1/3 Seitenbreite */
+      const cell = (x, y, w, h, fill) => doc.rect(x, y, w, h, { fill: fill || null, stroke: "#000000", lw: BD });
+      const nLines = (str, w) => wrapLines(str, w - 2 * PAD, FS, false).length;
+      const textH = (str, w, minLines) => Math.max(minLines || 1, nLines(str, w)) * lh + 2 * PAD;
+      /* Beschriftungszelle: grau, fett, vertikal zentriert */
+      const label = (x, y, w, h, t) => {
+        cell(x, y, w, h, GREY);
+        doc.text(x + PAD, y + (h - lh) / 2 + (baselineMm(0, FS, F) + 0.25), t, FS, true);
       };
-      const body = (x, yy, w, h, str, maxLines) => {
-        doc.rect(x, yy, w, h, { stroke: "#000000", lw: 0.4 });
-        let lines = wrapLines(str, w - 2 * pad, FS, false);
-        if (maxLines && lines.length > maxLines) { lines = lines.slice(0, maxLines); lines[maxLines - 1] = lines[maxLines - 1].replace(/\s*\S{0,2}$/, "") + " …"; }
-        lines.forEach((ln, i) => { if (ln) doc.text(x + pad, baselineMm(yy + pad + i * lhMm(FS, F), FS, F), ln, FS, false); });
+      /* Inhaltszelle: weiß, oben ausgerichtet, ggf. gekürzt */
+      const content = (x, y, w, h, str, maxLines) => {
+        cell(x, y, w, h);
+        let lines = wrapLines(str, w - 2 * PAD, FS, false);
+        if (maxLines && lines.length > maxLines) { lines = lines.slice(0, maxLines); lines[maxLines - 1] += " …"; }
+        lines.forEach((ln, k) => { if (ln) doc.text(x + PAD, baselineMm(y + PAD + k * lh, FS, F) + 0.25, ln, FS, false); });
       };
-      const linesH = (str, w) => wrapLines(str, w - 2 * pad, FS, false).length * lhMm(FS, F) + 2 * pad;
+      /* vertikal zentrierter Einzeiler in weißer Zelle */
+      const valueMid = (x, y, w, h, t) => {
+        cell(x, y, w, h);
+        doc.text(x + PAD, y + (h - lh) / 2 + (baselineMm(0, FS, F) + 0.25), t, FS, false);
+      };
+      const HH = 5.2;
+
+      doc.text(L, 20, "Servicereport", 10, true);
+      doc.text(L, 26, "Auftrag : " + d.nr, 9, false);
+      let y = 31;
+
+      /* 1) Kunde | Auftragnehmer und Einsatzort | Zuständig: EINE durchgehende Tabelle */
       [["Kunde", d.kunde, "Auftragnehmer", d.auftragnehmer], ["Einsatzort", d.einsatzort, "Zuständig", d.zustaendig]].forEach((r) => {
-        head(L, y, HALF, r[0]); head(L + HALF, y, HALF, r[2]);
-        y += 7;
-        const h = Math.max(14, linesH(r[1], HALF), linesH(r[3], HALF));
-        body(L, y, HALF, h, r[1], 6); body(L + HALF, y, HALF, h, r[3], 6);
-        y += h + 4;
+        label(L, y, HALF, HH, r[0]); label(L + HALF, y, HALF, HH, r[2]);
+        y += HH;
+        const h = Math.max(textH(r[1], HALF, 3), textH(r[3], HALF, 3));
+        content(L, y, HALF, h, r[1], 6); content(L + HALF, y, HALF, h, r[3], 6);
+        y += h;
       });
-      head(L, y, 45, "Starttermin"); head(L + 45, y, 45, "Fertigtermin");
-      y += 7;
-      body(L, y, 45, 8, d.start); body(L + 45, y, 45, 8, d.ende);
-      y += 8 + 5;
-      head(L, y, HALF, "Mitarbeiter"); y += 7;
-      body(L, y, HALF, Math.max(8, linesH(d.mitarbeiter, HALF)), d.mitarbeiter, 3);
-      y += Math.max(8, linesH(d.mitarbeiter, HALF)) + 5;
-      head(L, y, W, "Beschreibung"); y += 7;
-      body(L, y, W, 8, d.beschr1, 1); y += 8;
-      body(L, y, W, 8, d.beschr2, 1); y += 8 + 5;
-      head(L, y, W, "Ausgeführte Arbeiten"); y += 7;
-      const SIG_Y = 232;
-      const avail = SIG_Y - 6 - y;
-      const maxLines = Math.max(1, Math.floor((avail - 2 * pad) / lhMm(FS, F)));
-      body(L, y, W, Math.max(20, Math.min(avail, linesH(d.arbeiten, W))), d.arbeiten, maxLines);
-      /* Unterschriften – Striche kommen live aus dem Speicher (sigs), nie aus Storage */
-      const BW = 88, BH = 38;
-      [["Unterschrift Mitarbeiter", d.nameMa, sigs && sigs.ma, L], ["Unterschrift Kunde", d.nameKunde, sigs && sigs.kunde, L + W - BW]].forEach(([cap, name, st, x]) => {
-        doc.rect(x, SIG_Y, BW, BH, { stroke: "#000000", lw: 0.4 });
-        doc.strokes(x, SIG_Y, BW, BH, st, 0.9);
-        doc.text(x, SIG_Y + BH + 5, cap, 9, false);
-        doc.text(x, SIG_Y + BH + 5 + lhMm(9, 1.25), (d.datum + " " + name).trim(), 9, false);
+
+      /* 2) Termine: schmale Tabelle, zwei gestapelte Zeilen */
+      y += 5;
+      const lw = NARROW * 0.4, vw = NARROW - lw, RH = 5.6;
+      label(L, y, lw, RH, "Starttermin"); valueMid(L + lw, y, vw, RH, d.start);
+      y += RH;
+      label(L, y, lw, RH, "Fertigtermin"); valueMid(L + lw, y, vw, RH, d.ende);
+      y += RH;
+
+      /* 3) Mitarbeiter: gleiche schmale Breite */
+      y += 4;
+      label(L, y, NARROW, HH, "Mitarbeiter"); y += HH;
+      const mh = textH(d.mitarbeiter, NARROW, 1) + 0.6;
+      content(L, y, NARROW, mh, d.mitarbeiter, 3); y += mh;
+
+      /* 4) Beschreibung + Ausgeführte Arbeiten: eine durchgehende Tabelle */
+      y += 4;
+      label(L, y, W, HH, "Beschreibung"); y += HH;
+      content(L, y, W, textH(d.beschr1, W, 1), d.beschr1, 2); y += textH(d.beschr1, W, 1);
+      content(L, y, W, textH(d.beschr2, W, 1), d.beschr2, 2); y += textH(d.beschr2, W, 1);
+      label(L, y, W, HH, "Ausgeführte Arbeiten"); y += HH;
+      const maxArb = Math.max(2, Math.floor((236 - y - 2 * PAD) / lh));
+      const ah = textH(d.arbeiten, W, 1);
+      content(L, y, W, Math.min(ah, maxArb * lh + 2 * PAD), d.arbeiten, maxArb);
+      y += Math.min(ah, maxArb * lh + 2 * PAD);
+
+      /* 5) Unterschriften: ca. 45 pt unter dem Text, zwei aneinanderstoßende Boxen, linksbündig */
+      y += 45 / MM;
+      const BW = 135 / MM, SH = 50 / MM, CH = 2 * lh + 2 * PAD;
+      [["Unterschrift Mitarbeiter", d.nameMa, sigs && sigs.ma, L], ["Unterschrift Kunde", d.nameKunde, sigs && sigs.kunde, L + BW]].forEach(([cap, name, st, x]) => {
+        cell(x, y, BW, SH);
+        const fw = Math.min(BW - 2, (SH - 2) * 88 / 38), fh = fw * 38 / 88;
+        doc.strokes(x + (BW - fw) / 2, y + (SH - fh) / 2, fw, fh, st, 0.8);
+        cell(x, y + SH, BW, CH, GREY);
+        doc.text(x + PAD, baselineMm(y + SH + PAD, FS, F) + 0.25, cap, FS, true);
+        doc.text(x + PAD, baselineMm(y + SH + PAD + lh, FS, F) + 0.25, (d.datum + " " + name).trim(), FS, true);
       });
-      doc.text(L, 289, "Auftrag : " + d.nr, 9, false);
+
+      /* 6) Fußzeile mit dünner Linie */
+      doc.line(L, 282, L + W, 282, 0.3, "#000000");
+      doc.text(L, 286.5, "Auftrag : " + d.nr, 8, false);
       const pg = "1/1";
-      doc.text(L + W - textWidthMm(pg, 9, false), 289, pg, 9, false);
+      doc.text(L + W - textWidthMm(pg, 8, false), 286.5, pg, 8, false);
       return doc.build("Servicereport " + d.nr);
     }
 
