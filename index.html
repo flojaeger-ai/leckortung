@@ -1107,7 +1107,7 @@
 
   <script>
   (function () {
-    const APP_VERSION = 30; /* Version 30 */
+    const APP_VERSION = 31; /* Version 31 */
     const STORAGE_CURRENT = "leckortung.current";
     const STORAGE_LIST = "leckortung.reports";
     const DB_NAME = "leckortung";
@@ -1372,7 +1372,7 @@
           { nr: "WSORT0001", text: "Leckageortung", menge: "1,00", einheit: "Stck", pos: "01.0010" },
           { nr: "MV10101", text: "Energiekostenzuschlag für Leckageortung", menge: "1,00", einheit: "psch", pos: "01.0020" }
         ],
-        /* Namen unter den Unterschriften (die Unterschriften selbst werden nie gespeichert) */
+        /* Namen unter den Unterschriften (die Unterschriften selbst liegen ab v31 pro Auftrag in IndexedDB "leckortung-signaturen") */
         sigNameMa: "",
         sigNameKunde: "",
         kundeEmail: ""
@@ -2739,6 +2739,7 @@
     }
     function isPristineAuftrag(r) {
       if (!r) return true;
+      if (sigStore.owner === r.id && (sigStore.ma.length || sigStore.kunde.length)) return false;
       if (r.photos && r.photos.length) return false;
       const fresh = freshAuftrag();
       return auftragContentEquals(r, fresh);
@@ -2799,6 +2800,8 @@
       reports = reports.filter((r) => r.id !== id);
       persistList();
       try { await idbDeleteAuftragPhotos(id); } catch (e) {}
+      await sigDeleteFor(id);
+      if (sigStore.owner === id) { clearTimeout(sigSaveTimer); sigSaveTimer = null; sigStore.ma = []; sigStore.kunde = []; sigStore.owner = null; }
       if (current.id === id) {
         current = freshAuftrag();
         persistCurrent();
@@ -2827,7 +2830,7 @@
             Body = { "format": "leckortung-auftrag", "formatVersion": 1, "appVersion": 22, "auftragsNr", "status": "abgeschlossen",
                      "abgeschlossenAm": ISO, "meta": {...}, "values": {...}, "mitarbeiter": {...},
                      "photos": [ { order, id, name, comment, druck, annotated, annotationsRelative: [...] } ] }
-            Fotos nur als Metadaten (ohne Bilddaten). Unterschriften sind NIE enthalten (sie existieren nur im Arbeitsspeicher
+            Fotos nur als Metadaten (ohne Bilddaten). Unterschriften sind NIE enthalten (sie liegen getrennt pro Auftrag in IndexedDB
             und landen ausschließlich in den lokal erzeugten PDFs). Antwort 2xx = angenommen.
     */
     const STORAGE_SETTINGS = "leckortung.settings";
@@ -3647,7 +3650,7 @@
     /* ================= Dokumente (3): PDF-Writer, DOCX-Writer, Unterschriften ================= */
     /* Version 18 – erzeugt wie das echte EasyTec drei Dateien:
        1) <Nr>_Leckortungsbericht.pdf  2) <Nr>_Servicereport.pdf  3) <Nr>_Notizen.docx
-       Unterschriften liegen NUR im Arbeitsspeicher (sigStore) – nie in localStorage, IndexedDB oder JSON-Exporten. */
+       Unterschriften (sigStore) werden ab v31 pro Auftrag in einer eigenen IndexedDB gespeichert – nie in JSON-Exporten. */
     const HELV_W = [278,278,355,556,556,889,667,191,333,333,389,584,278,333,278,278,556,556,556,556,556,556,556,556,556,556,278,278,584,584,584,556,1015,667,667,722,722,667,611,778,722,278,500,667,556,833,722,778,667,778,722,667,611,722,667,944,667,667,611,278,278,278,469,556,333,556,556,500,556,556,278,556,556,222,222,500,222,833,556,556,556,556,333,500,278,556,500,722,500,500,500,334,260,334,584,0,556,350,222,556,333,1000,556,556,333,1000,667,333,1000,350,611,350,350,222,222,333,333,350,556,1000,333,1000,500,333,944,350,500,667,278,333,556,556,556,556,260,556,333,737,370,556,584,333,737,552,400,549,333,333,333,576,537,333,333,333,365,556,834,834,834,611,667,667,667,667,667,667,1000,722,667,667,667,667,278,278,278,278,722,722,778,778,778,778,778,584,778,722,722,722,722,667,667,611,556,556,556,556,556,556,889,500,556,556,556,556,278,278,278,278,556,556,556,556,556,556,556,549,611,556,556,556,556,500,556,500];
     const HELV_WB = [278,333,474,556,556,889,722,238,333,333,389,584,278,333,278,278,556,556,556,556,556,556,556,556,556,556,333,333,584,584,584,611,975,722,722,722,722,667,611,778,722,278,556,722,611,833,722,778,667,778,722,667,611,722,667,944,667,667,611,333,278,333,584,556,333,556,611,556,611,556,333,611,611,278,278,556,278,889,611,611,611,611,389,556,333,611,556,778,556,556,500,389,280,389,584,0,556,350,278,556,500,1000,556,556,333,1000,667,333,1000,350,611,350,350,278,278,500,500,350,556,1000,333,1000,556,333,944,350,500,667,278,333,556,556,556,556,280,556,333,737,370,556,584,333,737,552,400,549,333,333,333,576,556,333,333,333,365,556,834,834,834,611,722,722,722,722,722,722,1000,722,667,667,667,667,278,278,278,278,722,722,778,778,778,778,778,584,778,722,722,722,722,667,667,611,556,556,556,556,556,556,889,556,556,556,556,556,278,278,278,278,611,611,611,611,611,611,611,549,611,611,611,611,611,556,611,556];
     const MM = 72 / 25.4;
@@ -4401,14 +4404,71 @@
       return out;
     }
 
-    /* ----- Unterschriften: NUR im Arbeitsspeicher ----- */
+    /* ----- Unterschriften (v31): pro Auftrag dauerhaft gespeichert, bis der Auftrag gelöscht wird -----
+       Eigene IndexedDB "leckortung-signaturen" (Store "sigs", Schlüssel = Auftrags-id) – rein additiv,
+       bestehende Daten (localStorage, Foto-DB) bleiben unberührt. Gespeichert werden die Striche als
+       Vektor (normierte Koordinaten, 4 Nachkommastellen) – kleiner als ein PNG.
+       Nie in einen anderen Auftrag übernommen: Laden/Speichern immer nur über current.id; keine Bibliothek,
+       nicht im JSON-Export/Import, beim Import "als Kopie" (neue id) also leer. */
     const sigStore = { owner: null, ma: [], kunde: [] };
     let sigTab = "ma";
-    function sigClearAll() { sigStore.ma = []; sigStore.kunde = []; sigStore.owner = null; }
-    function sigSyncOwner() {
-      if (sigStore.owner && sigStore.owner !== current.id) { sigStore.ma = []; sigStore.kunde = []; }
-      sigStore.owner = current.id;
+    let sigLoadPromise = Promise.resolve();
+    let sigDbPromise = null;
+    function openSigDb() {
+      if (sigDbPromise) return sigDbPromise;
+      sigDbPromise = new Promise((resolve, reject) => {
+        const req = indexedDB.open("leckortung-signaturen", 1);
+        req.onupgradeneeded = () => { const db = req.result; if (!db.objectStoreNames.contains("sigs")) db.createObjectStore("sigs", { keyPath: "auftragId" }); };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+      return sigDbPromise;
     }
+    async function sigDbOp(mode, fn) {
+      const db = await openSigDb();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction("sigs", mode);
+        let out;
+        const r = fn(tx.objectStore("sigs"));
+        if (r) r.onsuccess = () => { out = r.result; };
+        tx.oncomplete = () => resolve(out);
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+    const sigRound = (strokes) => (strokes || []).map((st) => st.map((p) => [Math.round(p[0] * 1e4) / 1e4, Math.round(p[1] * 1e4) / 1e4]));
+    function sigLoadFor(id) {
+      sigLoadPromise = sigDbOp("readonly", (st) => st.get(id)).then((rec) => {
+        if (sigStore.owner !== id || !rec) return;
+        let changed = false;
+        ["ma", "kunde"].forEach((k) => { if (!sigStore[k].length && Array.isArray(rec[k]) && rec[k].length) { sigStore[k] = rec[k]; changed = true; } });
+        if (changed && (view === "unterschrift" || view === "report" || view === "overview")) renderMain();
+      }).catch((e) => console.warn("Unterschriften laden", e));
+      return sigLoadPromise;
+    }
+    let sigSaveTimer = null;
+    function sigPersist() {
+      const id = sigStore.owner;
+      if (!id) return Promise.resolve();
+      clearTimeout(sigSaveTimer);
+      const ma = sigRound(sigStore.ma), kunde = sigRound(sigStore.kunde);
+      const p = (ma.length || kunde.length)
+        ? sigDbOp("readwrite", (st) => st.put({ auftragId: id, ma, kunde, updatedAt: nowIso() }))
+        : sigDbOp("readwrite", (st) => st.delete(id));
+      return p.catch((e) => { console.warn("Unterschrift speichern", e); toast("Unterschrift konnte nicht gespeichert werden.", true); });
+    }
+    function sigPersistSoon() { clearTimeout(sigSaveTimer); sigSaveTimer = setTimeout(sigPersist, 250); }
+    function sigDeleteFor(id) { return sigDbOp("readwrite", (st) => st.delete(id)).catch(() => {}); }
+    window.addEventListener("pagehide", () => { if (sigSaveTimer) sigPersist(); });
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden" && sigSaveTimer) sigPersist(); });
+    function sigSyncOwner() {
+      if (sigStore.owner !== current.id) {
+        if (sigStore.owner && sigSaveTimer) sigPersist();
+        sigStore.ma = []; sigStore.kunde = [];
+        sigStore.owner = current.id;
+        sigLoadFor(current.id);
+      }
+    }
+    async function sigEnsure() { sigSyncOwner(); await sigLoadPromise; }
     function sigPresent(k) { sigSyncOwner(); return sigStore[k].length > 0; }
     function sigBothPresent() { return sigPresent("ma") && sigPresent("kunde"); }
 
@@ -4430,7 +4490,7 @@
             <input type="text" class="sig-input" data-mit="${nameId}" id="mit-${nameId}" value="${attr(m[nameId] || "")}" placeholder="${attr(namePh)}" aria-label="Name" />
             ${isK ? `<div class="sig-mailrow"><label for="mit-kundeEmail">E-Mail</label><input type="email" class="sig-input" data-mit="kundeEmail" id="mit-kundeEmail" value="${attr(m.kundeEmail || "")}" placeholder="E-Mail-Adresse nicht vorhanden" /></div>` : ""}
           </div>
-          <p class="sig-note">Die Unterschrift bleibt nur im Arbeitsspeicher und wird nach dem Erzeugen der Dokumente oder beim Neuladen gelöscht. Sie wird nie gespeichert.</p>
+          <p class="sig-note">Die Unterschrift wird nur für diesen Auftrag gespeichert und mit dem Auftrag gelöscht. Sie wird nie in andere Aufträge übernommen.</p>
         </div>`;
     }
 
@@ -4481,7 +4541,7 @@
         (evs.length ? evs : [e]).forEach((ev) => cur.push(pt(ev)));
         redraw();
       });
-      const done = () => { cur = null; };
+      const done = () => { if (cur) sigPersistSoon(); cur = null; };
       canvas.addEventListener("pointerup", done);
       canvas.addEventListener("pointercancel", done);
       canvas.addEventListener("contextmenu", (e) => e.preventDefault());
@@ -4494,12 +4554,14 @@
     function sigClearCurrent() {
       sigSyncOwner();
       sigStore[sigTab] = [];
+      sigPersist();
       if (view === "unterschrift") renderMain();
       toast("Unterschrift gelöscht");
     }
     function sigSaveClick() {
       sigSyncOwner();
-      toast("Unterschrift übernommen (nur Arbeitsspeicher, wird nicht gespeichert)");
+      sigPersist();
+      toast("Unterschrift gespeichert (nur für diesen Auftrag)");
       showView("overview");
     }
 
@@ -4633,7 +4695,7 @@
       try {
         if (view === "fotodetail") readPhotoDetailIntoModel();
         persistCurrent();
-        sigSyncOwner();
+        await sigEnsure();
         toast("Dokumente werden erzeugt…");
         const meta = current.meta || {};
         const base = safeFilePart(meta.auftragsNr || (current.values && current.values.schadenNr) || (current.values && current.values.datum) || current.id) || "Auftrag";
@@ -4646,8 +4708,6 @@
           new File([pdf2], base + "_Servicereport.pdf", { type: "application/pdf" }),
           new File([docx], base + "_Notizen.docx", { type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" })
         ];
-        sigClearAll();
-        if (view === "unterschrift" || view === "report" || view === "overview") renderMain();
         showDocsSheet(files);
       } catch (err) {
         console.error(err);
@@ -4756,7 +4816,7 @@
         if (!current) throw new Error("Kein Auftrag");
         if (view === "fotodetail") readPhotoDetailIntoModel();
         persistCurrent();
-        sigSyncOwner();
+        await sigEnsure();
         const meta = current.meta || {};
         const base = safeFilePart(meta.auftragsNr || (current.values && current.values.schadenNr) || (current.values && current.values.datum) || current.id) || "Auftrag";
         let bytes, name;
@@ -4805,7 +4865,7 @@
       o.id = "docsOverlay";
       o.innerHTML = `<div class="choice-dialog docs-dialog" role="dialog" aria-modal="true" aria-labelledby="docsTitle">
         <h3 id="docsTitle">Dokumente erstellt</h3>
-        <p>Tippen Sie jedes Dokument einzeln an, um es zu speichern oder zu teilen. Die Unterschriften wurden aus dem Speicher gelöscht.</p>
+        <p>Tippen Sie jedes Dokument einzeln an, um es zu speichern oder zu teilen.</p>
         <div class="docs-list">${files.map((f, i) => `<button type="button" class="btn docs-file" data-doc="${i}"><span>${escapeHtml(labels[i] || f.name)}</span><small>${escapeHtml(f.name)} · ${fileSizeLabel(f)}</small></button>`).join("")}</div>
         <div class="choice-actions"><button type="button" class="btn primary" id="docsAll">Alle speichern (3)</button><button type="button" class="btn" id="docsClose">Schließen</button></div>
       </div>`;
