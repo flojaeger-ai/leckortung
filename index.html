@@ -1107,7 +1107,7 @@
 
   <script>
   (function () {
-    const APP_VERSION = 31; /* Version 31 */
+    const APP_VERSION = 32; /* Version 32 */
     const STORAGE_CURRENT = "leckortung.current";
     const STORAGE_LIST = "leckortung.reports";
     const DB_NAME = "leckortung";
@@ -1149,6 +1149,9 @@
         id: "allgemein",
         title: "Allgemeine Informationen",
         fields: [
+          /* v32: Adressblock (Rechnungsempfänger) und Objekt (Einsatzort) für Seite 1 des Berichts; leer = Kundenadresse */
+          { type: "textarea", id: "rechnungsempfaenger", label: "Rechnungsempfänger", placeholder: "z. B. Versicherung, Abteilung, Straße, PLZ Ort (je Zeile eine Adresszeile, max. 5) – leer = Kundenadresse" },
+          { type: "textarea", id: "objektEinsatzort", label: "Einsatzort", placeholder: "z. B. Gebäude, Straße, PLZ Ort (je Zeile eine Zeile, max. 4) – leer = Kundenadresse" },
           { type: "text", id: "versicherungsNr", label: "Versicherungs-Nr." },
           { type: "text", id: "schadenNr", label: "Schaden-Nr." },
           { type: "text", id: "kundenAuftragsnummer", label: "Kunden Auftragsnummer" },
@@ -3409,8 +3412,11 @@
       const messDatum = dateOnly(v.messterminVon) || dateOnly(v.datum) || berichtDatum;
       const messVon = timeOnly(v.messterminVon);
       const messBis = timeOnly(v.messterminBis);
-      const objekt = [meta.kunde, meta.strasse, [meta.plz, meta.ort].filter(Boolean).join(" ")].filter(Boolean).join(", ");
-      const empf = [meta.anrede, meta.kunde, meta.strasse, [meta.plz, meta.ort].filter(Boolean).join(" ")].filter(Boolean);
+      const pvLines = (t, max) => String(t == null ? "" : t).split(/\r?\n/).map((x) => x.trim()).filter(Boolean).slice(0, max);
+      const objLinesPv = pvLines(v.objektEinsatzort, 4);
+      const objekt = objLinesPv.length ? objLinesPv.join(", ") : [meta.kunde, meta.strasse, [meta.plz, meta.ort].filter(Boolean).join(" ")].filter(Boolean).join(", ");
+      const empfPv = pvLines(v.rechnungsempfaenger, 5);
+      const empf = empfPv.length ? empfPv : [meta.anrede, meta.kunde, meta.strasse, [meta.plz, meta.ort].filter(Boolean).join(" ")].filter(Boolean);
 
       const page1 = `
         <div class="sender">Watersolution GmbH - Fritz-Karl-Henkel-Straße 14 - 67454 Haßloch</div>
@@ -3975,7 +3981,21 @@
       const sender = "Watersolution GmbH - Fritz-Karl-Henkel-Straße 14 - 67454 Haßloch";
       T(X0, 36.62, sender, false, 6.96);
       doc.rect(X0, 36.87, textWidthMm(sender, 6.96, false), 0.17, { fill: BLACK });
-      [meta.anrede, meta.kunde, meta.strasse, plzOrt].filter(filled).forEach((ln, i) => T(X0, 41.74 + i * 4.233, ln, false, 9.96));
+      /* v32: Rechnungsempfänger (max. 5 Zeilen, Breite bis 95 mm) – leer = Kundenadresse wie bisher */
+      const clipSz = (s, maxW, size, bold) => {
+        s = String(s == null ? "" : s).trim();
+        if (textWidthMm(s, size, bold) <= maxW) return s;
+        while (s.length > 1 && textWidthMm(s + "...", size, bold) > maxW) s = s.slice(0, -1);
+        return s + "...";
+      };
+      const linesOf = (txt, max) => {
+        const l = String(txt == null ? "" : txt).split(/\r?\n/).map((x) => x.trim()).filter(Boolean);
+        if (l.length > max) { l.length = max; l[max - 1] = l[max - 1] + " ..."; }
+        return l;
+      };
+      const empfLines = linesOf(v.rechnungsempfaenger, 5);
+      (empfLines.length ? empfLines : [meta.anrede, meta.kunde, meta.strasse, plzOrt].filter(filled))
+        .forEach((ln, i) => T(X0, 41.74 + i * 4.233, clipSz(ln, 95, 9.96, false), false, 9.96));
       /* rechter Block */
       const RX = 161.92;
       T(RX, 36.62, "Bitte bei Rückfragen und", false, 6.96);
@@ -3991,7 +4011,10 @@
       T(RX, 79.50, "www.service-watersolution.de", false, 6.96);
       /* Objekt */
       T(X0, 65.49, "Objekt:");
-      [meta.kunde, meta.strasse, plzOrt].filter(filled).forEach((ln, i) => T(49.49, 65.49 + i * 4.77, clip(ln, 140)));
+      /* v32: Einsatzort (max. 4 Zeilen, Breite bis 105 mm) – leer = Kundenadresse wie bisher */
+      const objLines = linesOf(v.objektEinsatzort, 4);
+      (objLines.length ? objLines : [meta.kunde, meta.strasse, plzOrt].filter(filled))
+        .forEach((ln, i) => T(49.49, 65.49 + i * 4.77, clip(ln, 105)));
       T(X0, 84.03, "Vers.-Schein-Nr.:"); T(49.49, 84.03, clip(v.versicherungsNr, 140));
       T(X0, 88.82, "Schaden-Nr.:"); T(49.49, 88.82, clip(v.schadenNr, 140));
       T(X0, 102.57, "Schadensaufnahme", true, 15.96);
@@ -4147,7 +4170,7 @@
         nr: noQ(meta.auftragsNr || v.schadenNr),
         kunde: kundeAdr,
         auftragnehmer: noQ(m.auftragnehmer),
-        einsatzort: String(m.einsatzort || "").trim() ? m.einsatzort : kundeAdr,
+        einsatzort: String(m.einsatzort || "").trim() ? m.einsatzort : (String(v.objektEinsatzort || "").trim() ? String(v.objektEinsatzort).trim() : kundeAdr),
         zustaendig: String(m.zustaendig || "").trim() || "Nicht definiert",
         start: fmtDateTimeDe(meta.terminVon || m.startzeit),
         ende: fmtDateTimeDe(meta.terminBis || m.endzeit),
@@ -4634,7 +4657,7 @@
         <div class="card">
           ${f("auftragnehmer", "Auftragnehmer", "", true)}
           ${f("zustaendig", "Zuständig", "Nicht definiert", false)}
-          ${f("einsatzort", "Standort", "leer = Kundenadresse", true)}
+          ${f("einsatzort", "Standort", "leer = Einsatzort aus dem Bericht bzw. Kundenadresse", true)}
           ${f("mitarbeiterName", "Mitarbeiter", v.messtechniker || "z. B. DÜW-WS-850 WSB", false)}
           ${f("beschreibung1", "Beschreibung", [meta.kunde, meta.strasse, meta.ort].filter(Boolean).join(", ") || "z. B. WS WEG Am Schlossberg 10, Maikammer", false)}
           ${f("beschreibung2", "Beschreibung 2", meta.auftragsart || "z. B. Wasserschaden", false)}
