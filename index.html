@@ -1080,11 +1080,14 @@
       <button class="btn primary" id="btnNew">Neuer Auftrag</button>
       <button class="btn btn-ico" id="btnOpenAuftrag" title="Auftrag aus Datei öffnen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8l-2-2z"/></svg> 📂 Öffnen</button>
       <button class="btn" id="btnExport">JSON exportieren</button>
+      <button class="btn" id="btnBackupAll" title="Alle Aufträge mit Fotos und Unterschriften als eine Sicherungsdatei speichern (z. B. iCloud Drive / Google Drive)">Alle Berichte sichern</button>
+      <button class="btn" id="btnBackupLoad" title="Sicherungsdatei laden und mit den Berichten auf diesem Gerät abgleichen">Berichte laden</button>
       <button class="btn btn-quiet" id="btnExportEasyTec" title="Fotoreihenfolge, Kommentare, Druck und Markierungen als JSON (ohne Bilder) für die Übergabe an EasyTec">Export für EasyTec</button>
       <button class="btn primary" id="btnDocs" title="Leckortungsbericht (PDF), Servicereport (PDF) und Notizen (Word) erzeugen">Dokumente erzeugen (3)</button>
       <button class="btn" id="btnPrint">Leckortungsbericht (PDF)</button>
     </div>
     <input class="hidden-file" id="icloudFileInput" type="file" accept=".json,application/json" />
+    <input class="hidden-file" id="backupFileInput" type="file" accept=".json,application/json" />
   </aside>
 
   <div class="lightbox" id="lightbox" hidden>
@@ -1107,7 +1110,7 @@
 
   <script>
   (function () {
-    const APP_VERSION = 32; /* Version 32 */
+    const APP_VERSION = 33; /* Version 33 */
     const STORAGE_CURRENT = "leckortung.current";
     const STORAGE_LIST = "leckortung.reports";
     const DB_NAME = "leckortung";
@@ -1399,7 +1402,10 @@
         sync: a.sync === "wartet" || a.sync === "gesendet" ? a.sync : null,
         abgeschlossenAm: a.abgeschlossenAm || null,
         syncedAt: a.syncedAt || null,
-        serverNr: a.serverNr || ""
+        serverNr: a.serverNr || "",
+        /* v33 (additiv): Zeitpunkt der letzten echten Inhaltsänderung + Inhalts-Prüfsumme für den Geräte-Abgleich */
+        changedAt: a.changedAt || null,
+        contentHash: a.contentHash || null
       };
       if (!Array.isArray(out.mitarbeiter.artikel)) out.mitarbeiter.artikel = freshMitarbeiter().artikel;
       /* Version 24: Anrede "Herrn" → "Herr" */
@@ -1599,8 +1605,25 @@
         return Array.isArray(list) ? list.map(migrateAuftrag) : [];
       } catch (e) { return []; }
     }
+    /* v33: Inhalts-Prüfsumme (ohne Zeitstempel/Ansichts-Einstellungen). updatedAt wird bei jedem Speichern
+       gesetzt (auch beim bloßen Öffnen) – für den Abgleich zählt deshalb changedAt (nur bei echter Änderung). */
+    function auftragContentHash(r) {
+      const str = JSON.stringify({ meta: r.meta || {}, values: r.values || {}, mitarbeiter: r.mitarbeiter || {}, photos: r.photos || [], status: r.status || "offen", abgeschlossenAm: r.abgeschlossenAm || null });
+      let h1 = 0x811c9dc5, h2 = 0x01000193;
+      for (let i = 0; i < str.length; i++) { const c = str.charCodeAt(i); h1 = Math.imul(h1 ^ c, 16777619); h2 = Math.imul(h2 + c, 2654435761) ^ (h2 >>> 13); }
+      return (h1 >>> 0).toString(16).padStart(8, "0") + (h2 >>> 0).toString(16).padStart(8, "0") + ":" + str.length;
+    }
+    function auftragChangeTime(r) {
+      const t = Date.parse((r && (r.changedAt || r.updatedAt || r.createdAt)) || "");
+      return isFinite(t) ? t : 0;
+    }
     function persistCurrent() {
       current.updatedAt = nowIso();
+      try {
+        const h = auftragContentHash(current);
+        if (current.contentHash && current.contentHash !== h) current.changedAt = current.updatedAt;
+        current.contentHash = h;
+      } catch (e) {}
       current.photoSortMode = photoSortMode;
       try { localStorage.setItem(STORAGE_CURRENT, JSON.stringify(current)); }
       catch (e) { toast("Speichern nicht möglich (Speicher voll?)", true); }
@@ -4473,6 +4496,7 @@
       const id = sigStore.owner;
       if (!id) return Promise.resolve();
       clearTimeout(sigSaveTimer);
+      sigSaveTimer = null; /* v33: nach dem Speichern zurücksetzen (sonst unnötiges Neuspeichern mit neuem Zeitstempel) */
       const ma = sigRound(sigStore.ma), kunde = sigRound(sigStore.kunde);
       const p = (ma.length || kunde.length)
         ? sigDbOp("readwrite", (st) => st.put({ auftragId: id, ma, kunde, updatedAt: nowIso() }))
@@ -5702,6 +5726,180 @@
       }
     }
 
+
+    /* ================= Version 33: Geräte-Abgleich per Sicherungsdatei =================
+       Datei: { format: "leckortung-sicherung", formatVersion: 1, appVersion, exportedAt, anzahl,
+                auftraege: [ { auftrag, fotos: [{ id, mime, width, height, original, markiert }], unterschrift } ] }
+       - Fotos als Daten-URL genau so, wie sie gespeichert sind (bereits verkleinerte JPEGs), ohne Doppel-Kopie.
+       - Unterschrift nur die des jeweiligen Auftrags (gleiche Auftrags-ID = derselbe Bericht auf anderem Gerät).
+       - Einstellungen werden nicht exportiert.
+       Laden: pro Auftrags-ID gewinnt der neuere Stand (changedAt, sonst updatedAt); gleicher Inhalt = unverändert;
+       neue IDs werden hinzugefügt; es wird nie etwas gelöscht. Unterschriften: jeweils die neuere. */
+    const BACKUP_FORMAT = "leckortung-sicherung";
+    function backupAuftraege() {
+      if (view === "fotodetail") readPhotoDetailIntoModel();
+      persistCurrent();
+      const list = reports.map((r) => (r.id === current.id ? current : r));
+      if (!list.some((r) => r.id === current.id) && !isPristineAuftrag(current)) list.unshift(current);
+      return list;
+    }
+    async function buildBackupFile() {
+      if (sigSaveTimer) await sigPersist();
+      const list = backupAuftraege();
+      const stamp = new Date();
+      const p2 = (n) => String(n).padStart(2, "0");
+      const name = "Leckortung-Sicherung_" + stamp.getFullYear() + "-" + p2(stamp.getMonth() + 1) + "-" + p2(stamp.getDate()) + "_" + p2(stamp.getHours()) + p2(stamp.getMinutes()) + ".json";
+      const parts = ['{"format":"' + BACKUP_FORMAT + '","formatVersion":1,"appVersion":' + APP_VERSION + ',"exportedAt":' + JSON.stringify(nowIso()) + ',"anzahl":' + list.length + ',"auftraege":['];
+      let fotos = 0;
+      for (let i = 0; i < list.length; i++) {
+        const a = list[i];
+        const item = { auftrag: JSON.parse(JSON.stringify(a)), fotos: [], unterschrift: null };
+        if (!item.auftrag.contentHash) item.auftrag.contentHash = auftragContentHash(item.auftrag);
+        for (const p of a.photos || []) {
+          let rec = null;
+          try { rec = await idbGetPhoto(a.id, p.id); } catch (e) {}
+          if (!rec || (!rec.blob && !rec.annotatedBlob)) continue;
+          item.fotos.push({
+            id: p.id, mime: rec.mime || "image/jpeg", width: rec.width || null, height: rec.height || null,
+            original: rec.blob ? await blobToDataUrl(rec.blob) : null,
+            markiert: rec.annotatedBlob ? await blobToDataUrl(rec.annotatedBlob) : null
+          });
+          fotos++;
+        }
+        try {
+          const sig = await sigDbOp("readonly", (st) => st.get(a.id));
+          if (sig && ((sig.ma && sig.ma.length) || (sig.kunde && sig.kunde.length))) item.unterschrift = { ma: sig.ma || [], kunde: sig.kunde || [], updatedAt: sig.updatedAt || "" };
+        } catch (e) {}
+        parts.push((i ? "," : "") + JSON.stringify(item));
+      }
+      parts.push("]}");
+      const file = new File(parts, name, { type: "application/json" });
+      return { file, anzahl: list.length, fotos };
+    }
+    async function backupAllClick() {
+      try {
+        closeDrawer();
+        toast("Sicherung wird erstellt…");
+        const { file, anzahl, fotos } = await buildBackupFile();
+        showSaveFallback([file], "Sicherung erstellt: " + anzahl + (anzahl === 1 ? " Bericht" : " Berichte") + ", " + fotos + " Fotos, " + fileSizeLabel(file) + ". iPhone/iPad: „Teilen“ → „In Dateien sichern“ → iCloud Drive. Android/Mac: „Herunterladen“ und die Datei in Google Drive bzw. iCloud Drive ablegen.");
+        const t = document.getElementById("saveTitle"); if (t) t.textContent = "Alle Berichte sichern";
+      } catch (err) {
+        console.error(err);
+        toast("Sicherung fehlgeschlagen.", true);
+      }
+    }
+    function backupPlan(items) {
+      const plan = [];
+      for (const it of items) {
+        if (!it || !it.auftrag || !it.auftrag.id) continue;
+        const inc = migrateAuftrag(JSON.parse(JSON.stringify(it.auftrag)));
+        const local = current.id === inc.id ? current : reports.find((r) => r.id === inc.id);
+        let action;
+        if (!local) action = "neu";
+        else if (auftragContentHash(local) === auftragContentHash(inc)) action = "gleich";
+        else if (auftragChangeTime(inc) > auftragChangeTime(local)) action = "update";
+        else action = "lokalNeuer";
+        plan.push({ it, inc, local, action });
+      }
+      return plan;
+    }
+    async function restoreBackupPhotos(auftragId, fotos, onlyMissing) {
+      for (const f of fotos || []) {
+        if (!f || !f.id) continue;
+        if (onlyMissing) {
+          let rec = null; try { rec = await idbGetPhoto(auftragId, f.id); } catch (e) {}
+          if (rec && (rec.blob || rec.annotatedBlob)) continue;
+        }
+        const patch = { mime: f.mime || "image/jpeg" };
+        if (f.width) patch.width = f.width;
+        if (f.height) patch.height = f.height;
+        if (f.original) patch.blob = await dataUrlToBlob(f.original);
+        patch.annotatedBlob = f.markiert ? await dataUrlToBlob(f.markiert) : null;
+        if (!patch.blob && !patch.annotatedBlob) continue;
+        await idbMergePhoto(auftragId, f.id, patch);
+      }
+    }
+    async function mergeBackupSig(auftragId, u) {
+      if (!u || !((u.ma && u.ma.length) || (u.kunde && u.kunde.length))) return false;
+      let local = null;
+      try { local = await sigDbOp("readonly", (st) => st.get(auftragId)); } catch (e) {}
+      const lt = local ? Date.parse(local.updatedAt || "") || 0 : -1;
+      const it = Date.parse(u.updatedAt || "") || 0;
+      if (local && lt >= it) return false;
+      if (sigStore.owner === auftragId && sigSaveTimer) await sigPersist();
+      await sigDbOp("readwrite", (st) => st.put({ auftragId, ma: u.ma || [], kunde: u.kunde || [], updatedAt: u.updatedAt || nowIso() }));
+      if (sigStore.owner === auftragId) { sigStore.owner = null; sigSyncOwner(); await sigLoadPromise; }
+      return true;
+    }
+    async function loadBackupObject(obj) {
+      const items = Array.isArray(obj.auftraege) ? obj.auftraege : [];
+      const plan = backupPlan(items);
+      const nUpd = plan.filter((p) => p.action === "update").length;
+      if (nUpd > 0) {
+        const choice = await showChoiceDialog("Berichte laden",
+          nUpd + (nUpd === 1 ? " Bericht wird" : " Berichte werden") + " durch einen neueren Stand aus der Datei ersetzt. Möchten Sie vorher eine Sicherung der Berichte auf diesem Gerät speichern?",
+          [{ label: "Abbrechen", value: "cancel", id: "bkCancel" }, { label: "Erst sichern", value: "backup", id: "bkFirst" }, { label: "Laden", value: "go", primary: true, id: "bkGo" }]);
+        if (choice === "cancel" || choice == null) return null;
+        if (choice === "backup") { await backupAllClick(); return null; }
+      }
+      const res = { neu: 0, aktualisiert: 0, unveraendert: 0, lokalNeuer: 0, unterschriften: 0 };
+      let currentReplaced = false;
+      toast("Berichte werden geladen…");
+      for (const p of plan) {
+        const id = p.inc.id;
+        if (p.action === "neu" || p.action === "update") {
+          await restoreBackupPhotos(id, p.it.fotos, false);
+          const next = p.inc;
+          const idx = reports.findIndex((r) => r.id === id);
+          if (idx >= 0) reports[idx] = JSON.parse(JSON.stringify(next)); else reports.push(JSON.parse(JSON.stringify(next)));
+          if (current.id === id) { current = migrateAuftrag(JSON.parse(JSON.stringify(next))); currentReplaced = true; }
+          res[p.action === "neu" ? "neu" : "aktualisiert"]++;
+        } else {
+          await restoreBackupPhotos(id, p.it.fotos, true);
+          res[p.action === "gleich" ? "unveraendert" : "lokalNeuer"]++;
+        }
+        if (await mergeBackupSig(id, p.it.unterschrift)) res.unterschriften++;
+      }
+      sortReportsNewestFirst();
+      persistList();
+      if (currentReplaced) {
+        photoSortMode = current.photoSortMode === "date" ? "date" : "custom";
+        try { localStorage.setItem(STORAGE_CURRENT, JSON.stringify(current)); } catch (e) {}
+      }
+      renderReportList();
+      renderApp();
+      return res;
+    }
+    async function backupLoadFile(file) {
+      if (!file) return;
+      let obj;
+      try { obj = JSON.parse(await file.text()); } catch (err) { console.error(err); toast("Datei konnte nicht gelesen werden.", true); return; }
+      try {
+        if (obj && obj.format === BACKUP_FORMAT) {
+          const res = await loadBackupObject(obj);
+          if (!res) return;
+          const parts = [res.neu + " neu", res.aktualisiert + " aktualisiert", res.unveraendert + " unverändert"];
+          if (res.lokalNeuer) parts.push(res.lokalNeuer + " hier neuer (behalten)");
+          await showChoiceDialog("Berichte geladen", escapeHtml(parts.join(", ")) + "." + (res.unterschriften ? "<br>" + res.unterschriften + " Unterschrift(en) übernommen." : "") + "<br>Es wurde nichts gelöscht.", [{ label: "OK", value: "ok", primary: true, id: "bkOk" }]);
+        } else if (looksLikeAuftrag(obj)) {
+          await importAuftragFromObject(obj);
+        } else toast("Die Datei ist keine Leckortung-Sicherung.", true);
+      } catch (err) {
+        console.error(err);
+        toast("Laden fehlgeschlagen.", true);
+      }
+    }
+    document.getElementById("btnBackupAll").addEventListener("click", () => { backupAllClick(); });
+    document.getElementById("btnBackupLoad").addEventListener("click", () => {
+      const inp = document.getElementById("backupFileInput");
+      inp.value = "";
+      inp.click();
+    });
+    document.getElementById("backupFileInput").addEventListener("change", (e) => {
+      const file = e.target.files && e.target.files[0];
+      e.target.value = "";
+      if (file) { closeDrawer(); backupLoadFile(file); }
+    });
 
     /* ================= Version 28: Vergrößern-Icon an allen mehrzeiligen Textfeldern ================= */
     const ICO_EXPAND = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3h7v7h-2V6.41l-5.3 5.3-1.4-1.42L17.59 5H14V3zM3 14h2v3.59l5.3-5.3 1.4 1.42L6.41 19H10v2H3v-7z"/></svg>';
