@@ -1768,6 +1768,18 @@ window.addEventListener("message", async (e) => {
     try { busy(true, "PDF wird geöffnet …"); await loadPdf(new Uint8Array(d.buffer), d.name || "Dokument.pdf", null); fileHandle = null; }
     catch (err) { console.error(err); alert("Die Datei konnte nicht geöffnet werden.\n" + (err && err.message ? err.message : err)); }
     finally { busy(false); }
+  } else if (d.type === "pdfed-query") {
+    window.parent.postMessage({ type: "pdfed-state", loaded: !!pdfBytes, name: fileName || "", dirty: !!(pdfBytes && isDirty()) }, HOST);
+  } else if (d.type === "pdfed-export") {
+    if (!pdfBytes) { window.parent.postMessage({ type: "pdfed-export-result", empty: true }, HOST); return; }
+    try {
+      const bytes = await buildExport();
+      const buf = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+      window.parent.postMessage({ type: "pdfed-export-result", name: outName(), buffer: buf }, HOST, [buf]);
+    } catch (err) {
+      console.error(err);
+      window.parent.postMessage({ type: "pdfed-export-result", error: String(err && err.message ? err.message : err) }, HOST);
+    }
   }
 });
 if (EMBED) window.parent.postMessage({ type: "pdfed-ready" }, HOST);
@@ -1787,7 +1799,7 @@ setTool("write");
     finally { busy(false); }
   }
 })();
-window.__pdfEditor = { get objects() { return objects; }, get formValues() { return formValues; }, get pages() { return pages; }, buildExport, setTool, loadPdf, layoutText, get fileHandle() { return fileHandle; }, outName, setZoom, get baseScale() { return baseScale; } };
+window.__pdfEditor = { get objects() { return objects; }, get formValues() { return formValues; }, get pages() { return pages; }, get loaded() { return !!pdfBytes; }, get fileName() { return fileName; }, buildExport, setTool, loadPdf, layoutText, get fileHandle() { return fileHandle; }, outName, setZoom, get baseScale() { return baseScale; } };
 
 /* ---------- service worker (network-first, auto update) ---------- */
 function setupServiceWorker() {
