@@ -635,7 +635,7 @@
     .sig-tab.active { color: var(--text); border-bottom-color: #f08a00; }
     .sig-wrap { padding: 10px 0 24px; max-width: 760px; margin: 0 auto; }
     .sig-head { background: #5b6573; color: #fff; font-size: 13px; font-weight: 700; letter-spacing: .02em; padding: 10px 12px; border-radius: 6px 6px 0 0; }
-    .sig-area { position: relative; background: #fff; border: 1px solid var(--line); border-top: 0; aspect-ratio: 88 / 38; width: 100%; max-height: 52vh; }
+    .sig-area { position: relative; background: #fff; border: 1px solid var(--line); border-top: 0; aspect-ratio: 88 / 38; width: min(100%, calc(52vh * 88 / 38)); max-height: 52vh; height: auto; margin-inline: auto; }
     .sig-area canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
     .sig-x { position: absolute; left: 10px; bottom: 6px; font-size: 22px; font-weight: 700; color: #777; pointer-events: none; }
     .sig-area::after { content: ""; position: absolute; left: 10px; right: 10px; bottom: 30px; border-bottom: 1px solid #999; pointer-events: none; }
@@ -650,10 +650,11 @@
     .sig-fs-bar { flex: 0 0 auto; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: max(8px, env(safe-area-inset-top, 0px)) 10px 8px; }
     .sig-fs-title { flex: 1 1 120px; font-weight: 700; font-size: 15px; min-width: 0; }
     .sig-fs-hint { flex: 0 0 auto; margin: 0 10px 6px; font-size: 13px; color: #ffe08a; }
-    .sig-fs-stage { position: relative; flex: 1 1 auto; min-height: 0; margin: 0 8px max(8px, env(safe-area-inset-bottom, 0px)); background: #fff; border-radius: 10px; overflow: hidden; touch-action: none; }
-    .sig-fs-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
-    .sig-fs-stage .sig-x { position: absolute; left: 16px; bottom: 10px; font-size: 28px; font-weight: 700; color: #777; pointer-events: none; }
-    .sig-fs-stage::after { content: ""; position: absolute; left: 16px; right: 16px; bottom: 36px; border-bottom: 2px solid #999; pointer-events: none; }
+    .sig-fs-stage { position: relative; flex: 1 1 auto; min-height: 0; margin: 0 8px max(8px, env(safe-area-inset-bottom, 0px)); background: #121821; border-radius: 10px; overflow: hidden; touch-action: none; }
+    .sig-fs-surface { position: absolute; background: #fff; border-radius: 10px; overflow: hidden; touch-action: none; }
+    .sig-fs-surface canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: crosshair; display: block; }
+    .sig-fs-surface .sig-x { position: absolute; left: 16px; bottom: 10px; font-size: 28px; font-weight: 700; color: #777; pointer-events: none; }
+    .sig-fs-surface::after { content: ""; position: absolute; left: 16px; right: 16px; bottom: 36px; border-bottom: 2px solid #999; pointer-events: none; }
     .sig-fs-bar .btn { min-height: 44px; }
     @media print { .sig-fs, .sig-fs-openbtn { display: none !important; } }
     .doc-card { padding: 12px 14px; }
@@ -1123,7 +1124,7 @@
 
   <script>
   (function () {
-    const APP_VERSION = 34; /* Version 34 */
+    const APP_VERSION = 35; /* Version 35 */
     const STORAGE_CURRENT = "leckortung.current";
     const STORAGE_LIST = "leckortung.reports";
     const DB_NAME = "leckortung";
@@ -2840,7 +2841,7 @@
       persistList();
       try { await idbDeleteAuftragPhotos(id); } catch (e) {}
       await sigDeleteFor(id);
-      if (sigStore.owner === id) { clearTimeout(sigSaveTimer); sigSaveTimer = null; sigStore.ma = []; sigStore.kunde = []; sigStore.owner = null; }
+      if (sigStore.owner === id) { clearTimeout(sigSaveTimer); sigSaveTimer = null; sigStore.ma = []; sigStore.kunde = []; sigStore.maAspect = SIG_PAD_ASPECT; sigStore.kundeAspect = SIG_PAD_ASPECT; sigStore.owner = null; }
       if (current.id === id) {
         current = freshAuftrag();
         persistCurrent();
@@ -3689,6 +3690,7 @@
       }
     });
 
+    const SIG_PAD_ASPECT = 88 / 38; /* festes Seitenverhältnis des Unterschriftenfelds / der Speicherung */
     /* ================= Dokumente (3): PDF-Writer, DOCX-Writer, Unterschriften ================= */
     /* Version 18 – erzeugt wie das echte EasyTec drei Dateien:
        1) <Nr>_Leckortungsbericht.pdf  2) <Nr>_Servicereport.pdf  3) <Nr>_Notizen.docx
@@ -4309,7 +4311,9 @@
       const BW = 135 / MM, SH = 50 / MM, CH = 2 * lh + 2 * PAD;
       [["Unterschrift Mitarbeiter", d.nameMa, sigs && sigs.ma, L], ["Unterschrift Kunde", d.nameKunde, sigs && sigs.kunde, L + BW]].forEach(([cap, name, st, x]) => {
         cell(x, y, BW, SH);
-        const fw = Math.min(BW - 2, (SH - 2) * 88 / 38), fh = fw * 38 / 88;
+        const srcA = (st && sigs && st === sigs.ma) ? (sigs.maAspect || SIG_PAD_ASPECT) : ((sigs && sigs.kundeAspect) || SIG_PAD_ASPECT);
+        const iw = BW - 2, ih = SH - 2;
+        const fw = iw / ih > srcA ? ih * srcA : iw, fh = fw / srcA;
         doc.strokes(x + (BW - fw) / 2, y + (SH - fh) / 2, fw, fh, st, 0.8);
         cell(x, y + SH, BW, CH, GREY);
         doc.text(x + PAD, baselineMm(y + SH + PAD, FS, F) + 0.25, cap, FS, true);
@@ -4469,7 +4473,7 @@
        Vektor (normierte Koordinaten, 4 Nachkommastellen) – kleiner als ein PNG.
        Nie in einen anderen Auftrag übernommen: Laden/Speichern immer nur über current.id; keine Bibliothek,
        nicht im JSON-Export/Import, beim Import "als Kopie" (neue id) also leer. */
-    const sigStore = { owner: null, ma: [], kunde: [] };
+    const sigStore = { owner: null, ma: [], kunde: [], maAspect: SIG_PAD_ASPECT, kundeAspect: SIG_PAD_ASPECT };
     let sigTab = "ma";
     let sigLoadPromise = Promise.resolve();
     let sigDbPromise = null;
@@ -4499,7 +4503,12 @@
       sigLoadPromise = sigDbOp("readonly", (st) => st.get(id)).then((rec) => {
         if (sigStore.owner !== id || !rec) return;
         let changed = false;
-        ["ma", "kunde"].forEach((k) => { if (!sigStore[k].length && Array.isArray(rec[k]) && rec[k].length) { sigStore[k] = rec[k]; changed = true; } });
+        ["ma", "kunde"].forEach((k) => {
+          if (!sigStore[k].length && Array.isArray(rec[k]) && rec[k].length) { sigStore[k] = rec[k]; changed = true; }
+          const ak = k + "Aspect";
+          if (rec[ak] && rec[ak] > 0.05) sigStore[ak] = rec[ak];
+          else if (!sigStore[ak]) sigStore[ak] = SIG_PAD_ASPECT;
+        });
         if (changed && (view === "unterschrift" || view === "report" || view === "overview")) renderMain();
       }).catch((e) => console.warn("Unterschriften laden", e));
       return sigLoadPromise;
@@ -4511,8 +4520,9 @@
       clearTimeout(sigSaveTimer);
       sigSaveTimer = null; /* v33: nach dem Speichern zurücksetzen (sonst unnötiges Neuspeichern mit neuem Zeitstempel) */
       const ma = sigRound(sigStore.ma), kunde = sigRound(sigStore.kunde);
+      const rec = { auftragId: id, ma, kunde, maAspect: sigStore.maAspect || SIG_PAD_ASPECT, kundeAspect: sigStore.kundeAspect || SIG_PAD_ASPECT, updatedAt: nowIso() };
       const p = (ma.length || kunde.length)
-        ? sigDbOp("readwrite", (st) => st.put({ auftragId: id, ma, kunde, updatedAt: nowIso() }))
+        ? sigDbOp("readwrite", (st) => st.put(rec))
         : sigDbOp("readwrite", (st) => st.delete(id));
       return p.catch((e) => { console.warn("Unterschrift speichern", e); toast("Unterschrift konnte nicht gespeichert werden.", true); });
     }
@@ -4524,6 +4534,7 @@
       if (sigStore.owner !== current.id) {
         if (sigStore.owner && sigSaveTimer) sigPersist();
         sigStore.ma = []; sigStore.kunde = [];
+        sigStore.maAspect = SIG_PAD_ASPECT; sigStore.kundeAspect = SIG_PAD_ASPECT;
         sigStore.owner = current.id;
         sigLoadFor(current.id);
       }
@@ -4561,10 +4572,14 @@
       const key = sigTab;
       const ctx = canvas.getContext("2d");
       function size() {
+        const parent = canvas.parentElement;
+        const r = (parent || canvas).getBoundingClientRect();
+        const cssW = Math.max(1, r.width), cssH = Math.max(1, r.height);
         const dpr = window.devicePixelRatio || 1;
-        const r = canvas.getBoundingClientRect();
-        canvas.width = Math.max(1, Math.round(r.width * dpr));
-        canvas.height = Math.max(1, Math.round(r.height * dpr));
+        canvas.style.width = cssW + "px";
+        canvas.style.height = cssH + "px";
+        canvas.width = Math.max(1, Math.round(cssW * dpr));
+        canvas.height = Math.max(1, Math.round(cssH * dpr));
         redraw();
       }
       function redraw() {
@@ -4590,6 +4605,7 @@
       canvas.addEventListener("pointerdown", (e) => {
         e.preventDefault();
         sigSyncOwner();
+        sigStore[key + "Aspect"] = SIG_PAD_ASPECT;
         try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
         cur = [pt(e)];
         sigStore[key].push(cur);
@@ -4615,17 +4631,23 @@
       if (fsBtn) fsBtn.addEventListener("click", openSigFullscreen);
     }
 
-    /* ----- v34: Unterschrift im Vollbild (Fullscreen-API, sonst Overlay 100dvh; iOS Safari) ----- */
-    const SIG_PAD_ASPECT = 88 / 38;
+    /* ----- v34/v35: Unterschrift im Vollbild. Seitenverhältnis wird festgehalten (Letterbox),
+       damit z. B. das Ein-/Ausblenden der iOS-Adressleiste die Unterschrift nicht in die Höhe zieht.
+       Beim Übernehmen: zuschneiden, einpassen (contain) ins Feld 88/38, danach so speichern. */
     let sigFsStrokes = [];
     let sigFsOpen = false;
     let sigFsUsedNative = false;
-    function sigCanvasAspect(el) {
-      if (el && el.clientWidth > 8 && el.clientHeight > 8) return el.clientWidth / el.clientHeight;
+    let sigFsLockAspect = null;
+    let sigFsLockW = 0, sigFsLockH = 0;
+    function sigMeasureAspect(el) {
+      if (!el) return SIG_PAD_ASPECT;
+      const r = el.getBoundingClientRect();
+      if (r.width > 8 && r.height > 8) return r.width / r.height;
+      if (el.clientWidth > 8 && el.clientHeight > 8) return el.clientWidth / el.clientHeight;
       return SIG_PAD_ASPECT;
     }
     function sigDeep(strokes) { return (strokes || []).map((st) => st.map((p) => [p[0], p[1]])); }
-    /* Unterschrift beschneiden, Seitenverhältnis erhalten, zentriert in die Zielfläche legen */
+    /* Unterschrift beschneiden, Seitenverhältnis erhalten, zentriert in die Zielfläche legen (contain, nie strecken) */
     function sigMapStrokes(strokes, srcAspect, dstAspect) {
       const srcA = (srcAspect > 0.05) ? srcAspect : SIG_PAD_ASPECT;
       const dstA = (dstAspect > 0.05) ? dstAspect : SIG_PAD_ASPECT;
@@ -4665,7 +4687,8 @@
       let cur = null;
       const pt = (e) => {
         const r = canvas.getBoundingClientRect();
-        return [Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)), Math.min(1, Math.max(0, (e.clientY - r.top) / r.height))];
+        const w = Math.max(1, r.width), h = Math.max(1, r.height);
+        return [Math.min(1, Math.max(0, (e.clientX - r.left) / w)), Math.min(1, Math.max(0, (e.clientY - r.top) / h))];
       };
       canvas.addEventListener("pointerdown", (e) => {
         e.preventDefault();
@@ -4703,8 +4726,10 @@
         </div>
         <p class="sig-fs-hint" id="sigFsHint">Für mehr Platz das Gerät quer halten.</p>
         <div class="sig-fs-stage" id="sigFsStage">
-          <canvas id="sigFsCanvas" aria-label="Unterschrift im Vollbild"></canvas>
-          <span class="sig-x" aria-hidden="true">X</span>
+          <div class="sig-fs-surface" id="sigFsSurface">
+            <canvas id="sigFsCanvas" aria-label="Unterschrift im Vollbild"></canvas>
+            <span class="sig-x" aria-hidden="true">X</span>
+          </div>
         </div>`;
       document.body.appendChild(o);
       const stop = (e) => { e.preventDefault(); };
@@ -4731,13 +4756,7 @@
           try { portrait = window.matchMedia("(orientation: portrait)").matches && Math.min(window.innerWidth, (vv && vv.width) || window.innerWidth) < 900; } catch (e) {}
           hint.hidden = !portrait;
         }
-        const c = document.getElementById("sigFsCanvas");
-        if (!c) return;
-        const dpr = window.devicePixelRatio || 1;
-        const r = c.getBoundingClientRect();
-        c.width = Math.max(1, Math.round(r.width * dpr));
-        c.height = Math.max(1, Math.round(r.height * dpr));
-        sigDrawStrokes(c.getContext("2d"), c, sigFsStrokes);
+        sigFsLayoutSurface();
       };
       o.__fit = fit;
       if (window.visualViewport) { window.visualViewport.addEventListener("resize", fit); window.visualViewport.addEventListener("scroll", fit); }
@@ -4747,21 +4766,57 @@
       document.addEventListener("webkitfullscreenchange", () => { if (sigFsOpen) fit(); });
       return o;
     }
+    function sigFsLayoutSurface() {
+      const stage = document.getElementById("sigFsStage");
+      const surface = document.getElementById("sigFsSurface");
+      const c = document.getElementById("sigFsCanvas");
+      if (!stage || !surface || !c) return;
+      const sr = stage.getBoundingClientRect();
+      const sw = Math.max(1, sr.width), sh = Math.max(1, sr.height);
+      const stageA = sw / sh;
+      if (sigFsLockW && sigFsLockH) {
+        const rotated = (sw > sh) !== (sigFsLockW > sigFsLockH);
+        if (rotated) {
+          const newA = stageA;
+          if (sigFsStrokes.length && sigFsLockAspect) sigFsStrokes = sigMapStrokes(sigFsStrokes, sigFsLockAspect, newA);
+          sigFsLockAspect = newA;
+        }
+      }
+      if (!sigFsLockAspect || sigFsLockAspect < 0.05) sigFsLockAspect = stageA;
+      sigFsLockW = sw; sigFsLockH = sh;
+      const A = sigFsLockAspect;
+      let w, h;
+      if (stageA > A) { h = sh; w = h * A; } else { w = sw; h = w / A; }
+      surface.style.left = ((sw - w) / 2) + "px";
+      surface.style.top = ((sh - h) / 2) + "px";
+      surface.style.width = w + "px";
+      surface.style.height = h + "px";
+      const dpr = window.devicePixelRatio || 1;
+      c.style.width = w + "px";
+      c.style.height = h + "px";
+      c.width = Math.max(1, Math.round(w * dpr));
+      c.height = Math.max(1, Math.round(h * dpr));
+      sigDrawStrokes(c.getContext("2d"), c, sigFsStrokes);
+    }
     async function openSigFullscreen() {
       sigSyncOwner();
       const o = sigFsEl();
-      const src = document.getElementById("sigCanvas");
-      const srcA = sigCanvasAspect(src);
       sigFsOpen = true;
+      sigFsLockAspect = null;
+      sigFsLockW = 0; sigFsLockH = 0;
       document.body.classList.add("sig-fs-open");
       o.classList.add("open");
       const title = document.getElementById("sigFsTitle");
       if (title) title.textContent = (sigTab === "kunde" ? "Unterschrift des Kunden" : "Unterschrift des Monteurs") + " – Vollbild";
       o.__fit();
-      const dest = document.getElementById("sigFsCanvas");
-      sigFsStrokes = sigMapStrokes(sigStore[sigTab], srcA, sigCanvasAspect(dest));
+      const stage = document.getElementById("sigFsStage");
+      const sr = stage ? stage.getBoundingClientRect() : { width: 1, height: 1 };
+      sigFsLockAspect = (sr.width > 8 && sr.height > 8) ? sr.width / sr.height : SIG_PAD_ASPECT;
+      const srcA = sigStore[sigTab + "Aspect"] || SIG_PAD_ASPECT;
+      sigFsStrokes = sigStore[sigTab].length ? sigMapStrokes(sigStore[sigTab], srcA, sigFsLockAspect) : [];
       o.__fit();
-      if (!dest.__bound) { sigBindDraw(dest, () => sigFsStrokes, null); dest.__bound = true; }
+      const dest = document.getElementById("sigFsCanvas");
+      if (dest && !dest.__bound) { sigBindDraw(dest, () => sigFsStrokes, null); dest.__bound = true; }
       try { o.focus(); } catch (e) {}
       sigFsUsedNative = false;
       const fn = o.requestFullscreen || o.webkitRequestFullscreen;
@@ -4778,15 +4833,16 @@
       if (!sigFsOpen) return;
       if (accept) {
         sigSyncOwner();
-        const dest = document.getElementById("sigCanvas");
-        const src = document.getElementById("sigFsCanvas");
-        sigStore[sigTab] = sigMapStrokes(sigFsStrokes, sigCanvasAspect(src), sigCanvasAspect(dest) || SIG_PAD_ASPECT);
+        const srcA = (sigFsLockAspect && sigFsLockAspect > 0.05) ? sigFsLockAspect : sigMeasureAspect(document.getElementById("sigFsCanvas"));
+        sigStore[sigTab] = sigMapStrokes(sigFsStrokes, srcA, SIG_PAD_ASPECT);
+        sigStore[sigTab + "Aspect"] = SIG_PAD_ASPECT;
         sigPersist();
         if (view === "unterschrift") renderMain();
         toast(sigStore[sigTab].length ? "Unterschrift übernommen" : "Unterschrift gelöscht");
       }
       sigFsOpen = false;
       sigFsStrokes = [];
+      sigFsLockAspect = null;
       document.body.classList.remove("sig-fs-open");
       const o = document.getElementById("sigFs");
       if (o) o.classList.remove("open");
@@ -4798,6 +4854,7 @@
     function sigClearCurrent() {
       sigSyncOwner();
       sigStore[sigTab] = [];
+      sigStore[sigTab + "Aspect"] = SIG_PAD_ASPECT;
       sigPersist();
       if (view === "unterschrift") renderMain();
       toast("Unterschrift gelöscht");
@@ -4945,7 +5002,7 @@
         const base = safeFilePart(meta.auftragsNr || (current.values && current.values.schadenNr) || (current.values && current.values.datum) || current.id) || "Auftrag";
         const photoImgs = await collectPhotoImages();
         const pdf1 = buildLeckPdf(photoImgs);
-        const pdf2 = buildServicePdf({ ma: sigStore.ma, kunde: sigStore.kunde });
+        const pdf2 = buildServicePdf({ ma: sigStore.ma, kunde: sigStore.kunde, maAspect: sigStore.maAspect, kundeAspect: sigStore.kundeAspect });
         const docx = buildNotizenDocx();
         const files = [
           new File([pdf1], base + "_Leckortungsbericht.pdf", { type: "application/pdf" }),
@@ -5068,7 +5125,7 @@
         const base = safeFilePart(meta.auftragsNr || (current.values && current.values.schadenNr) || (current.values && current.values.datum) || current.id) || "Auftrag";
         let bytes, name;
         if (kind === "lb") { bytes = buildLeckPdf(await collectPhotoImages()); name = base + "_Leckortungsbericht.pdf"; }
-        else { bytes = buildServicePdf({ ma: sigStore.ma, kunde: sigStore.kunde }); name = base + "_Servicereport.pdf"; }
+        else { bytes = buildServicePdf({ ma: sigStore.ma, kunde: sigStore.kunde, maAspect: sigStore.maAspect, kundeAspect: sigStore.kundeAspect }); name = base + "_Servicereport.pdf"; }
         const buf = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
         pdfEdPost({ type: "pdfed-open", name, buffer: buf }, [buf]);
       } catch (err) {
@@ -6000,7 +6057,7 @@
         }
         try {
           const sig = await sigDbOp("readonly", (st) => st.get(a.id));
-          if (sig && ((sig.ma && sig.ma.length) || (sig.kunde && sig.kunde.length))) item.unterschrift = { ma: sig.ma || [], kunde: sig.kunde || [], updatedAt: sig.updatedAt || "" };
+          if (sig && ((sig.ma && sig.ma.length) || (sig.kunde && sig.kunde.length))) item.unterschrift = { ma: sig.ma || [], kunde: sig.kunde || [], maAspect: sig.maAspect || SIG_PAD_ASPECT, kundeAspect: sig.kundeAspect || SIG_PAD_ASPECT, updatedAt: sig.updatedAt || "" };
         } catch (e) {}
         parts.push((i ? "," : "") + JSON.stringify(item));
       }
@@ -6059,7 +6116,7 @@
       const it = Date.parse(u.updatedAt || "") || 0;
       if (local && lt >= it) return false;
       if (sigStore.owner === auftragId && sigSaveTimer) await sigPersist();
-      await sigDbOp("readwrite", (st) => st.put({ auftragId, ma: u.ma || [], kunde: u.kunde || [], updatedAt: u.updatedAt || nowIso() }));
+      await sigDbOp("readwrite", (st) => st.put({ auftragId, ma: u.ma || [], kunde: u.kunde || [], maAspect: u.maAspect || SIG_PAD_ASPECT, kundeAspect: u.kundeAspect || SIG_PAD_ASPECT, updatedAt: u.updatedAt || nowIso() }));
       if (sigStore.owner === auftragId) { sigStore.owner = null; sigSyncOwner(); await sigLoadPromise; }
       return true;
     }
